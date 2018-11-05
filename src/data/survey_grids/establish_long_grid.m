@@ -14,9 +14,9 @@ close all
 xshore = (-30:3:60)';
 % xshore = ([-15, -10, -5, 0, 5])';
 % loncoord= (-70:1:30);
-loncoord= ([-50, -25, 0, 25]);
+loncoord= ([0]);
 
-fileID = fopen('survey_grid_readable.txt', 'w');
+fileID = fopen('survey_grid_long2.txt', 'w');
 fclose(fileID); 
 
 figure(1), clf, hold on
@@ -66,31 +66,31 @@ for ii = 1 : length(loncoord)
 %     y_w = H*ones(size(x_w));
    
     figure(1)
-        if ii==3
-            plot(easting, northing, 'r.')
-        else
-            plot(easting, northing, '.') 
-        end
+        plot(easting, northing, '.')    
         
     utm_coords = [(Ipt + (1:length(xshore))')'; northing'; easting'; zeros(size(easting'))];    
 %     utm_coords = [northing'; easting'; zeros(size(easting'))];        
     
-%     fileID = fopen('survey_grid_readable.txt', 'a');
+    fileID = fopen('survey_grid_long2.txt', 'a');
 %     fprintf(fileID,['\ncross-shore line ' num2str(ii) '\n\n']);
-%     fmt = '%d %10.10f %10.10f %10.10f\n';
-% %     fmt = '%10.10f %10.10f %10.10f\n';
-%     fprintf(fileID,fmt, utm_coords);
-%     fclose(fileID);    
+    fmt = '%d %10.10f %10.10f %10.10f\n';
+%     fmt = '%10.10f %10.10f %10.10f\n';
+    fprintf(fileID,fmt, utm_coords);
+    fclose(fileID);    
     
     Ipt = Ipt + length(xshore);
     
 end
 
 % select beach-frame coordinates to revert to pixel coordinates 
-% xshore = (-40:1:60)';
-xcoord = ([-15, -10, -5, 0, 5]);
-lonshore= (-50:1:25)';
-% loncoord= ([-30,0,30]);
+
+% % long grid 1
+% xcoord = ([-5]);
+% lonshore= (-50:3:25)';
+
+% long grid 2
+xcoord = ([-13]);
+lonshore= (-50:3:25)';
 
 % flip axis for consistency
     lonshore = -lonshore;
@@ -153,13 +153,13 @@ for ii = 1 : length(xcoord)
     %
         utm_coords = [(Ipt + (1:length(lonshore))')'; northing'; easting'; zeros(size(easting'))];    
 %     utm_coords = [northing'; easting'; zeros(size(easting'))];        
-   
-%     fileID = fopen('survey_grid_readable.txt', 'a');
+    
+    fileID = fopen('survey_grid_long2.txt', 'a');
 %     fprintf(fileID,['\nlongshore line ' num2str(ii) '\n\n']);
-%     fmt = '%d %10.10f %10.10f %10.10f\n';
-% %     fmt = '%10.10f %10.10f %10.10f\n';
-%     fprintf(fileID,fmt, utm_coords);
-%     fclose(fileID);    
+    fmt = '%d %10.10f %10.10f %10.10f\n';
+%     fmt = '%10.10f %10.10f %10.10f\n';
+    fprintf(fileID,fmt, utm_coords);
+    fclose(fileID);    
     
     Ipt = Ipt + length(lonshore);
 end

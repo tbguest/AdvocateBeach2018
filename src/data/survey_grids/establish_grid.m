@@ -14,10 +14,11 @@ close all
 xshore = (-30:3:60)';
 % xshore = ([-15, -10, -5, 0, 5])';
 % loncoord= (-70:1:30);
-loncoord= ([-50, -25, 0, 25]);
+% loncoord= ([-50, -25, 0, 25]);
+loncoord= ([0]);
 
-fileID = fopen('survey_grid_readable.txt', 'w');
-fclose(fileID); 
+% fileID = fopen('survey_grid_readable.txt', 'w');
+% fclose(fileID); 
 
 figure(1), clf, hold on
 
