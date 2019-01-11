@@ -33,6 +33,9 @@ close all
 dn = 'C:\Projects\AdvocateBeach2018\data\raw\images\BeachSurveys\18_10_2018\AM\dense_array1\';
 fn = 'IMG_0345.jpg';
 
+% validation
+dn = 'C:\Projects\AdvocateBeach2018\data\raw\images\LabValidation\';
+
 imnames = dir([dn 'IMG*']);
 
 count = 0;
@@ -40,7 +43,7 @@ count = 0;
 xscl = zeros(1, floor(length(imnames)/2));
 yscl = zeros(1, floor(length(imnames)/2));
 
-for ii = 1:20%length(imnames)
+for ii = 1:length(imnames)
     
     if mod(ii, 2) == 0;
         

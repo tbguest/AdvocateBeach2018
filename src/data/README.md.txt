@@ -1,0 +1,1 @@
+Comment headers need to be added to all these scripts.
