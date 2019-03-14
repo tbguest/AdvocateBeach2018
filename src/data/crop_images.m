@@ -59,9 +59,10 @@ cameraHeight = 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FOR PICAM IMAGES
-dn = ['C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide19\pi74\'];
-dnout = ['C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide19\pi74\cropped'];
+dn = ['C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide15\pi74\'];
+dnout = ['C:\Projects\AdvocateBeach2018\data\processed\images\cropped\pi_cameras\tide15\pi74'];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 % create the folder if it doesn't exist already.
 if notValidation == 1
@@ -89,6 +90,7 @@ for ii = 1:length(imnames)
 %     if mod(counter, 2) == 0;
 
         img = imread([dn imnames(ii).name]);
+%         img = imread([dn 'img1540667045-106253.jpg']);
     %     img = imread([dn fn]);
 
 %         figure(100)
@@ -99,10 +101,21 @@ for ii = 1:length(imnames)
             % mask dims
             hght = floor(size(img, 1)/2);
             wdth = floor(size(img, 2)/2);
-
-            % mask origin
-            h0 = floor(size(img, 1)/4);
-            w0 = floor(size(img, 2)/4);
+            
+            if strcmp(dn,'C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide27\pi74\')
+            % avoid large water droplet on lens cover    
+                
+                % mask origin
+                h0 = floor(size(img, 1)/8*3);
+                w0 = floor(size(img, 2)/4);
+                
+            else
+                
+                % mask origin
+                h0 = floor(size(img, 1)/4);
+                w0 = floor(size(img, 2)/4);
+                
+            end
 
         elseif cameraHeight == 2
 
@@ -130,7 +143,7 @@ for ii = 1:length(imnames)
 
         imwrite(newimg, [dnout '\' imnames(ii).name(1:end-4) '-cropped.jpg'])
 
-%         figure(ii), clf
+%         figure(ii+1), clf
 %             image(newimg)
     
 %     end

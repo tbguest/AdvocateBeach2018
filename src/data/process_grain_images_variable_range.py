@@ -2,24 +2,24 @@
 
 import DGS
 #import pickle
-import os 
+import os
 import errno
 import numpy as np
 import glob
 
 
 def imname2scalefactor(image_file, tide, pinum):
-    
+
     # img has form: img**unixtime-fractionalsecond**-cropped.jpg
     # use this to extract time so the range can be refernced to the sonar data
-    
+
 #    img = "img1540307172-338723-cropped.jpg" #img1540301878-322653
 #    image_file = "img1540304182-837550-cropped.jpg" # from pi71 on tide19
-    
+
     usec = image_file[-29:-19]
     ufrac = image_file[-18:-12]
     utime = usec + "." + ufrac
-        
+
     homechar = "/mnt/c"
 #    rangefile = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
 #            "range_data", "bed_level", "tide" + tide, "sonar" + pinum + ".npy")
@@ -40,34 +40,34 @@ def imname2scalefactor(image_file, tide, pinum):
 #    vvv = np.load(rangefile).item()
 #    rtime = vvv['time']
 #    sonar_range = vvv['bed level']
-        
+
     Ivalidrange = np.argmin(abs(float(utime) + 60*60*3 - rtime)) # adjust for ADT->UTC
     t_resid = np.abs(float(utime) + 60*60*3 - rtime[Ivalidrange])
-    
+
     if t_resid > 60:
         return 0
-    
+
     offset = 75 # [mm] must be measured from physical array setup
     pi_range = sonar_range[Ivalidrange] + offset
-    
+
 #     - Max resolution: 3280 x 2464
 #  - fov: 62.2 x 48.8 deg
-    
+
     ground_width = 2*pi_range*np.tan(62.2/2*np.pi/180)
     mm_per_pix = ground_width/3280
-    
+
 #    # check for consistency with other dimension
 #    ground_width2 = 2*pi_range*np.tan(48.8/2*np.pi/180)
 #    mm_per_pix2 = ground_width2/2464
-    
+
     return mm_per_pix
 
 
-        
-date_str0 = "23_10_2018"
-tide = "19"
-pinum = "71"
-    
+
+date_str0 = "21_10_2018"
+tide = "15"
+pinum = "74"
+
 #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/" + date_str0 + "/horn_growth/selected/cropped"
 #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/tide" + tide + "/pi" + pinum + "/cropped"
 imdir = "/mnt/c/Projects/AdvocateBeach2018/data/processed/images/cropped/pi_cameras/tide" + tide + "/pi" + pinum
@@ -85,14 +85,14 @@ if not os.path.exists(outdir):
 for file in glob.glob(imdir + '/*-cropped.jpg'):
 
     image_file = file
-    
+
 	  #'/home/tristan/Documents/Projects/DigitalGrainSizing/20180809_071614.jpg'
-          
+
     mm_per_pix = imname2scalefactor(image_file, tide, pinum)
-    
+
     if mm_per_pix is 0:
         continue
-        
+
     density = 10 # process every 10 lines
 	  #resolution = 0.162 # mm/pixel [camera height 1]
 #        resolution = 0.123 # mm/pixel [camera height 2]
@@ -113,12 +113,12 @@ for file in glob.glob(imdir + '/*-cropped.jpg'):
 #            w = csv.DictWriter(f, dgs_stats.keys())
 #            w.writeheader()
 #            w.writerow(dgs_stats)
-            
+
 
 #        with open(outpydir + file[len(imdir):-4] + '.json', 'w') as f:
-#            json.dump(dgs_stats, f)    
-            
-    np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)      
+#            json.dump(dgs_stats, f)
+
+    np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)
 
 		# #remove spaces from var names for matlab compatability
 		# dgs_stats['grain_size_bins'] = dgs_stats['grain size bins']

@@ -31,8 +31,8 @@ for ii in tide_range:
     tide = "tide" + str(ii)
     
     gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                          "grainsize_dists", tide, grid_spec + ".npy")
-    
+                          "grainsize", "beach_surveys", tide, grid_spec + ".npy")
+        
     gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                           "GPS", "by_tide", tide, grid_spec + ".npy")
     
@@ -106,18 +106,39 @@ for ii in tide_range:
         xcorr_z_lastz = signal.correlate2d((z-np.mean(z))/np.std(z), (last_z-np.mean(last_z))/np.std(last_z), boundary='symm', mode='same')/mgs.size
         xcorr_sort_lastsort = signal.correlate2d((sort-np.mean(sort))/np.std(sort), (last_sort-np.mean(last_sort))/np.std(last_sort), boundary='symm', mode='same')/mgs.size
         
-    #    plt.figure(1)
-    #    plt.plot(ii, Hs, 'bo')
-    #    
-    #    plt.figure(2)
-    #    plt.plot(ii, pcorr_dz_dmgs, 'bo')
-    #    plt.plot(ii, pcorr_dz_dsort, 'ro')
-    #    plt.plot(ii, pcorr_dmgs_dsort, 'ko')
+        plt.figure(1)
+        plt.plot(ii, Hs, 'bo')
+        
+#        plt.figure(2)
+#        plt.plot(ii, pcorr_dz_dmgs, 'bo')
+#        plt.plot(ii, pcorr_dz_dsort, 'ro')
+#        plt.plot(ii, pcorr_dmgs_dsort, 'ko')
             
-    #    # tide-tide change in z, gsize, sorting
-    #    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(9,7))
-    #    pos1 = ax1.plot(dz, dmgs, 'b.')        
-    #    pos2 = ax2.plot(dz, dsort, 'r.')          
+        # tide-tide change in z, gsize, sorting
+        fig = plt.figure(2)
+        ax1 = fig.add_subplot(211)
+        ax1.plot(dz, dmgs, 'b.')   
+        ax1.set_ylabel('delta mgs [mm]')
+        ax2 = fig.add_subplot(212)
+        ax2.plot(dz, dsort, 'r.')       
+        ax2.set_xlabel('delta z [mm]')
+        ax2.set_ylabel('delta sort [mm]')
+        
+
+        
+        # tide-tide change in z, gsize, sorting
+        fig = plt.figure(3)
+        ax1 = fig.add_subplot(311)
+        ax1.plot(ii, Hs, 'bo')
+        ax1.set_ylabel('Hsig')
+        ax2 = fig.add_subplot(312)
+        ax2.plot(ii, np.sum(dz)*2, 'bo')   
+        ax2.set_ylabel('vol. change [m^3]')
+        ax3 = fig.add_subplot(313)
+        ax3.plot(ii, np.mean(mgs), 'bo')   
+        ax3.set_ylabel('mean grain size [mm]')
+        ax3.set_xlabel('tide')
+#        pos2 = ax2.plot(dz, dsort, 'r.')       
         
     #    fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(9,7))
     #    pos1 = ax1.imshow(dz, cmap='bwr', vmin=-0.25, vmax=0.25)        
@@ -132,13 +153,14 @@ for ii in tide_range:
     #    cmap_limit2 = np.max(np.abs(xcorr_dz_dsort))
     #    cmap_limit3 = np.max(np.abs(xcorr_dmgs_dsort))
         
-        fig2, (ax21, ax22, ax23) = plt.subplots(nrows=3, ncols=1, figsize=(9,7))
-        pos21 = ax21.imshow(xcorr_dz_dmgs, cmap='bwr')  
-        fig2.colorbar(pos21, ax=ax21)   
-        pos22 = ax22.imshow(xcorr_dz_dsort, cmap='bwr')  
-        fig2.colorbar(pos22, ax=ax22) 
-        pos23 = ax23.imshow(xcorr_dmgs_dsort, cmap='bwr')  
-        fig2.colorbar(pos23, ax=ax23)    
+#        fig2, (ax21, ax22, ax23) = plt.subplots(nrows=3, ncols=1, figsize=(9,7))
+#        pos21 = ax21.imshow(xcorr_dz_dmgs, cmap='bwr')  
+#        ax21.ylabel()
+#        fig2.colorbar(pos21, ax=ax21)   
+#        pos22 = ax22.imshow(xcorr_dz_dsort, cmap='bwr')  
+#        fig2.colorbar(pos22, ax=ax22) 
+#        pos23 = ax23.imshow(xcorr_dmgs_dsort, cmap='bwr')  
+#        fig2.colorbar(pos23, ax=ax23)    
         
     #    fig2, (ax21, ax22, ax23) = plt.subplots(nrows=3, ncols=1, figsize=(9,7))
     #    pos21 = ax21.imshow(xcorr_dz_dmgs, cmap='bwr')  

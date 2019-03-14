@@ -54,8 +54,13 @@ def main():
     
     for ii in sample_loc:
             
+#        gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+#                          "grainsize_dists", "LabValidation_x0", date_str0[ii] + tide0[ii])
+        
         gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                          "grainsize_dists", "LabValidation_x0", date_str0[ii] + tide0[ii])
+                          "grainsize", "validation", "LabValidation_xpos05", date_str0[ii] + tide0[ii])
+        
+#        C:\Projects\AdvocateBeach2018\data\processed\grainsize\validation\LabValidation_x0
         
         allfiles = os.listdir(gsizedir)
         

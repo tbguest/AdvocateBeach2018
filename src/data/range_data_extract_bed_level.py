@@ -73,20 +73,20 @@ find_points_of_interest = False
 
 ## tide 21
 ## 24 
-fn1 = "sonar71_2018-10-24-14_14.dat"
-fn1 = "sonar72_2018-10-24-14_14.dat"
-fn1 = "sonar73_2018-10-24-14_14.dat"
-fn1 = "sonar74_2018-10-24-14_15.dat"
-dn = "C:\\Projects\\AdvocateBeach2018\\data\\raw\\range_data\\24_10_2018\\PM\\"
-tide = '21'
+#fn1 = "sonar71_2018-10-24-14_14.dat"
+#fn1 = "sonar72_2018-10-24-14_14.dat"
+#fn1 = "sonar73_2018-10-24-14_14.dat"
+#fn1 = "sonar74_2018-10-24-14_15.dat"
+#dn = "C:\\Projects\\AdvocateBeach2018\\data\\raw\\range_data\\24_10_2018\\PM\\"
+#tide = '21'
 
 ## tide 27
 ## 27
-#fn1 = "sonar71_2018-10-27-16_16.dat"
+fn1 = "sonar71_2018-10-27-16_16.dat"
 #fn1 = "sonar73_2018-10-27-16_16.dat"
 #fn1 = "sonar74_2018-10-27-16_16.dat"
-#dn = "C:\\Projects\\AdvocateBeach2018\\data\\raw\\range_data\\27_10_2018\\"
-#tide = '27'
+dn = "C:\\Projects\\AdvocateBeach2018\\data\\raw\\range_data\\27_10_2018\\"
+tide = '27'
 
 # unix tstapmp of main run start: 1540303640
 # end: 1540308900
@@ -255,7 +255,7 @@ if not os.path.exists(outdir):
             raise
    
             
-np.save(os.path.join(outdir, fn1[:7] + ".npy"), bed_level)
+#np.save(os.path.join(outdir, fn1[:7] + ".npy"), bed_level)
 
 
 
