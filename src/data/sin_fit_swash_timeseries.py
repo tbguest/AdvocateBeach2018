@@ -40,18 +40,18 @@ homechar = "C:\\"
 
 stone_class = 'yellows'
 
-# # for tide 19, position 1: scaling = 421.0550841144531 pix/m
-# tide = "tide19"
-# position = "position1"
-# vidspec = "vid_1540304255" # pos1
-# navg = 10 # 10 frames were averaged
-# startframe = 1510 + np.int(navg/2)
-# # this is obtained using "exrtact_scaling_from_swash_images.py"
-# scaling = 421.0550841144531
-# # this range must be determined manually be inspecting the timeseries for
-# # region of little/no cutoff
-# goodrange = (295.56834780092595, 295.57413483796296)
-# nbins = 8
+# for tide 19, position 1: scaling = 421.0550841144531 pix/m
+tide = "tide19"
+position = "position1"
+vidspec = "vid_1540304255" # pos1
+navg = 10 # 10 frames were averaged
+startframe = 1510 + np.int(navg/2)
+# this is obtained using "exrtact_scaling_from_swash_images.py"
+scaling = 421.0550841144531
+# this range must be determined manually be inspecting the timeseries for
+# region of little/no cutoff
+goodrange = (295.56834780092595, 295.57413483796296)
+nbins = 8
 
 # # for tide 19, position 2: scaling = 458.05166513842414 pix/m
 # tide = "tide19"
@@ -83,18 +83,18 @@ stone_class = 'yellows'
 # nbins = 8
 
 
-# for tide 19, position 2: scaling = 458.05166513842414 pix/m
-tide = "tide19"
-position = "position4"
-vidspec = "vid_1540311466" # pos 4
-navg = 10 # 10 frames were averaged
-startframe = 701 + np.int(navg/2)
-# this is obtained using "exrtact_scaling_from_swash_images.py"
-scaling = 436.65137206616646
-# this range must be determined manually be inspecting the timeseries for
-# region of little/no cutoff
-goodrange = (295.6416811342593, 295.64982060185184)
-nbins = 8
+# # for tide 19, position 2: scaling = 458.05166513842414 pix/m
+# tide = "tide19"
+# position = "position4"
+# vidspec = "vid_1540311466" # pos 4
+# navg = 10 # 10 frames were averaged
+# startframe = 701 + np.int(navg/2)
+# # this is obtained using "exrtact_scaling_from_swash_images.py"
+# scaling = 436.65137206616646
+# # this range must be determined manually be inspecting the timeseries for
+# # region of little/no cutoff
+# goodrange = (295.6416811342593, 295.64982060185184)
+# nbins = 8
 
 
 # pressure data for determining mean shoreline
