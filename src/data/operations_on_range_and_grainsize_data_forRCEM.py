@@ -35,7 +35,7 @@ def utime2yearday(unixtime):
     return yearday
 
 
-tide = '19'
+tide = '27'
 chunk = '2'
 
 post = 1.7 # survey post height
@@ -72,69 +72,85 @@ t73 = aaa['pi73']['tvec']
 t74 = aaa['pi74']['tvec']
 
 
+
 if tide == '27':
 
 #    mgs_fit1, yout, wout = loess_1d(aaa['pi73']['tvec'], aaa['pi73']['mgs'], frac=f0, degree=1, rotate=False)
+    #
+    # z_fit1 = lowess.lowess(utime2yearday(bbb['pi71']['tvec']), pilocs['z'][0] + post - bbb['pi71']['range']/1000, f=f0, iter=iters)
 
     mgs_fit1 = lowess.lowess(aaa['pi71']['tvec'], aaa['pi71']['mgs'], f=f0, iter=iters)
     #mgs_fit2 = lowess.lowess(aaa['pi72']['tvec'], aaa['pi72']['mgs'], f=f0, iter=iters)
-    mgs_fit3 = lowess.lowess(aaa['pi73']['tvec'], aaa['pi73']['mgs'], f=f0, iter=iters)
-    mgs_fit4 = lowess.lowess(aaa['pi74']['tvec'], aaa['pi74']['mgs'], f=f0, iter=iters)
+    # mgs_fit3 = lowess.lowess(aaa['pi73']['tvec'], aaa['pi73']['mgs'], f=f0, iter=iters)
+    # mgs_fit4 = lowess.lowess(aaa['pi74']['tvec'], aaa['pi74']['mgs'], f=f0, iter=iters)
 
     sort_fit1 = lowess.lowess(aaa['pi71']['tvec'], aaa['pi71']['sort'], f=f0, iter=iters)
     #sort_fit2 = lowess.lowess(aaa['pi72']['tvec'], aaa['pi72']['sort'], f=f0, iter=iters)
-    sort_fit3 = lowess.lowess(aaa['pi73']['tvec'], aaa['pi73']['sort'], f=f0, iter=iters)
-    sort_fit4 = lowess.lowess(aaa['pi74']['tvec'], aaa['pi74']['sort'], f=f0, iter=iters)
+    # sort_fit3 = lowess.lowess(aaa['pi73']['tvec'], aaa['pi73']['sort'], f=f0, iter=iters)
+    # sort_fit4 = lowess.lowess(aaa['pi74']['tvec'], aaa['pi74']['sort'], f=f0, iter=iters)
 
 
-    fig1 = plt.figure(1, figsize=(8,6))
+    fig1 = plt.figure(1, figsize=(5.5,4.5))
 
     ax1 = fig1.add_subplot(311)
-    ax1.plot(utime2yearday(bbb['pi71']['tvec']), pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0')
+    ax1.plot(utime2yearday(bbb['pi71']['tvec']), pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.k')
+    # ax1.plot(utime2yearday(bbb['pi71']['tvec']), z_fit1, 'k', Linewidth=2)
     #ax1.plot(bbb['pi72']['tvec'], bbb['pi72']['range'], '.C1')
-    ax1.plot(utime2yearday(bbb['pi73']['tvec']), pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2')
-    ax1.plot(utime2yearday(bbb['pi74']['tvec']), pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3')
+    # ax1.plot(utime2yearday(bbb['pi73']['tvec']), pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2')
+    # ax1.plot(utime2yearday(bbb['pi74']['tvec']), pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3')
+    lms = ax1.get_ylim()
+    ax1.plot([299.681, 299.681], [0, 5], 'k--')
+    ax1.set_ylim([lms[0], lms[1]])
     ax1.autoscale(enable=True, axis='x', tight=True)
     ax1.set_ylabel('elevation [m]')
     ax1.xaxis.set_major_formatter(plt.NullFormatter())
 
-    ax2 = fig1.add_subplot(312)
-    ax2.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['mgs'], '.C0')
-    #ax2.plot(aaa['pi72']['tvec'], aaa['pi72']['mgs'], '.C1')
-    ax2.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['mgs'], '.C2')
-    ax2.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['mgs'], '.C3')
-    ax2.plot(utime2yearday(aaa['pi71']['tvec']), mgs_fit1, 'C0', Linewidth=2)
-    #ax2.plot(aaa['pi72']['tvec'], mgs_fit2, 'C1', Linewidth=2)
-    ax2.plot(utime2yearday(aaa['pi73']['tvec']), mgs_fit3, 'C2', Linewidth=2)
-    ax2.plot(utime2yearday(aaa['pi74']['tvec']), mgs_fit4, 'C3', Linewidth=2)
-    ax2.autoscale(enable=True, axis='x', tight=True)
-    ax2.set_ylabel('mean grain size [mm]')
-    ax2.xaxis.set_major_formatter(plt.NullFormatter())
 
+    ax2 = fig1.add_subplot(312)
+    ax2.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['mgs'], '.k')
+    # #ax2.plot(aaa['pi72']['tvec'], aaa['pi72']['mgs'], '.C1')
+    # ax2.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['mgs'], '.C2')
+    # ax2.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['mgs'], '.C3')
+    ax2.plot(utime2yearday(aaa['pi71']['tvec']), mgs_fit1, 'k', Linewidth=2)
+    # #ax2.plot(aaa['pi72']['tvec'], mgs_fit2, 'C1', Linewidth=2)
+    # ax2.plot(utime2yearday(aaa['pi73']['tvec']), mgs_fit3, 'C2', Linewidth=2)
+    # ax2.plot(utime2yearday(aaa['pi74']['tvec']), mgs_fit4, 'C3', Linewidth=2)
+    lms = ax2.get_ylim()
+    ax2.plot([299.681, 299.681], [0, 50], 'k--')
+    ax2.set_ylim([lms[0], lms[1]])
+    ax2.autoscale(enable=True, axis='x', tight=True)
+    ax2.set_ylabel('grain size [mm]')
+    ax2.xaxis.set_major_formatter(plt.NullFormatter())
+    # ax2.set_xlabel('yearday')
+    # fig1.tight_layout()
 
 
 
 
     ax3 = fig1.add_subplot(313)
-    ax3.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['sort'], '.C0')
-    #ax3.plot(aaa['pi72']['tvec'], aaa['pi72']['sort'], '.C1')
-    ax3.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['sort'], '.C2')
-    ax3.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['sort'], '.C3')
-    ax3.plot(utime2yearday(aaa['pi71']['tvec']), sort_fit1, 'C0', Linewidth=2)
-    #ax3.plot(aaa['pi72']['tvec'], sort_fit2, 'C1', Linewidth=2)
-    ax3.plot(utime2yearday(aaa['pi73']['tvec']), sort_fit3, 'C2', Linewidth=2)
-    ax3.plot(utime2yearday(aaa['pi74']['tvec']), sort_fit4, 'C3', Linewidth=2)
+    ax3.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['sort'], '.k')
+    # #ax3.plot(aaa['pi72']['tvec'], aaa['pi72']['sort'], '.C1')
+    # ax3.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['sort'], '.C2')
+    # ax3.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['sort'], '.C3')
+    ax3.plot(utime2yearday(aaa['pi71']['tvec']), sort_fit1, 'k', Linewidth=2)
+    lms = ax3.get_ylim()
+    ax3.plot([299.681, 299.681], [0, 50], 'k--')
+    ax3.set_ylim([lms[0], lms[1]])
+    # #ax3.plot(aaa['pi72']['tvec'], sort_fit2, 'C1', Linewidth=2)
+    # ax3.plot(utime2yearday(aaa['pi73']['tvec']), sort_fit3, 'C2', Linewidth=2)
+    # ax3.plot(utime2yearday(aaa['pi74']['tvec']), sort_fit4, 'C3', Linewidth=2)
     ax3.autoscale(enable=True, axis='x', tight=True)
     ax3.set_ylabel('sorting [mm]')
     ax3.set_xlabel('yearday')
+    fig1.tight_layout()
 
 
     fig2 = plt.figure(2)
 
     ax1 = fig2.add_subplot(311)
     ax1.plot(bbb['pi71']['tvec'], pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0')
-    ax1.plot(bbb['pi73']['tvec'], pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2')
-    ax1.plot(bbb['pi74']['tvec'], pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3')
+    # ax1.plot(bbb['pi73']['tvec'], pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2')
+    # ax1.plot(bbb['pi74']['tvec'], pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3')
     ax1.autoscale(enable=True, axis='x', tight=True)
     ax1.set_ylabel('elevation [m]')
 
@@ -142,8 +158,8 @@ if tide == '27':
 
     ax2 = fig2.add_subplot(312)
     ax2.plot(aaa['pi71']['tvec'][1:], np.diff(mgs_fit1)/np.diff(aaa['pi71']['tvec']), 'C0', Linewidth=2)
-    ax2.plot(aaa['pi73']['tvec'][1:], np.diff(mgs_fit3)/np.diff(aaa['pi73']['tvec']), 'C2', Linewidth=2)
-    ax2.plot(aaa['pi74']['tvec'][1:], np.diff(mgs_fit4)/np.diff(aaa['pi74']['tvec']), 'C3', Linewidth=2)
+    # ax2.plot(aaa['pi73']['tvec'][1:], np.diff(mgs_fit3)/np.diff(aaa['pi73']['tvec']), 'C2', Linewidth=2)
+    # ax2.plot(aaa['pi74']['tvec'][1:], np.diff(mgs_fit4)/np.diff(aaa['pi74']['tvec']), 'C3', Linewidth=2)
     ax2.plot(aaa['pi74']['tvec'], zvec, 'k--')
     ax2.autoscale(enable=True, axis='x', tight=True)
     ax2.set_ylabel('d(mgs)/dt [mm/s]')
@@ -245,8 +261,8 @@ if saveFlag == 1:
             if exc.errno != errno.EEXIST:
                 raise
 
-    fig1.savefig(os.path.join(savedn, 'array_timeseries.png'), dpi=1000, transparent=True)
-    fig1.savefig(os.path.join(savedn, 'array_timeseries.pdf'), dpi=None, transparent=True)
+    fig1.savefig(os.path.join(savedn, 'array_timeseriesRCEM2.jpg'), dpi=750, transparent=True)
+    fig1.savefig(os.path.join(savedn, 'array_timeseriesRCEM2.pdf'), dpi=None, transparent=True)
 
     # fig2.savefig(os.path.join(savedn, 'transport_stats.png'), dpi=1000, transparent=True)
     # fig2.savefig(os.path.join(savedn, 'transport_stats.pdf'), dpi=None, transparent=True)

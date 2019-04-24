@@ -7,6 +7,9 @@ Created on Fri Jan  4 10:34:20 2019
 Use this script to organize range and grain size data (separately) into
 separate chunk files with data from all pimodules grouped together in a single
 dict.
+
+17 April 2019:
+Modified to also save raw range data chunks for swash analysis.
 """
 
 import numpy as np
@@ -34,11 +37,11 @@ def make_gs_chunk(mgs, std, tvec, tt_start, tt_end):
 
     return chunkdata_gs
 
-def make_range_chunk(rng, tvec_rng, tt_start, tt_end):
+def make_range_chunk(rng, tvec_rng, raw, tvec_raw, tt_start, tt_end):
     ''' Uses the predefined points of interest (POI) to break the full range
     record into the chunks associated with each sampling location.
 
-    Returns dict of range data from all pis for given chunk
+    Returns dict of range data (bed level only; raw range) from all pis for given chunk
     '''
 
     # initialize dict
@@ -46,31 +49,33 @@ def make_range_chunk(rng, tvec_rng, tt_start, tt_end):
 
     for Ipi in np.sort(list(rng.keys())):
 
-        Ichunk = np.where(np.logical_and(tvec_rng[Ipi]>=tt_start, tvec_rng[Ipi]<=tt_end))
-        data = {'tvec': tvec_rng[Ipi][Ichunk], 'range': rng[Ipi][Ichunk]}
+        Ichunk_rng = np.where(np.logical_and(tvec_rng[Ipi]>=tt_start, tvec_rng[Ipi]<=tt_end))
+        Ichunk_raw = np.where(np.logical_and(tvec_raw[Ipi]>=tt_start, tvec_raw[Ipi]<=tt_end))
+        data = {'tvec': tvec_rng[Ipi][Ichunk_rng], 'range': rng[Ipi][Ichunk_rng], \
+                'tvec_raw': tvec_raw[Ipi][Ichunk_raw], 'raw_range': raw[Ipi][Ichunk_raw]}
         chunkdata_rng[Ipi] = data
 
     return chunkdata_rng
 
 
 homechar = "C:\\"
-#
+
 # # tide 15
 # tide = '15'
 # skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
 # skip_last_chunk = 0
 
-# tide 19
-tide = '19'
-skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
-skip_last_chunk = 0
+# # tide 19
+# tide = '19'
+# skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
+# skip_last_chunk = 0
 
 # tide 21 ?
 
-# # tide 27
-# tide = '27'
-# skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
-# skip_last_chunk = 1
+# tide 27
+tide = '27'
+skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
+skip_last_chunk = 1
 
 pinums = ['71', '72', '73', '74']
 
@@ -93,6 +98,8 @@ std = {}
 tvec = {}
 
 rng = {}
+raw = {}
+tvec_raw = {}
 tvec_rng = {}
 
 
@@ -148,9 +155,10 @@ for pinum in pinums:
 
     jnk = np.load(os.path.join(rangedir, 'sonar' + pinum + '.npy')).item()
 
+    raw[dictkey] = jnk['raw range'][1]
+    tvec_raw[dictkey] = jnk['raw range'][0]
     rng[dictkey] = jnk['raw bed level'][1]
     tvec_rng[dictkey] = jnk['raw bed level'][0]
-
 
 
 # cycle through chunks, create chunk-specific data dicts
@@ -163,7 +171,7 @@ for jj in range(0 + skip_first_chunk, nchunks - skip_last_chunk):
     tt_end = POI[1 + jj*2][0]
 
     chunkdata_gs = make_gs_chunk(mgs, std, tvec, tt_start, tt_end)
-    chunkdata_rng = make_range_chunk(rng, tvec_rng, tt_start, tt_end)
+    chunkdata_rng = make_range_chunk(rng, tvec_rng, raw, tvec_raw, tt_start, tt_end)
 
     savedir_gs = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
                            'processed', 'grainsize', 'pi_array', 'tide' + tide)

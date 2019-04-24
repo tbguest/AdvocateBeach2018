@@ -23,3 +23,5 @@ From raw video:
 `python opencv_cobble_tracker.py --video C:\Projects\AdvocateBeach2018\data\interim\images\timeAverage\tide19\position3\vid_1540307860\tenframeaverage\position3_10frameavg.webm --tracker kcf`
 - extract pixel-to-distance scaling using extract_scaling_from_cobble_images.py. This requires a relevant targets photo to the manually selected and put in the 'targets' folder
 - use scaling and smoothed, scaled pressure record to define mean and +/- extents of swash zone, and some prelim visualization in sin_fit_swash_timeseries.py
+
+## Range data

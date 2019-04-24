@@ -16,14 +16,14 @@ homechar = "C:\\"
 tide = "tide19"
 position = "position4"
 vidspec = "vid_1540304255" # pos1
-vidspec = "vid_1540307860" # pos2
-vidspec = "vid_1540307860" # pos3
+# vidspec = "vid_1540307860" # pos2
+# vidspec = "vid_1540307860" # pos3
 vidspec = "vid_1540311466" # pos4
 colour = "yellow"
 imgnum = "img001796.jpg" # p1
-imgnum = "img010768.jpg" #p2
-imgnum = "img014226.jpg" #p3
-imgnum = "img001796.jpg" # p4
+# imgnum = "img010768.jpg" #p2
+# imgnum = "img014226.jpg" #p3
+imgnum = "img003284.jpg" # p4
 
 cmap = cm.tab10
 
@@ -65,9 +65,10 @@ for stone in sorted(cobfiles):
     xpix = np.array(jnk['position'])[:,0] * rescale_pix_x
     ypix = np.array(jnk['position'])[:,1] * rescale_pix_x
 
+
     ax.plot(xpix, ypix,Linewidth=2, c='C3')
-    ax.plot(xpix[0], ypix[0], 'y.', markersize=8)
-    ax.plot(xpix[-1], ypix[-1], 'ko')
+    ax.plot(xpix[0], ypix[0], 'o', markersize=8, markerfacecolor='r',markeredgewidth=2, markeredgecolor='k')
+    ax.plot(xpix[-1], ypix[-1], '>', markersize=10, markerfacecolor='yellow',markeredgewidth=2, markeredgecolor='k')
     ax.yaxis.set_major_locator(plt.NullLocator())
     ax.yaxis.set_major_formatter(plt.NullFormatter())
     ax.xaxis.set_major_locator(plt.NullLocator())
