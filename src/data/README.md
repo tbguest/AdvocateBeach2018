@@ -4,6 +4,15 @@ Comment headers need to be added to all these scripts.
 
 ### 1. Survey images
 
+#### 1.2 Validation
+- sieve samples
+- photograph samples (in lab or similar) -- 1 photo/sample of the bag w/ label, 3-5 sets of 2 photos (duplicates) per sample (redistribute sediment between each set).
+- manually separate into date_cusp folders
+- run crop_images.m, with parameters tuned for validation dataset
+- run DGS on "cropped" photos (on my machine, this has to be done via ubuntu shell. DGS package won't build otherwise)
+- Within folders, how do I match images up with associated sieve data? a: with img2sample_lookuo table (filled out manually)
+
+
 ### 2. PiImages
 - Manually curate image sets; delete images containing swash, seaweed, shadows, etc. in the image region to be processed.
 - crop images in matlab (crop_images.m)

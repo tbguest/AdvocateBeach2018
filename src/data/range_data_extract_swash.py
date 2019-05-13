@@ -270,7 +270,7 @@ plt.ylabel('occurrences')
 
 
 
-saveFlag = 1
+saveFlag = 0
 if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports',\
         'figures','swash','tide' + tide, 'chunk' + chunk)

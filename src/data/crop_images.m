@@ -17,51 +17,52 @@ close all
 %     '26_10_2018'; '26_10_2018'; '27_10_2018'; '27_10_2018'];
 % tide0 = ['AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FOR PICAM IMAGES
-notValidation = 1;
-% camera height was changed (at least once)
-% use 1 for 1st setting, 2 for 2nd, etc
-% 3 for validation
-cameraHeight = 1;
-% date_str0 = ['23_10_2018'; '23_10_2018'; '24_10_2018'; '24_10_2018'; '25_10_2018'; '25_10_2018';...
-%     '26_10_2018'; '26_10_2018'; '27_10_2018'; '27_10_2018'];
-% tide0 = ['AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FOR VALIDATION IMAGES
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % FOR PICAM IMAGES
+% notValidation = 1;
 % % camera height was changed (at least once)
 % % use 1 for 1st setting, 2 for 2nd, etc
 % % 3 for validation
-% cameraHeight = 3;
-% notValidation = 0;
-% date_str0 = ['Oct21'; 'Oct21'; 'Oct21'; 'Oct21'; 'Oct21'; 'Oct21'; ...
-%     'Oct25'; 'Oct25'; 'Oct25'; 'Oct25'];
-% tide0 = {'horn1'; 'horn2'; 'horn3'; 'bay1'; 'bay2'; 'bay3'; 'horn1'; 'horn2'; 'bay1'; 'bay2'};
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% cameraHeight = 1;
+% % date_str0 = ['23_10_2018'; '23_10_2018'; '24_10_2018'; '24_10_2018'; '25_10_2018'; '25_10_2018';...
+% %     '26_10_2018'; '26_10_2018'; '27_10_2018'; '27_10_2018'];
+% % tide0 = ['AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'; 'AM'; 'PM'];
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FOR VALIDATION IMAGES
+% camera height was changed (at least once)
+% use 1 for 1st setting, 2 for 2nd, etc
+% 3 for validation
+cameraHeight = 3;
+notValidation = 0;
+date_str0 = ['Oct21'; 'Oct21'; 'Oct21'; 'Oct21'; 'Oct21'; 'Oct21'; ...
+    'Oct25'; 'Oct25'; 'Oct25'; 'Oct25'];
+tide0 = {'horn1'; 'horn2'; 'horn3'; 'bay1'; 'bay2'; 'bay3'; 'horn1'; 'horn2'; 'bay1'; 'bay2'};
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % date_str0 = ['22_10_2018'];
 % tide0 = ['AM'];
 
-% for kk = 1:length(tide0)
+for kk = 1:length(tide0)
 
-% date_str = date_str0(kk, :);
-% tide = tide0{kk, :};
-% % imset = 'longshore1'; %'cross_shore'; % longshore; longshore1; longshore2, dense_array1; dense_array2
-% imset = 'dense_array2'; %'cross_shore'; % longshore; longshore1; longshore2, dense_array1; dense_array2
-% 
+date_str = date_str0(kk, :);
+tide = tide0{kk, :};
+% imset = 'longshore1'; %'cross_shore'; % longshore; longshore1; longshore2, dense_array1; dense_array2
+imset = 'dense_array2'; %'cross_shore'; % longshore; longshore1; longshore2, dense_array1; dense_array2
+
 % dn = ['C:\Projects\AdvocateBeach2018\data\raw\images\LabValidation\' date_str '_' tide '\' ];
-% dnout = dn;
+dn = ['C:\Projects\AdvocateBeach2018\data\raw\images\OutdoorValidation\' date_str '_' tide '\' ];
+dnout = dn;
 % dn = ['C:\Projects\AdvocateBeach2018\data\raw\images\BeachSurveys\' date_str '\' tide '\' imset '\'];
 % dnout = ['C:\Projects\AdvocateBeach2018\data\processed\images\cropped\beach_surveys\' date_str '\' tide '\' imset];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FOR PICAM IMAGES
-dn = ['C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide15\pi74\'];
-dnout = ['C:\Projects\AdvocateBeach2018\data\processed\images\cropped\pi_cameras\tide15\pi74'];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % FOR PICAM IMAGES
+% dn = ['C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide15\pi74\'];
+% dnout = ['C:\Projects\AdvocateBeach2018\data\processed\images\cropped\pi_cameras\tide15\pi74'];
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % create the folder if it doesn't exist already.
@@ -87,7 +88,7 @@ for ii = 1:length(imnames)
     
     counter = counter + 1;
     
-%     if mod(counter, 2) == 0;
+    if mod(counter, 2) == 0;
 
         img = imread([dn imnames(ii).name]);
 %         img = imread([dn 'img1540667045-106253.jpg']);
@@ -146,9 +147,9 @@ for ii = 1:length(imnames)
 %         figure(ii+1), clf
 %             image(newimg)
     
-%     end
+    end % mod
 
-end
+end % imnames
 
 
-% end % kk
+end % kk
