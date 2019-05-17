@@ -1,0 +1,13 @@
+name: Advocate2018
+channels:
+  - pjamesjoyce
+  - defaults
+dependencies:
+  - ipykernel
+  - numpy
+  - opencv=3.4.2
+  - pandas
+  - pillow
+  - scipy
+  - pip:
+    - opencv-python==4.0.1
