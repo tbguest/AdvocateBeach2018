@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from scipy import signal
-%matplotlib qt5
+# %matplotlib qt5
 
 def corr2(a,b):
     a = a - np.mean(a)
@@ -19,7 +19,8 @@ def corr2(a,b):
     return r
 
 # for portability
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser("~") # linux
 
 grid_spec = "dense_array2"
 
@@ -55,11 +56,11 @@ for ii in tide_range:
     if not os.path.exists(wavefn):
         continue
 
-    bar = np.load(wavefn).item()
+    bar = np.load(wavefn, allow_pickle=True).item()
     Hs = np.mean(bar["Hs"])
 
     # sediment data
-    jnk = np.load(gsizefn).item()
+    jnk = np.load(gsizefn, allow_pickle=True).item()
 
     mgs = jnk['mean_grain_size']
     sort = jnk['sorting']
@@ -70,7 +71,7 @@ for ii in tide_range:
     if not os.path.exists(gpsfn):
         continue
 
-    foo = np.load(gpsfn).item()
+    foo = np.load(gpsfn, allow_pickle=True).item()
 
     x = foo['x'].reshape(6, 24)
     y = foo['y'].reshape(6, 24)

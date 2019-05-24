@@ -9,5 +9,7 @@ dependencies:
   - pandas
   - pillow
   - scipy
+  - matplotlib
+  - imageio
   - pip:
     - opencv-python==4.0.1

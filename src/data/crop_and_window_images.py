@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import glob, os
+import glob
 from scipy.io import savemat
 import os
 import errno

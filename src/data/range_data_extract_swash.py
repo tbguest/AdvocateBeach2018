@@ -24,6 +24,8 @@ from datetime import datetime
 import time
 from scipy.ndimage import label
 
+from pathlib import Path
+
 %matplotlib qt5
 
 # change default font size
@@ -111,13 +113,17 @@ def bed_change(newtt, cut_noise, Iall_max, date_good, bed_good):
 
 
 
-tide = '27'
-chunk = '4'
+tide = '19'
+chunk = '1'
 pino = 'pi74'
 
 post = 1.7 # survey post height
 
-homechar = "C:\\"
+# homechar = "C:\\" # windows
+homechar = os.path.expanduser("~") # linux
+# ext drive:
+homechar_ext = os.path.join('/media','tristan2','Advocate2018_backup2')
+
 
 rngdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
                            'processed', 'range_data', 'bed_level', 'tide' + tide)
@@ -270,7 +276,7 @@ plt.ylabel('occurrences')
 
 
 
-saveFlag = 0
+saveFlag = 1
 if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports',\
         'figures','swash','tide' + tide, 'chunk' + chunk)

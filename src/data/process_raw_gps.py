@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Process survey grid data: organize into tide-delimited folders, with 
+"""Process survey grid data: organize into tide-delimited folders, with
 longshore, cross-shore, and dense grids separated"""
 
 import numpy as np
 import math
 import os
-
+import json
 
 # for portability
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser("~") # linux
 
 dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                   "GPS", "raw_by_tide")
@@ -81,7 +82,7 @@ def import_RTK(fname, gridnum):
 
     # rotation angle from 2015 stake coordinates
     theta_rot = math.pi + math.atan((357899.3979000000 - 357908.4006000000)/(5022717.801400000 - 5022709.436700001))
-    
+
     # rotation matrix
     R = np.array([math.cos(theta_rot), -math.sin(theta_rot), math.sin(theta_rot), math.cos(theta_rot)]).reshape((2, 2))
 
@@ -122,7 +123,7 @@ def import_RTK(fname, gridnum):
                 ILl1.append(list(np.where(stkID==stk))[0][0])
             if stk in denseID:
                 Ida1.append(list(np.where(stkID==stk))[0][0])
-    
+
     elif gridnum == 3:
 
         zlineID = list(range(145,175))
@@ -144,68 +145,80 @@ def import_RTK(fname, gridnum):
         for stk in stkID:
             if stk in LlineID:
                 ILl1.append(list(np.where(stkID==stk))[0][0])
-                
+
 
     zline = (y[Izl], x[Izl], elevation[Izl])
     longshore1 = (y[ILl1], x[ILl1], elevation[ILl1])
     longshore2 = (y[ILl2], x[ILl2], elevation[ILl2])
     dense_array1 = (y[Ida1], x[Ida1], elevation[Ida1])
     dense_array2 = (y[Ida2], x[Ida2], elevation[Ida2])
-    
-    zline = {"y": y[Izl], "x": x[Izl], \
-             "z": elevation[Izl]}
-    longshore1 = {"y": y[ILl1], "x": x[ILl1], \
-                  "z": elevation[ILl1]}
-    longshore2 = {"y": y[ILl2], "x": x[ILl2], \
-                  "z": elevation[ILl2]}
-    dense_array1 = {"y": y[Ida1], "x": x[Ida1], \
-                    "z": elevation[Ida1]}
-    dense_array2 = {"y": y[Ida2], "x": x[Ida2], \
-                    "z": elevation[Ida2]}
-    
+
+    zline = {"y": y[Izl].tolist(), "x": x[Izl].tolist(), \
+             "z": elevation[Izl].tolist()}
+    longshore1 = {"y": y[ILl1].tolist(), "x": x[ILl1].tolist(), \
+                  "z": elevation[ILl1].tolist()}
+    longshore2 = {"y": y[ILl2].tolist(), "x": x[ILl2].tolist(), \
+                  "z": elevation[ILl2].tolist()}
+    dense_array1 = {"y": y[Ida1].tolist(), "x": x[Ida1].tolist(), \
+                    "z": elevation[Ida1].tolist()}
+    dense_array2 = {"y": y[Ida2].tolist(), "x": x[Ida2].tolist(), \
+                    "z": elevation[Ida2].tolist()}
+
 #    coords = {"zline": zline,
 #              "longshore1": longshore1,
 #              "longshore2": longshore2,
 #              "dense_array1": dense_array1
 #              "dense_array2": dense_array2}
-    
+
     # output
     if "longshore1" in fname:
         fout = fname[-27:-15]
     else:
         fout = fname[-16:-4]
-        
-    tidenum = str(tide[fout + ".txt"])    
-    
+
+    tidenum = str(tide[fout + ".txt"])
+
 #    svdir = os.path.join(dnout, fout)
     svdir = os.path.join(dnout, "tide" + tidenum)
-        
+
     if not os.path.isdir(svdir):
         os.mkdir(svdir)
-        
-#    fnout = os.path.join(svdir, "zline.npy")     
-    
+
+#    fnout = os.path.join(svdir, "zline.npy")
+
     # don't save over existing writes
-    if "longshore1" in fname:    
+    if "longshore1" in fname:
         np.save(os.path.join(svdir, "longshore1.npy") , longshore1)
+        with open(os.path.join(svdir, "longshore1.json"), 'w') as fp:
+            json.dump(longshore1, fp)
     else:
-        np.save(os.path.join(svdir, "zline.npy") , zline)
+        np.save(os.path.join(svdir, "cross_shore.npy") , zline)
         np.save(os.path.join(svdir, "longshore1.npy") , longshore1)
         np.save(os.path.join(svdir, "longshore2.npy") , longshore2)
         np.save(os.path.join(svdir, "dense_array1.npy") , dense_array1)
         np.save(os.path.join(svdir, "dense_array2.npy") , dense_array2)
-    
+        with open(os.path.join(svdir, "cross_shore.json"), 'w') as fp:
+            json.dump(zline, fp)
+        with open(os.path.join(svdir, "longshore1.json"), 'w') as fp:
+            json.dump(longshore1, fp)
+        with open(os.path.join(svdir, "longshore2.json"), 'w') as fp:
+            json.dump(longshore2, fp)
+        with open(os.path.join(svdir, "dense_array1.json"), 'w') as fp:
+            json.dump(dense_array1, fp)
+        with open(os.path.join(svdir, "dense_array2.json"), 'w') as fp:
+            json.dump(dense_array2, fp)
+
 #    return zline, longshore, dense_array
 
 
 # MAIN LOOP
-def main():   
-    
-    for m in range(0, len(fn)): 
-            
+def main():
+
+    for m in range(0, len(fn)):
+
         fname = os.path.join(dn, fn[m])
-    
+
         import_RTK(fname, grid[m])
-        
-    #    # NB: coords[zl,Ll,da][x,y,z]    
-main()    
+
+    #    # NB: coords[zl,Ll,da][x,y,z]
+main()

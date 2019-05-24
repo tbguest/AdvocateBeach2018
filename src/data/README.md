@@ -1,8 +1,18 @@
 Comment headers need to be added to all these scripts.
 
+## RTK GPS
+- run `process_raw_gps.py`
+
+## Pressure data
+- run `process_raw_pressure_data.py`
+- run `compute_wavestats.py`
+
 ## Grain sizing
 
 ### 1. Survey images
+- run `crop_images.py` to reduce size of all raw survey images, saving output in folders according to tide number (1-27) rather than date.
+- run `run_dgs_static_range.py` to produce a grain size distribution for each image (specify imageset -- e.g. dense_array1)
+-
 
 #### 1.2 Validation
 - sieve samples

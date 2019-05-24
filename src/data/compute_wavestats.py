@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+
 """
 Created on Mon Nov 19 10:38:23 2018
 
@@ -11,19 +12,30 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import time
 from scipy import signal
+import json
 
-%matplotlib qt5
+# %matplotlib qt5
 
+
+##### Make these into a module for wider use ######
 
 def return_data(fname):
 
-    jnk = np.load(fname)
-    jnk = jnk[()]
-    d = jnk['d']
-    t = jnk['t']
-    hightide = jnk['high_tide']
+    # jnk = np.load(fname, allow_pickle=True)
+    # jnk = jnk[()]
 
-    return t, d, hightide
+    with open(fname, 'r') as fpp:
+        jnk_json = json.load(fpp)
+
+    # d = jnk['d']
+    # t = jnk['t']
+    # hightide = jnk['high_tide']
+
+    d = jnk_json['d']
+    t = jnk_json['t']
+    hightide = jnk_json['high_tide']
+
+    return np.array(t), np.array(d), hightide
 
 
 #def get_chunk(t, d):
@@ -49,7 +61,7 @@ def return_data(fname):
 def implicit_wavenumber(F, hmean):
 
     ''' Takes Frequency vector returned by pwelch fuction, along with a mean
-    water depth, to compute a wavenumber vector implicitly using the surface gravity
+    water depth, to compute a wavenumber vector implicitly using os.path.join(dn, fn)the surface gravity
     wave dispersion relation.
     '''
 
@@ -191,134 +203,144 @@ def compute_wavestats(Phh, F, hmean):
 
 
 
+def main():
 
+    # homechar = "C:\\"
+    homechar = os.path.expanduser("~") # linux
 
-homechar = "C:\\"
+    dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
+                         "interim","pressure")
 
-dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                     "interim","pressure")
+    #fns = os.listdir(dn)
 
-#fns = os.listdir(dn)
+    yd = range(9, 27)
 
-yd = range(9, 27)
+    beta_slope = 0.12
 
-beta_slope = 0.12
+    # sampling  frequency of RBR
+    fs = 4
 
-# sampling  frequency of RBR
-fs = 4
-
-rho_s = 1030 # [kg*m^-3] density of seawater
-g = 9.81
-
-# define time intervals for averaging
-dt = 12/(60*24) # 12 min averaging intervals
-
-# spectral analysis
-nfft = 512
-#nfft = ceil(fs/fResMin)
-winhann = signal.hann(nfft, sym=False)
-overlap = 0.5
-
-for kk in yd:
-
-    fn = "tide" + str(kk + 1) + ".npy"
-    t, d, hightide = return_data(os.path.join(dn, fn))
-
-    if kk == 26:
-        plt.figure(99)
-        plt.plot(t,d)
+    rho_s = 1030 # [kg*m^-3] density of seawater
+    g = 9.81
 
     # define time intervals for averaging
-    nintervals = np.floor((np.max(t) - np.min(t))/dt)
+    dt = 12/(60*24) # 12 min averaging intervals
 
-    # initialize (new short time interval vectors)
-    Hs_infr = np.zeros(int(nintervals))
-    Hs_swell = np.zeros(int(nintervals))
-    Hs_wind = np.zeros(int(nintervals))
-    Hs = np.zeros(int(nintervals))
-    Tp = np.zeros(int(nintervals))
-    Tmean_infr = np.zeros(int(nintervals))
-    Tmean_swell = np.zeros(int(nintervals))
-    Tmean_wind = np.zeros(int(nintervals))
-    Tmean = np.zeros(int(nintervals))
-    L = np.zeros(int(nintervals))
-    steepness = np.zeros(int(nintervals))
-    M = np.zeros(int(nintervals))
-    xi_b = np.zeros(int(nintervals))
-    eps_sc = np.zeros(int(nintervals))
-    depth = np.zeros(int(nintervals))
-    timevec = np.zeros(int(nintervals))
+    # spectral analysis
+    nfft = 512
+    #nfft = ceil(fs/fResMin)
+    winhann = signal.hann(nfft, sym=False)
+    overlap = 0.5
 
-    for ii in range(0, int(nintervals)):
+    for kk in yd:
 
-        # define indices of interval limits
-        mnind = np.argmin(np.abs(t - (t[0] + ii*dt)))
-        mxind = np.argmin(np.abs(t - (t[0] + (ii+1)*dt)))
+        fn = "tide" + str(kk + 1) + ".npy"
+        fn_json = "tide" + str(kk + 1) + ".json"
+        # t, d, hightide = return_data(os.path.join(dn, fn))
+        t, d, hightide = return_data(os.path.join(dn, fn_json))
 
-        # new truncated vectors
-        tt0 = t[mnind:mxind]
-        hh0 = d[mnind:mxind]
-        hmean = np.nanmean(hh0)
+        if kk == 26:
+            plt.figure(99)
+            plt.plot(t,d)
 
-        hh = hh0[~np.isnan(hh0)]
-        tt = tt0[~np.isnan(hh0)]
+        # define time intervals for averaging
+        nintervals = np.floor((np.max(t) - np.min(t))/dt)
 
-        F, Pxx = signal.welch(signal.detrend(hh), fs=fs, window=winhann, nperseg=nfft, \
-                       noverlap=int(np.floor(nfft*overlap)), nfft=nfft)
+        # initialize (new short time interval vectors)
+        Hs_infr = np.zeros(int(nintervals))
+        Hs_swell = np.zeros(int(nintervals))
+        Hs_wind = np.zeros(int(nintervals))
+        Hs = np.zeros(int(nintervals))
+        Tp = np.zeros(int(nintervals))
+        Tmean_infr = np.zeros(int(nintervals))
+        Tmean_swell = np.zeros(int(nintervals))
+        Tmean_wind = np.zeros(int(nintervals))
+        Tmean = np.zeros(int(nintervals))
+        L = np.zeros(int(nintervals))
+        steepness = np.zeros(int(nintervals))
+        M = np.zeros(int(nintervals))
+        xi_b = np.zeros(int(nintervals))
+        eps_sc = np.zeros(int(nintervals))
+        depth = np.zeros(int(nintervals))
+        timevec = np.zeros(int(nintervals))
 
-        krad = implicit_wavenumber(F, hmean)
+        for ii in range(0, int(nintervals)):
 
-        Phh = atten_correct(Pxx, F, krad, hmean)
+            # define indices of interval limits
+            mnind = np.argmin(np.abs(t - (t[0] + ii*dt)))
+            mxind = np.argmin(np.abs(t - (t[0] + (ii+1)*dt)))
 
-#        Hs[ii], Hs_infr[ii], Hs_swell[ii], Hs_wind[ii], Tmean[ii], \
-#                    Tmean_infr[ii], Tmean_swell[ii], Tmean_wind[ii], \
-#                    Tp[ii], L[ii] = compute_wavestats(Phh, F, hmean)
+            # new truncated vectors
+            tt0 = t[mnind:mxind]
+            hh0 = d[mnind:mxind]
+            hmean = np.nanmean(hh0)
 
-        waves = compute_wavestats(Phh, F, hmean)
-        Hs[ii] = waves['Hs']
-        Hs_swell[ii] = waves['Hs_swell']
-        Hs_wind[ii] = waves['Hs_wind']
-        Tmean[ii] = waves['Tmean']
-        Tmean_swell[ii] = waves['Tmean_swell']
-        Tmean_wind[ii] = waves['Tmean_wind']
-        Tp[ii] = waves['Tp']
-        L[ii] = waves['wavelength']
-        steepness[ii] = waves['steepness']
-        M[ii] = waves['Miche']
-        xi_b[ii] = waves['Iribarren']
-        eps_sc[ii] = waves['surf_scaling']
+            hh = hh0[~np.isnan(hh0)]
+            tt = tt0[~np.isnan(hh0)]
+
+            F, Pxx = signal.welch(signal.detrend(hh), fs=fs, window=winhann, nperseg=nfft, \
+                           noverlap=int(np.floor(nfft*overlap)), nfft=nfft)
+
+            krad = implicit_wavenumber(F, hmean)
+
+            Phh = atten_correct(Pxx, F, krad, hmean)
+
+    #        Hs[ii], Hs_infr[ii], Hs_swell[ii], Hs_wind[ii], Tmean[ii], \
+    #                    Tmean_infr[ii], Tmean_swell[ii], Tmean_wind[ii], \
+    #                    Tp[ii], L[ii] = compute_wavestats(Phh, F, hmean)
+
+            waves = compute_wavestats(Phh, F, hmean)
+            Hs[ii] = waves['Hs']
+            Hs_swell[ii] = waves['Hs_swell']
+            Hs_wind[ii] = waves['Hs_wind']
+            Tmean[ii] = waves['Tmean']
+            Tmean_swell[ii] = waves['Tmean_swell']
+            Tmean_wind[ii] = waves['Tmean_wind']
+            Tp[ii] = waves['Tp']
+            L[ii] = waves['wavelength']
+            steepness[ii] = waves['steepness']
+            M[ii] = waves['Miche']
+            xi_b[ii] = waves['Iribarren']
+            eps_sc[ii] = waves['surf_scaling']
 
 
-        # new corresponding time and depth vectors
-        timevec[ii] = np.mean(tt)
-        depth[ii] = np.mean(hh)
+            # new corresponding time and depth vectors
+            timevec[ii] = np.mean(tt)
+            depth[ii] = np.mean(hh)
 
-    plt.figure(1)
-    plt.plot(timevec, Hs)
+        plt.figure(1)
+        plt.plot(timevec, Hs)
 
-    plt.figure(2)
-    plt.plot(timevec, Tp)
+        plt.figure(2)
+        plt.plot(timevec, Tp)
 
-    rf = 0.1*xi_b**2
-    rf[rf > 1] = 1
-    M[M > 1] = 1
+        rf = 0.1*xi_b**2
+        rf[rf > 1] = 1
+        M[M > 1] = 1
 
-    waves = {"yearday": timevec,
-             "depth": depth,
-             "Hs": Hs,
-             "Hs_swell": Hs_swell,
-             "Hs_wind": Hs_wind,
-             "Tmean": Tmean,
-             "Tmean_swell": Tmean_swell,
-             "Tmean_wind": Tmean_wind,
-             "Tp": Tp,
-             "wavelength": L,
-             "steepness": steepness,
-             "Miche": M,
-             "Iribarren": xi_b,
-             "surf_scaling": eps_sc,}
+        waves = {"yearday": timevec.tolist(),
+                 "depth": depth.tolist(),
+                 "Hs": Hs.tolist(),
+                 "Hs_swell": Hs_swell.tolist(),
+                 "Hs_wind": Hs_wind.tolist(),
+                 "Tmean": Tmean.tolist(),
+                 "Tmean_swell": Tmean_swell.tolist(),
+                 "Tmean_wind": Tmean_wind.tolist(),
+                 "Tp": Tp.tolist(),
+                 "wavelength": L.tolist(),
+                 "steepness": steepness.tolist(),
+                 "Miche": M.tolist(),
+                 "Iribarren": xi_b.tolist(),
+                 "surf_scaling": eps_sc.tolist(),}
 
-    # save new variables
-    fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                     "processed","pressure", "wavestats", fn)
-    # np.save(fout, waves)
+        # save new variables
+        fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
+                         "processed","pressure", "wavestats")
+        np.save(os.path.join(fout, fn), waves)
+
+        with open(os.path.join(fout, fn_json), 'w') as fp:
+            json.dump(waves, fp)
+
+
+if __name__ == '__main__':
+    main()
