@@ -3,7 +3,7 @@
 Created on Wed Nov 21 14:31:00 2018
 
 This script refines all DGS output (for each of many images) into easily callable
-files. I.e. 1 file/grid_spec/tide. 
+files. I.e. 1 file/grid_spec/tide.
 
 @author: Owner
 """
@@ -18,7 +18,7 @@ def build_gsize_arrays(gsizedir):
     '''Takes image-specific output from DGS package and consolidates into a single data file for each survey conponent, for each day
     '''
 
-    allfn = os.listdir(gsizedir)
+    allfn = sorted(os.listdir(gsizedir))
 
     mean_gsize = []
     sort = []
@@ -71,7 +71,7 @@ def main():
     # homechar = "C:\\"
     homechar = os.path.expanduser("~") # linux
 
-    # grid_spec = "dense_array2"
+    # grid_spec = "cross_shore"
     grid_specs = ['cross_shore', 'longshore1', 'longshore2', 'dense_array1', 'dense_array2']
 
     for grid_spec in grid_specs:

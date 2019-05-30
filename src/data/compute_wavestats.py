@@ -61,7 +61,7 @@ def return_data(fname):
 def implicit_wavenumber(F, hmean):
 
     ''' Takes Frequency vector returned by pwelch fuction, along with a mean
-    water depth, to compute a wavenumber vector implicitly using os.path.join(dn, fn)the surface gravity
+    water depth, to compute a wavenumber vector implicitly using the surface gravity
     wave dispersion relation.
     '''
 
@@ -186,6 +186,11 @@ def compute_wavestats(Phh, F, hmean):
     a_b = Hs/2 # an approximation for wave runup
     eps_sc = a_b*omeg**2/(g*np.tan(beta_slope)**2)
 
+    # compute wave energy
+    wave_energy = np.sum(Phh[I1:I2])*np.mean(np.diff(F))
+    wave_energy_wind = np.sum(Phh[I1_wind:I2_wind])*np.mean(np.diff(F))
+    wave_energy_swel = np.sum(Phh[I1_swel:I2_swel])*np.mean(np.diff(F))
+
     waves = {"Hs": Hs,
              "Hs_swell": Hs_swell,
              "Hs_wind": Hs_wind,
@@ -197,7 +202,10 @@ def compute_wavestats(Phh, F, hmean):
              "steepness": steepness,
              "Miche": M,
              "Iribarren": xi_b,
-             "surf_scaling": eps_sc,}
+             "surf_scaling": eps_sc,
+             "wave_energy": wave_energy,
+             "wave_energy_wind": wave_energy_wind,
+             "wave_energy_swell": wave_energy_swel}
 
     return waves
 
@@ -263,6 +271,9 @@ def main():
         eps_sc = np.zeros(int(nintervals))
         depth = np.zeros(int(nintervals))
         timevec = np.zeros(int(nintervals))
+        wave_energy = np.zeros(int(nintervals))
+        wave_energy_wind = np.zeros(int(nintervals))
+        wave_energy_swell = np.zeros(int(nintervals))
 
         for ii in range(0, int(nintervals)):
 
@@ -285,10 +296,6 @@ def main():
 
             Phh = atten_correct(Pxx, F, krad, hmean)
 
-    #        Hs[ii], Hs_infr[ii], Hs_swell[ii], Hs_wind[ii], Tmean[ii], \
-    #                    Tmean_infr[ii], Tmean_swell[ii], Tmean_wind[ii], \
-    #                    Tp[ii], L[ii] = compute_wavestats(Phh, F, hmean)
-
             waves = compute_wavestats(Phh, F, hmean)
             Hs[ii] = waves['Hs']
             Hs_swell[ii] = waves['Hs_swell']
@@ -302,6 +309,9 @@ def main():
             M[ii] = waves['Miche']
             xi_b[ii] = waves['Iribarren']
             eps_sc[ii] = waves['surf_scaling']
+            wave_energy[ii] = waves['wave_energy']
+            wave_energy_wind[ii] = waves['wave_energy_wind']
+            wave_energy_swell[ii] = waves['wave_energy_swell']
 
 
             # new corresponding time and depth vectors
@@ -313,6 +323,11 @@ def main():
 
         plt.figure(2)
         plt.plot(timevec, Tp)
+
+        plt.figure(3)
+        plt.plot(timevec, wave_energy, 'r')
+        plt.plot(timevec, wave_energy_wind, 'g')
+        plt.plot(timevec, wave_energy_swell, 'b')
 
         rf = 0.1*xi_b**2
         rf[rf > 1] = 1
@@ -331,7 +346,10 @@ def main():
                  "steepness": steepness.tolist(),
                  "Miche": M.tolist(),
                  "Iribarren": xi_b.tolist(),
-                 "surf_scaling": eps_sc.tolist(),}
+                 "surf_scaling": eps_sc.tolist(),
+                 "wave_energy": wave_energy.tolist(),
+                 "wave_energy_wind": wave_energy_wind.tolist(),
+                 "wave_energy_swell": wave_energy_swell.tolist()}
 
         # save new variables
         fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \

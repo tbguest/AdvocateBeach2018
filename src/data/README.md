@@ -12,7 +12,7 @@ Comment headers need to be added to all these scripts.
 ### 1. Survey images
 - run `crop_images.py` to reduce size of all raw survey images, saving output in folders according to tide number (1-27) rather than date.
 - run `run_dgs_static_range.py` to produce a grain size distribution for each image (specify imageset -- e.g. dense_array1)
--
+- run `process_dgs_output.py`
 
 #### 1.2 Validation
 - sieve samples

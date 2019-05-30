@@ -14,7 +14,9 @@ import csv
 
 
 # for portability
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser("~") # linux
+
 
 validation_dns = ["LabValidation_xpos05", "OutdoorValidation_xpos05"]
 # validation_dns = ["LabValidation_xmin05", "OutdoorValidation_xmin05"]
@@ -80,14 +82,14 @@ for n in range(0, 2):
 
 
         gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                          "grainsize_dists", validation_dn, date_str0[ii] + tide0[ii])
+                          "grainsize", "validation",validation_dn, date_str0[ii] + tide0[ii])
 
-        allfiles = os.listdir(gsizedir)
+        allfiles = sorted(os.listdir(gsizedir))
 
         for jj in range(0, len(allfiles)):
 
 
-            dgsjnk = np.load(os.path.join(gsizedir, allfiles[jj]), encoding='latin1').item()
+            dgsjnk = np.load(os.path.join(gsizedir, allfiles[jj]), encoding='latin1', allow_pickle=True).item()
 
             imgnum = str(int(allfiles[jj][4:8])) # removes leading zeros
 
@@ -95,9 +97,9 @@ for n in range(0, 2):
 
             # load associated sieve data
             bar = np.load(os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                                       "interim", "grainsize_dists", "sieved", \
+                                       "interim", "grainsize", "sieved", \
                                        dates[Iimg][3:6] + dates[Iimg][:2] + '_' + \
-                                       locs[Iimg] + '_' + depths[Iimg] + '.npy')).item()
+                                       locs[Iimg] + '_' + depths[Iimg] + '.npy'), allow_pickle=True).item()
 
             gsfreqs = bar['grain size frequencies']#[2:-1] # omitting 45 mm size
             gsbins = bar['grain size bins']#[2:-1]
@@ -244,7 +246,7 @@ ax1[0].legend([l1, l2],['x=0.5; lab validation', 'x=0.5; outdoor validation'], l
 # ax1.legend(loc="upper right")
 # ax2.plot(xtr, color='r', label='HHN')
 # ax2.legend(loc="upper right")
-# ax3.plot(xtr, color='r', label='HHE') 
+# ax3.plot(xtr, color='r', label='HHE')
 # ax3.legend(loc="upper right")
 
 fig4, ax4 = plt.subplots(nrows=1, ncols=1, num='1-1')

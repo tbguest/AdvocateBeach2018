@@ -11,7 +11,8 @@ import numpy as np
 
 homechar = os.path.expanduser("~") # linux
 
-imset = "longshore2" #"cross_shore" #
+# imset = "cross_shore" #
+imset = "longshore2"
 
 tides = range(28)
 

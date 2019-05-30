@@ -12,40 +12,88 @@ from scipy import signal
 from scipy.signal import correlate
 import json
 
+plt.close('all')
+
+def save_figures(dn, fn, fig):
+    ''' Saves png and pdf of figure.
+
+    INPUTS
+    dn: save directory. will be created if doesn't exist
+    fn: file name WITHOUT extension
+    fig: figure handle
+    '''
+
+    if not os.path.exists(dn):
+        try:
+            os.makedirs(dn)
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+    fig.savefig(os.path.join(dn, fn + '.png'), dpi=1000, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.pdf'), dpi=None, transparent=True)
+
+
+
+saveFlag = 0
+saveCorr = 0
+
 # for portability
 # homechar = "C:\\"
 homechar = os.path.expanduser("~") # linux
 
-grid_spec = "cross_shore"
+figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
+'reports','figures')
 
-tide_range = range(14, 28)
+# grid_spec = "cross_shore"
+grid_spec = "longshore2"
+
+if grid_spec == 'cross_shore':
+    start_tide = 13
+else:
+    start_tide = 14
+
+tide_range = range(start_tide, 28)
+tide_axis = np.arange(start_tide+1,28) # for plotting later
 
 counter = 0
 
 # guess at cross-shore profile length
 npts = 50
 
+sum_dz_line = np.zeros((npts,len(tide_range)-1))
 dz_line = np.zeros((npts,len(tide_range)-1))
 z_line = np.zeros((npts,len(tide_range)-1))
 sum_dz = np.zeros((npts,))
 
+sum_dmgs_line = np.zeros((npts,len(tide_range)-1))
 dmgs_line = np.zeros((npts,len(tide_range)-1))
 mgs_line = np.zeros((npts,len(tide_range)-1))
 sum_dmgs = np.zeros((npts,))
 
+sum_dsort_line = np.zeros((npts,len(tide_range)-1))
 dsort_line = np.zeros((npts,len(tide_range)-1))
 sort_line = np.zeros((npts,len(tide_range)-1))
 sum_dsort = np.zeros((npts,))
 
 # initialize
-corrcoeffs = []
+corrcoeffs_dz_mgs= []
+corrcoeffs_dz_dmgs= []
+corrcoeffs_dz_sort= []
+corrcoeffs_dz_dsort= []
+corrcoeffs_dz_last_mgs = []
+corrcoeffs_dz_last_sort = []
+
 Hs = []
 Tp = []
 steepness = []
 iribarren = []
+wave_energy = []
+wave_energy_wind = []
+wave_energy_swell = []
 
 
-fig01, ax01 = plt.subplots(3,1, num='profiles')
+fig01, ax01 = plt.subplots(nrows=4,ncols=1, num='profiles', sharex=True)
 
 for ii in tide_range:
 
@@ -64,6 +112,14 @@ for ii in tide_range:
     if not os.path.exists(wavefn):
         continue
 
+    # GPS data
+    if not os.path.exists(gpsfn):
+        continue
+
+    # grainsize data
+    if not os.path.exists(gsizefn):
+        continue
+
     # bar = np.load(wavefn, allow_pickle=True).item()
     with open(wavefn, 'r') as fpp:
         bar = json.load(fpp)
@@ -71,6 +127,9 @@ for ii in tide_range:
     Tp.append(np.mean(np.array(bar["Tp"])))
     steepness.append(np.mean(np.array(bar["steepness"])))
     iribarren.append(np.mean(np.array(bar["Iribarren"])))
+    wave_energy.append(np.mean(np.array(bar["wave_energy"])))
+    wave_energy_wind.append(np.mean(np.array(bar["wave_energy_wind"])))
+    wave_energy_swell.append(np.mean(np.array(bar["wave_energy_swell"])))
 
     # sediment data
     # jnk = np.load(gsizefn, allow_pickle=True).item()
@@ -82,10 +141,6 @@ for ii in tide_range:
 
     mgs = np.pad(mgs0, (0, npts-len(mgs0)), 'constant', constant_values=(np.nan,np.nan))
     sort = np.pad(sort0, (0, npts-len(sort0)), 'constant', constant_values=(np.nan,np.nan))
-
-    # GPS data
-    if not os.path.exists(gpsfn):
-        continue
 
     # foo = np.load(gpsfn, allow_pickle=True).item()
     with open(gpsfn, 'r') as fpp:
@@ -102,9 +157,6 @@ for ii in tide_range:
     y = np.pad(y0, (0, npts-len(y0)), 'constant', constant_values=(np.nan,np.nan))
     z = np.pad(z0, (0, npts-len(z0)), 'constant', constant_values=(np.nan,np.nan))
 
-    ax01[0].plot(y0, z0)
-    ax01[1].plot(y0, mgs0)
-    ax01[2].plot(y0, sort0)
 
     # for first iteration
     if counter == 0:
@@ -117,10 +169,18 @@ for ii in tide_range:
         dmgs = mgs - last_mgs
         dsort = sort - last_sort
 
+        plt.figure(num='base profile')
+        plt.plot(y,z)
+        plt.ylabel('z [m]')
+        plt.xlabel('y [m]')
+
     else:
 
         dz = z - last_z
 #        last_z = z
+
+        last_mgs0 = last_mgs
+        last_sort0 = last_sort
 
         dmgs = mgs - last_mgs
         dsort = sort - last_sort
@@ -130,15 +190,23 @@ for ii in tide_range:
         last_mgs = mgs
         last_sort = sort
 
+        # populate space-time matrices for plotting
+
+        # cumulative differences
         sum_dz = sum_dz + dz
-        dz_line[:,counter-1] = sum_dz
-
         sum_dmgs = sum_dmgs + dmgs
-        dmgs_line[:,counter-1] = sum_dmgs
-
         sum_dsort = sum_dsort + dsort
-        dsort_line[:,counter-1] = sum_dsort
 
+        sum_dz_line[:,counter-1] = sum_dz
+        sum_dmgs_line[:,counter-1] = sum_dmgs
+        sum_dsort_line[:,counter-1] = sum_dsort
+
+        # differences only; not cumulative
+        dz_line[:,counter-1] = dz
+        dmgs_line[:,counter-1] = dmgs
+        dsort_line[:,counter-1] = dsort
+
+        # undifferenced
         z_line[:,counter-1] = z
         mgs_line[:,counter-1] = mgs
         sort_line[:,counter-1] = sort
@@ -146,88 +214,234 @@ for ii in tide_range:
         # correlate dz with mgs(t-1), mgs, dmgs
 
         tmp_dz = dz
-        tmp_dz = tmp_dz[~np.isnan(tmp_dz)]
+        tmp_dz = tmp_dz[~np.isnan(tmp_dz)] - np.nanmean(dz)
 
-        tmp_mgs = dmgs
-        tmp_mgs = tmp_mgs[~np.isnan(tmp_mgs)]
+        tmp_mgs = mgs
+        tmp_dmgs = dmgs
+        tmp_sort = sort
+        tmp_dsort = dsort
+        tmp_last_mgs = last_mgs0
+        tmp_last_sort = last_sort0
 
-        corrcoeffs.append(np.corrcoef(tmp_dz,tmp_mgs[:len(tmp_dz)])[0,1])
+        plt_tag = 'mgs'
+        tmp_mgs = tmp_mgs[~np.isnan(tmp_mgs)] - np.nanmean(mgs)
+
+        corrcoeffs_dz_mgs.append(np.corrcoef(tmp_dz,tmp_mgs[:len(tmp_dz)])[0,1])
+        corrcoeffs_dz_dmgs.append(np.corrcoef(tmp_dz,tmp_dmgs[:len(tmp_dz)])[0,1])
+        corrcoeffs_dz_sort.append(np.corrcoef(tmp_dz,tmp_sort[:len(tmp_dz)])[0,1])
+        corrcoeffs_dz_dsort.append(np.corrcoef(tmp_dz,tmp_dsort[:len(tmp_dz)])[0,1])
+        corrcoeffs_dz_last_mgs.append(np.corrcoef(tmp_dz,tmp_last_mgs[:len(tmp_dz)])[0,1])
+        corrcoeffs_dz_last_sort.append(np.corrcoef(tmp_dz,tmp_last_sort[:len(tmp_dz)])[0,1])
+
+# plt.figure()
+# plt.plot(tmp_dz)
+# plt.figure()
+# plt.plot(dmgs)
+        fig, ax1 = plt.subplots(1, 1, num='tide'+str(ii))
+        ax1.xcorr(tmp_dz, tmp_mgs[:len(tmp_dz)], usevlines=True, maxlags=10, normed=True, lw=2)
+        ax1.set_ylabel('correlation')
+        ax1.set_xlabel('lag')
+
+        # EXPORT PLOTS
+        if saveCorr == 1:
+            savedn = os.path.join(figsdn,'beach_profile',grid_spec,'cross_correlation',tide)
+            savefn = 'dz_' + plt_tag
+
+            save_figures(savedn, savefn, fig)
 
 
-#     # xcorrtmp = np.correlate(tmp_dz, tmp_mgs[:len(tmp_dz)], mode='full')
-#
-#     a = (tmp_dz - np.mean(tmp_dz)) / (np.std(tmp_dz) * len(tmp_dz))
-#     b = (tmp_mgs - np.mean(tmp_mgs)) / (np.std(tmp_mgs))
-#     c = np.correlate(a, b, 'full')
-#     lag = np.argmax(np.correlate(a, b, 'full'))
-#
-# lag = np.argmax(correlate(a_sig, b_sig))
-# c_sig = np.roll(b, shift=int(np.ceil(lag)))
-#
-#
-#     # plt.plot(xcorrtmp, '.')
-#     plt.figure()
-#     # plt.plot(c, '.')
-#     plt.plot(c_sig, '.')
-
+    #tide 19: +1 more DGS obs than GPS
+    if grid_spec == 'cross_shore':
+        ax01[0].plot(y0, z0)
+        ax01[1].plot(y0, dz[:len(y0)])
+        ax01[2].plot(y0, mgs0[:len(y0)])
+        ax01[3].plot(y0, sort0[:len(y0)])
+    else:
+        ax01[0].plot(x0, z0)
+        ax01[1].plot(x0, dz[:len(y0)])
+        ax01[2].plot(x0, mgs0[:len(y0)])
+        ax01[3].plot(x0, sort0[:len(y0)])
 
     counter = counter + 1
 
+
+
 # truncate nans
 maxreal = 0
-for col in dz_line.T:
+for col in sum_dz_line.T:
     candidate = np.count_nonzero(~np.isnan(col))
     if candidate > maxreal:
         maxreal = candidate
 
 
-# # correlate dz with mgs(t-1), mgs, dmgs
-#
-# tmp_dz = dz_line[:,1]
-# tmp_dz = tmp_dz[~np.isnan(tmp_dz)]
-#
-# tmp_mgs = mgs_line[:,1]
-# tmp_mgs = tmp_mgs[~np.isnan(tmp_mgs)]
-#
-# fig, ax1 = plt.subplots(1, 1, num=ii)
-# ax1.xcorr(tmp_dz, tmp_mgs[:len(tmp_dz)], usevlines=True, maxlags=10, normed=True, lw=2)
-#
-
-# dz_mgs_corr = plt.xcorr(tmp_dz, tmp_mgs[:len(tmp_dz)])
-
-# plt.figure()
-# plt.plot(dz_mgs_corr[0],dz_mgs_corr[1])
-
-
-
 # FIGURES
 
-plt.figure(100)
-plt.imshow(z_line)
-
-plt.figure(101)
-plt.imshow(mgs_line)
-
-plt.figure(102)
-plt.imshow(sort_line)
-
-fig2, ax2 = plt.subplots(nrows=3, ncols=1, figsize=(4,7), num='cumulative change')
-ax20 = ax2[0].imshow(dz_line[:maxreal,:], cmap='bwr', vmin=-0.35, vmax=0.35)
-fig2.colorbar(ax20, ax=ax2[0])
-ax21 = ax2[1].imshow(dmgs_line[:maxreal,:], cmap='bwr')
-fig2.colorbar(ax21, ax=ax2[1])
-ax22 = ax2[2].imshow(dsort_line[:maxreal,:], cmap='bwr')
-fig2.colorbar(ax22, ax=ax2[2])
+ax01[0].set_ylabel('z [m]')
+ax01[0].autoscale(enable=True, axis='x', tight=True)
+ax01[1].set_ylabel(r'$\Delta z$ [mm]')
+ax01[2].set_ylabel('mgs [mm]')
+ax01[3].set_xlabel('cross-shore [m]')
+ax01[3].set_ylabel('sorting [mm]')
+fig01.tight_layout()
 
 
-plt.figure(num='Hs')
-plt.plot(Hs[1:], corrcoeffs, '.')
+# plt.figure(100)
+# plt.imshow(dz_line, cmap='bwr', vmin=-0.35, vmax=0.35)
+# plt.colorbar()
+#
+# plt.figure(101)
+# plt.imshow(mgs_line, cmap='inferno')
+# plt.colorbar()
+#
+# plt.figure(102)
+# plt.imshow(sort_line, cmap='inferno')
+# plt.colorbar()
 
-plt.figure(num='Tp')
-plt.plot(Tp[1:], corrcoeffs, '.')
+fig2, ax2 = plt.subplots(nrows=3, ncols=1, figsize=(3,6), num='cumulative change')
+ax20 = ax2[0].imshow(sum_dz_line[:maxreal,:], cmap='bwr', vmin=-0.35, vmax=0.35, \
+extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+clb20 = fig2.colorbar(ax20, ax=ax2[0])
+clb20.ax.set_title('dz [m]')
+ax21 = ax2[1].imshow(sum_dmgs_line[:maxreal,:], cmap='bwr', vmin=-30, vmax=30, \
+extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+clb21 = fig2.colorbar(ax21, ax=ax2[1])
+clb21.ax.set_title('dmgs [mm]')
+ax22 = ax2[2].imshow(sum_dsort_line[:maxreal,:], cmap='bwr', vmin=-25, vmax=25, \
+extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+clb22 = fig2.colorbar(ax22, ax=ax2[2])
+ax2[2].set_ylabel('cross-shore [m]')
+ax2[2].set_xlabel('tide')
+clb22.ax.set_title('dsort [mm]')
+fig2.tight_layout()
 
-plt.figure(num='steep')
-plt.plot(steepness[1:], corrcoeffs, '.')
+fig3, ax3 = plt.subplots(nrows=3, ncols=1, figsize=(3,6), num='tide-tide change change')
+ax30 = ax3[0].imshow(dz_line[:maxreal,:], cmap='bwr', vmin=-0.2, vmax=0.2, \
+extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+clb30 = fig3.colorbar(ax30, ax=ax3[0])
+clb30.ax.set_title('dz [m]')
+ax31 = ax3[1].imshow(dmgs_line[:maxreal,:], cmap='bwr', vmin=-20, vmax=20, \
+extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+clb31 = fig3.colorbar(ax31, ax=ax3[1])
+clb31.ax.set_title('dmgs [mm]')
+ax32 = ax3[2].imshow(dsort_line[:maxreal,:], cmap='bwr', vmin=-15, vmax=15, \
+extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+clb32 = fig3.colorbar(ax32, ax=ax3[2])
+ax3[2].set_ylabel('cross-shore [m]')
+ax3[2].set_xlabel('tide')
+clb32.ax.set_title('dsort [mm]')
+fig3.tight_layout()
 
-plt.figure(num='iribarren')
-plt.plot(iribarren[1:], corrcoeffs, '.')
+# fig4 = plt.figure(num='Hs')
+# plt.plot(Hs[1:], corrcoeffs, 'k.')
+# plt.xlabel('Hs [m]')
+# plt.ylabel('correlation coeff.')
+#
+# fig5 = plt.figure(num='energy')
+# # plt.plot(wave_energy[1:], corrcoeffs, 'r.')
+# plt.plot(wave_energy_wind[1:], corrcoeffs, '.')
+# # plt.plot(wave_energy_swell[1:], corrcoeffs, 'b.')
+# plt.xlabel('wave energy - wind band [m^2]')
+# plt.ylabel('correlation coeff.')
+#
+# fig6 = plt.figure(num='Tp')
+# plt.plot(Tp[1:], corrcoeffs, '.')
+# plt.xlabel('T_p [s]')
+# plt.ylabel('correlation coeff.')
+#
+# fig7 = plt.figure(num='steep')
+# plt.plot(steepness[1:], corrcoeffs, '.')
+# plt.xlabel('steepness')
+# plt.ylabel('correlation coeff.')
+#
+# fig8 = plt.figure(num='iribarren')
+# plt.plot(iribarren[1:], corrcoeffs, '.')
+# plt.xlabel('Iribarren')
+# plt.ylabel('correlation coeff.')
+
+mean_cc_dz_mgs = np.mean(corrcoeffs_dz_mgs)
+std_cc_dz_mgs = np.std(corrcoeffs_dz_mgs)
+mean_cc_dz_dmgs = np.mean(corrcoeffs_dz_dmgs)
+std_cc_dz_dmgs = np.std(corrcoeffs_dz_dmgs)
+mean_cc_dz_sort = np.mean(corrcoeffs_dz_sort)
+std_cc_dz_sort = np.std(corrcoeffs_dz_sort)
+mean_cc_dz_dsort = np.mean(corrcoeffs_dz_dsort)
+std_cc_dz_dsort = np.std(corrcoeffs_dz_dsort)
+mean_cc_dz_last_mgs = np.mean(corrcoeffs_dz_last_mgs)
+std_cc_dz_last_mgs = np.std(corrcoeffs_dz_last_mgs)
+mean_cc_dz_last_sort = np.mean(corrcoeffs_dz_last_sort)
+std_cc_dz_last_sort = np.std(corrcoeffs_dz_last_sort)
+
+fig9, ax9 = plt.subplots(2,1,figsize=(3,7), gridspec_kw={'height_ratios': [3, 1]}, num='correlation coefficients')
+ax9[0].plot([0,0],[13,28],'k--')
+ax9[0].plot(corrcoeffs_dz_mgs, tide_axis, 'C0.')
+ax9[0].plot(corrcoeffs_dz_sort, tide_axis, 'C1.')
+ax9[0].plot(corrcoeffs_dz_dmgs, tide_axis, 'C2.')
+ax9[0].plot(corrcoeffs_dz_dsort, tide_axis, 'C3.')
+ax9[0].plot(corrcoeffs_dz_last_mgs, tide_axis, 'C4.')
+ax9[0].plot(corrcoeffs_dz_last_sort, tide_axis, 'C5.')
+ax9[0].autoscale(enable=True, axis='y', tight=True)
+ax9[0].invert_yaxis()
+ax9[0].set_ylabel('tide')
+ax90xlim = ax9[0].get_xlim()
+
+ax9[1].plot([0,0],[-0.5,5.5],'k--')
+ax9[1].plot(mean_cc_dz_mgs, 0, 'C0.')
+ax9[1].plot([mean_cc_dz_mgs-std_cc_dz_mgs,mean_cc_dz_mgs+std_cc_dz_mgs], [0,0], 'C0-')
+ax9[1].plot(mean_cc_dz_sort, 1, 'C1.')
+ax9[1].plot([mean_cc_dz_sort-std_cc_dz_sort,mean_cc_dz_sort+std_cc_dz_sort], [1,1], 'C1-')
+ax9[1].plot(mean_cc_dz_dmgs, 2, 'C2.')
+ax9[1].plot([mean_cc_dz_dmgs-std_cc_dz_dmgs,mean_cc_dz_dmgs+std_cc_dz_dmgs], [2,2], 'C2-')
+ax9[1].plot(mean_cc_dz_dsort, 3, 'C3.')
+ax9[1].plot([mean_cc_dz_dsort-std_cc_dz_dsort,mean_cc_dz_dsort+std_cc_dz_dsort], [3,3], 'C3-')
+ax9[1].plot(mean_cc_dz_last_mgs, 4, 'C4.')
+ax9[1].plot([mean_cc_dz_last_mgs-std_cc_dz_last_mgs,mean_cc_dz_last_mgs+std_cc_dz_last_mgs], [4,4], 'C4-')
+ax9[1].plot(mean_cc_dz_last_sort, 5, 'C5.')
+ax9[1].plot([mean_cc_dz_last_sort-std_cc_dz_last_sort,mean_cc_dz_last_sort+std_cc_dz_last_sort], [5,5], 'C5-')
+ax9[1].autoscale(enable=True, axis='y', tight=True)
+ax9[1].invert_yaxis()
+ax9[1].set_xlabel('correlation coefficient')
+setstr = [r'$\Delta z,M_0$', r'$\Delta z,M_1$', r'$\Delta z,\Delta M_0$',\
+r'$\Delta z,\Delta M_1$', r'$\Delta z,M_0[t-1]$', r'$\Delta z,M_1[t-1]$']
+setind = [0, 1, 2, 3, 4, 5]
+ax9[1].set_yticks(setind)
+ax9[1].set_yticklabels(setstr)
+ax9[1].set_xlim(ax90xlim)
+fig9.tight_layout()
+
+# plot changes in profile (z, mgs, ...) against hydrodynamics
+fig10, ax10 = plt.subplots(3,1,figsize=(5,9), num='profile change')
+ax10[0].plot(Hs[1:], np.nanmean(dz_line,axis=0), '.')
+ax10[0].set_ylabel(r'$\Delta z$ [m]')
+ax10[1].plot(Hs[1:], np.nanmean(mgs_line,axis=0), '.')
+ax10[1].set_ylabel(r'$M_0$ [mm]')
+ax10[2].plot(Hs[1:], np.nanmean(sort_line,axis=0), '.')
+ax10[2].set_ylabel(r'$M_1$ [mm]')
+ax10[2].set_xlabel('H_s [m]')
+# fig10.tight_layout()
+
+# plot changes in profile (z, mgs, ...) against hydrodynamics
+fig11, ax11 = plt.subplots(2,1,figsize=(5,3), sharex=True,num='Hs and grainsize change')
+ax11[0].plot(tide_axis, Hs[1:], '.')
+ax11[0].set_ylabel('$H_s$ [m]')
+ax11[1].plot(tide_axis, np.nanmean(mgs_line,axis=0), '.')
+# ax11[1].errorbar(tide_axis, np.nanmean(mgs_line,axis=0),
+#             xerr=0,
+#             yerr=np.nanmean(sort_line,axis=0))
+ax11[1].set_ylabel('mean grain size [mm]')
+ax11[1].set_xlabel('tide')
+# fig10.tight_layout()
+
+# EXPORT PLOTS
+if saveFlag == 1:
+
+    savedn = os.path.join(figsdn,'beach_profile',grid_spec)
+
+    save_figures(savedn, 'elevation_and_grainsize', fig01)
+    save_figures(savedn, 'cumulative_elevation_and_grainsize_change', fig2)
+    save_figures(savedn, 'tidal_elevation_and_grainsize_change', fig3)
+    save_figures(savedn, 'Hs_corr_coeff', fig4)
+    save_figures(savedn, 'energy_corr_coeff', fig5)
+    save_figures(savedn, 'Tp_corr_coeff', fig6)
+    save_figures(savedn, 'steepness_corr_coeff', fig7)
+    save_figures(savedn, 'iribarren_corr_coeff', fig8)
+    save_figures(savedn, 'pearson_correlation_coefficients', fig9)
