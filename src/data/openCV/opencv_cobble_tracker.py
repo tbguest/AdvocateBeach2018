@@ -18,12 +18,14 @@ import glob
 # python opencv_cobble_tracker.py --video .\timeavg_test.webm --tracker kcf
 # cd Projects\AdvocateBeach2018\src\data\openCV
 
+homechar = os.path.expanduser('~')
+
 tide = 'tide19'
-vidchunk = 'position1'
+vidchunk = 'position2'
 vid = 'vid_1540304255' # pos1
 # vid = 'vid_1540307860' # pos2, 3
 # vid = 'vid_1540311466' # pos4
-stonefile = 'yellow_15.npy'
+stonefile = 'yellow_01.npy'
 # stonefile = 'red_01.npy'
 # stonefile = 'blue_18.npy'
 # stonefile = 'green_02.npy'
@@ -32,7 +34,7 @@ stonefile = 'yellow_15.npy'
 #pos1 - did 7 move?
 
 # load in trajectories already logged
-traj_dir = os.path.join('C:\\','Projects','AdvocateBeach2018','data','interim','cobble_tracking',tide,vidchunk,vid)
+traj_dir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim','cobble_tracking',tide,vidchunk,vid)
 yellows = glob.glob(os.path.join(traj_dir, 'yellow_*.npy'))
 reds = glob.glob(os.path.join(traj_dir, 'red_*.npy'))
 blues = glob.glob(os.path.join(traj_dir, 'blue_*.npy'))

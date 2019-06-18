@@ -43,4 +43,6 @@ From raw video:
 - extract pixel-to-distance scaling using extract_scaling_from_cobble_images.py. This requires a relevant targets photo to the manually selected and put in the 'targets' folder
 - use scaling and smoothed, scaled pressure record to define mean and +/- extents of swash zone, and some prelim visualization in sin_fit_swash_timeseries.py
 
+- `coarsefine_split` qualitatively segments images from each cobble transport station into regions of coarse and fine bed coverage
+
 ## Range data

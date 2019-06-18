@@ -13,3 +13,4 @@ dependencies:
   - imageio
   - pip:
     - opencv-python==4.0.1
+    -imutils

@@ -12,22 +12,25 @@ import os
 %matplotlib qt5
 
 homechar = "C:\\"
+homechar = os.path.expanduser('~')
 
 tide = "tide19"
-position = "position4"
-vidspec = "vid_1540304255" # pos1
+position = "position3"
+# vidspec = "vid_1540304255" # pos1
 # vidspec = "vid_1540307860" # pos2
-# vidspec = "vid_1540307860" # pos3
-vidspec = "vid_1540311466" # pos4
+vidspec = "vid_1540307860" # pos3
+# vidspec = "vid_1540311466" # pos4
 colour = "yellow"
-imgnum = "img001796.jpg" # p1
+# imgnum = "img001796.jpg" # p1
 # imgnum = "img010768.jpg" #p2
-# imgnum = "img014226.jpg" #p3
-imgnum = "img003284.jpg" # p4
+imgnum = "img014226.jpg" #p3
+# imgnum = "img003284.jpg" # p4
 
 cmap = cm.tab10
 
-imgfile = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+# imgfile = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+#                            "images", "fromVideo", tide,position,vidspec,imgnum)
+imgfile = os.path.join('/media', 'tristan2','Advocate2018_backup2', "data", "interim", \
                            "images", "fromVideo", tide,position,vidspec,imgnum)
 im = plt.imread(imgfile)
 
@@ -61,7 +64,7 @@ for stone in sorted(cobfiles):
 
 
 # cmap = 'tab10'
-    jnk = np.load(stone).item()
+    jnk = np.load(stone, allow_pickle=True).item()
     xpix = np.array(jnk['position'])[:,0] * rescale_pix_x
     ypix = np.array(jnk['position'])[:,1] * rescale_pix_x
 
@@ -75,7 +78,7 @@ for stone in sorted(cobfiles):
     ax.xaxis.set_major_formatter(plt.NullFormatter())
     fig.tight_layout
 
-saveFlag = 1
+saveFlag = 0
 if saveFlag == 1:
 
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','cobble_transport',tide)

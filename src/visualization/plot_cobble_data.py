@@ -17,7 +17,7 @@ plt.rcParams.update({'font.size': 12})
 
 
 plt.close("all")
-saveFlag = 1
+saveFlag = 0
 
 def smooth_pressure(dep):
     ''' accepts a depth signal, p, for a given tide, and returns a smoothed
@@ -84,7 +84,9 @@ def binTrajectoryData(stones):
 
 # VARIABLE DEFINITIONS
 
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser('~')
+
 stone_class = 'yellows'
 # for tide 19, position 1: scaling = 421.0550841144531 pix/m
 tide = "tide19"
@@ -97,7 +99,7 @@ positions = ["position1", "position2", "position3", "position4"]
 
 # pressure data for determining mean shoreline
 pressurefn = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim','pressure',tide + '.npy')
-p = np.load(pressurefn).item()
+p = np.load(pressurefn, allow_pickle=True).item()
 tt = p['t']
 dep = p['d']
 mean_shoreline = smooth_pressure(dep) # not yet aligned with swash
@@ -153,13 +155,13 @@ for position in positions:
     # load swash timeseries data
     dn_swash = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', \
                 'data', 'processed', 'swash', tide, 'camera_' + position)
-    swash_ts = np.load(os.path.join(dn_swash, 'swash_timeseries.npy')).item()
+    swash_ts = np.load(os.path.join(dn_swash, 'swash_timeseries.npy'), allow_pickle=True).item()
     swash_std = swash_ts['stdev']
 
     # load cobble transport data
     dn_cobble = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', \
                 'data', 'processed', 'cobble_tracking', tide, 'camera_' + position)
-    stones = np.load(os.path.join(dn_cobble, stone_class + '.npy')).item()
+    stones = np.load(os.path.join(dn_cobble, stone_class + '.npy'), allow_pickle=True).item()
 
 
     ## bin tansport data

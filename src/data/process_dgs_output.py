@@ -61,7 +61,8 @@ def build_gsize_arrays(gsizedir):
 
 def main():
 
-    tide_range = range(28)
+    # tide_range = range(28)
+    tide_range = [14]
 
     ## load key:value dict to convert from yearday to tide num.
     #tidekeydn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "external", "tide_key_values.npy")
@@ -71,8 +72,9 @@ def main():
     # homechar = "C:\\"
     homechar = os.path.expanduser("~") # linux
 
-    # grid_spec = "cross_shore"
-    grid_specs = ['cross_shore', 'longshore1', 'longshore2', 'dense_array1', 'dense_array2']
+    grid_specs = ["longshore1"]
+    # grid_spec = "longshore1"
+    # grid_specs = ['cross_shore', 'longshore1', 'longshore2', 'dense_array1', 'dense_array2']
 
     for grid_spec in grid_specs:
 

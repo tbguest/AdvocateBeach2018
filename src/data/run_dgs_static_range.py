@@ -12,9 +12,11 @@ import numpy as np
 homechar = os.path.expanduser("~") # linux
 
 # imset = "cross_shore" #
-imset = "longshore2"
+# imset = "longshore2"
+imset = "longshore1"
 
-tides = range(28)
+# tides = range(28)
+tides = [14]
 
 for n in tides:
 
