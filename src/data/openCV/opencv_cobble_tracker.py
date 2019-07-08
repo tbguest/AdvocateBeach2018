@@ -67,6 +67,8 @@ ap.add_argument("-t", "--tracker", type=str, default="kcf",
 	help="OpenCV object tracker type")
 args = vars(ap.parse_args())
 
+# %tb
+
 # extract the OpenCV version info
 (major, minor) = cv2.__version__.split(".")[:2]
 

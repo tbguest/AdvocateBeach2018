@@ -81,6 +81,41 @@ def binTrajectoryData(stones):
 
     return bins, net_dx, net_dy, abs_dx_sum, abs_dy_sum, cumul_trans
 
+def coarsefine_binning(stones, tide, position):
+    '''Similar to above, but trajectories are binned based on whether substrate
+    is fine or coarse, as computed in coarsefine_split.py script. Currently
+    only set up to work for tide 19 data.
+    '''
+
+    splitdn = os.path.join(homechar,'Projects','AdvocateBeach2018','data','processed','images',\
+            'coarsefine_split',tide,position)
+    splitfn = os.listdir(splitdn)[0]
+
+    splitimg = np.load(os.path.join(splitdn,splitfn), allow_pickle=True)
+
+    for stone in stones:
+        stone = 1
+
+        dx = np.diff(stones[int(stone)]['x'])
+        dy = np.diff(stones[int(stone)]['y'])
+
+        Itransport = np.where(np.abs(dx) > transport_thresh)
+
+        for k in range(len(Itransport[0])):
+
+            # binning in image-centric reference frame
+            xpix = stones[int(stone)]['x_pixel']
+            ypix = stones[int(stone)]['y_pixel'] ################PICK IT UP AGAIN HERE###############################################################################
+
+            binx = np.int(xpix[Itransport[0][k]]/1000*nbins) # i think this gives the right starting point...
+            # append to dict bin
+            if binx not in bins:
+                bins[binx] = [dx[Itransport[0][k]]]
+            else:
+                bins.setdefault(binx, []).append(dx[Itransport[0][k]]) # worked at this one for a while...
+
+    return bins, net_dx, net_dy, abs_dx_sum, abs_dy_sum, cumul_trans
+
 
 # VARIABLE DEFINITIONS
 
@@ -99,6 +134,7 @@ positions = ["position1", "position2", "position3", "position4"]
 
 # pressure data for determining mean shoreline
 pressurefn = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim','pressure',tide + '.npy')
+p = np.load(pressurefn, allow_pickle=True)
 p = np.load(pressurefn, allow_pickle=True).item()
 tt = p['t']
 dep = p['d']
@@ -166,6 +202,9 @@ for position in positions:
 
     ## bin tansport data
     bins, net_dx, net_dy, abs_dx_sum, abs_dy_sum, cumul_trans  = binTrajectoryData(stones)
+
+    if tide == 'tide19':
+        bins, net_dx, net_dy, abs_dx_sum, abs_dy_sum, cumul_trans  = coarsefine_binning(stones, tide, position)
 
     # this funky indexing is just 0-3, without having to add a counter
     mean_xtransport[np.int(position[-1]) - 1] = np.mean(np.array(net_dx))
