@@ -58,29 +58,30 @@ def make_range_chunk(rng, tvec_rng, raw, tvec_raw, tt_start, tt_end):
     return chunkdata_rng
 
 
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser('~')
 
 # # tide 15
 # tide = '15'
 # skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
 # skip_last_chunk = 0
 
-# # tide 19
-# tide = '19'
-# skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
-# skip_last_chunk = 0
+# tide 19
+tide = '19'
+skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
+skip_last_chunk = 0
 
 # tide 21 ?
 
-# tide 27
-tide = '27'
-skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
-skip_last_chunk = 1
+# # tide 27
+# tide = '27'
+# skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
+# skip_last_chunk = 1
 
 pinums = ['71', '72', '73', '74']
 
 # where did this come from?
-timesdir = os.path.join("C:\\", "Projects", "AdvocateBeach2018", "data", \
+timesdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
                         "interim", "range_data", "start_and_end_times", \
                         "tide" + tide + ".npy")
 
@@ -104,14 +105,14 @@ tvec_rng = {}
 
 
 for pinum in pinums:
-#pinum = '71'
+#pinum = '72'
 
     ### grain size: ###
 
-    gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-               "grainsize_dists", "pi_array", "tide" + tide, 'pi' + pinum)
     # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-    #             "grainsize_dists", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level")
+               # "grainsize", "pi_array", "tide" + tide, 'pi' + pinum)
+    gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+                "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level")
 
     mean_gs = []
     std_gs = []
@@ -121,9 +122,9 @@ for pinum in pinums:
     if not os.path.exists(gsizedir):
         continue
 
-    for file in glob(os.path.join(gsizedir, 'img*.npy')):
+    for file in sorted(glob(os.path.join(gsizedir, 'img*.npy'))):
 
-        foo = np.load(file, encoding='latin1').item()
+        foo = np.load(file, allow_pickle=True, encoding='latin1').item()
         timg.append(float(file[-29:-19] + '.' + file[-18:-12]))
         mean_gs.append(foo['mean grain size'])
         std_gs.append(foo['grain size sorting'])
@@ -153,7 +154,7 @@ for pinum in pinums:
     if not os.path.exists(os.path.join(rangedir, 'sonar' + pinum + '.npy')):
         continue
 
-    jnk = np.load(os.path.join(rangedir, 'sonar' + pinum + '.npy')).item()
+    jnk = np.load(os.path.join(rangedir, 'sonar' + pinum + '.npy'), allow_pickle=True).item()
 
     raw[dictkey] = jnk['raw range'][1]
     tvec_raw[dictkey] = jnk['raw range'][0]
@@ -177,7 +178,7 @@ for jj in range(0 + skip_first_chunk, nchunks - skip_last_chunk):
                            'processed', 'grainsize', 'pi_array', 'tide' + tide)
 
     savedir_rng = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'range_data', 'bed_level', 'tide' + tide)
+                           'processed', 'range_data', 'tide' + tide)
 
     if not os.path.exists(savedir_gs):
         try:

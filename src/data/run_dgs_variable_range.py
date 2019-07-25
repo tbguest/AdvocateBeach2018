@@ -20,10 +20,12 @@ def imname2scalefactor(image_file, tide, pinum):
     ufrac = image_file[-18:-12]
     utime = usec + "." + ufrac
 
-    homechar = "/mnt/c"
-#    rangefile = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-#            "range_data", "bed_level", "tide" + tide, "sonar" + pinum + ".npy")
-    rangefile = homechar + "/Projects/AdvocateBeach2018/data/interim/range_data/bed_level/tide" + tide + "/sonar" + pinum + ".npy"
+    # homechar = "/mnt/c"
+    # homechar = os.path.expanduser('~')
+
+    rangefile = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+           "range_data", "bed_level", "tide" + tide, "sonar" + pinum + ".npy")
+    # rangefile = homechar + "/Projects/AdvocateBeach2018/data/interim/range_data/bed_level/tide" + tide + "/sonar" + pinum + ".npy"
 
     # for troubleshooting:
 #    homechar = "C:\\"
@@ -31,7 +33,7 @@ def imname2scalefactor(image_file, tide, pinum):
 #                "range_data", "bed_level", "tide" + tide, "sonar" + pinum + ".npy")
 
     ##
-    vvv = np.load(rangefile).item()
+    vvv = np.load(rangefile, allow_pickle=True).item()
     smth = vvv['smoothed chunks']
     rtime = smth[0]
     sonar_range = smth[1]
@@ -64,15 +66,24 @@ def imname2scalefactor(image_file, tide, pinum):
 
 
 
-date_str0 = "21_10_2018"
-tide = "15"
+
+homechar = os.path.expanduser('~')
+
+# date_str0 = "21_10_2018"
+tide = "19"
 pinum = "74"
 
 #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/" + date_str0 + "/horn_growth/selected/cropped"
 #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/tide" + tide + "/pi" + pinum + "/cropped"
-imdir = "/mnt/c/Projects/AdvocateBeach2018/data/processed/images/cropped/pi_cameras/tide" + tide + "/pi" + pinum
 #C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide19\pi71\cropped
-outdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/grainsize_dists/pi_array/tide" + tide + "/pi" + pinum + "/smooth_bed_level/"
+
+# imdir = "/mnt/c/Projects/AdvocateBeach2018/data/processed/images/cropped/pi_cameras/tide" + tide + "/pi" + pinum
+# outdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/grainsize_dists/pi_array/tide" + tide + "/pi" + pinum + "/smooth_bed_level/"
+
+imdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','processed',\
+                        'images','cropped','pi_cameras','tide'+tide,'pi'+pinum)
+outdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim',\
+                        'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level')
 
 if not os.path.exists(outdir):
     try:
@@ -82,7 +93,7 @@ if not os.path.exists(outdir):
             raise
 
 #for file in glob.glob(imdir + '*.jpg'):
-for file in glob.glob(imdir + '/*-cropped.jpg'):
+for file in glob.glob(os.path.join(imdir, '*-cropped.jpg')):
 
     image_file = file
 

@@ -25,9 +25,10 @@ Comment headers need to be added to all these scripts.
 
 ### 2. PiImages
 - Manually curate image sets; delete images containing swash, seaweed, shadows, etc. in the image region to be processed.
-- crop images in matlab (crop_images.m)
-- run image set through DGS pipeline for images with variable height (process_grain_images_variable_range.py). This must be done via the Ubuntu shell on my machine, since problems with package dependencies have not allowed me to successfully install the DGS package alongside anaconda.
+- crop images in matlab (crop_images.m -- now crop_images.py)
+- run image set through DGS pipeline for images with variable height (process_grain_images_variable_range.py). This must be done via the Ubuntu shell on my machine, since problems with package dependencies have not allowed me to successfully install the DGS package alongside anaconda. (fixed, now running on Ubuntu)
 - run consolidate_digital_grain_size_and_range_output.py for relevant tide to organize data into more accessible format. i.e. chunks associated with each position (this assumes some work has already been done with the range data, I think).
+- 
 
 ## Cobble tracking
 

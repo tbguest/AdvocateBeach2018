@@ -11,7 +11,7 @@ import os
 
 %matplotlib qt5
 
-homechar = "C:\\"
+# homechar = "C:\\"
 homechar = os.path.expanduser('~')
 
 tide = "tide19"
@@ -32,6 +32,13 @@ cmap = cm.tab10
 #                            "images", "fromVideo", tide,position,vidspec,imgnum)
 imgfile = os.path.join('/media', 'tristan2','Advocate2018_backup2', "data", "interim", \
                            "images", "fromVideo", tide,position,vidspec,imgnum)
+
+splitdn = os.path.join(homechar,'Projects','AdvocateBeach2018','data','processed','images',\
+        'coarsefine_split',tide,position)
+splitfn = os.listdir(splitdn)[0]
+
+splitimg = np.load(os.path.join(splitdn,splitfn), allow_pickle=True)
+
 im = plt.imread(imgfile)
 
 
@@ -48,6 +55,14 @@ pixloc = {}
 
 fig, ax = plt.subplots(nrows=1,ncols=1, num="trajectory overlay")
 ax.imshow(im)
+ax.imshow(splitimg, alpha=0.4)
+
+# ax.plot(925, 436, 'wo')
+# #841
+# # 413
+# # -1.904219368567567
+# # 925
+# # 436
 
 rescale_pix_x = 1640/1000
 rescale_pix_y = 1232/1000

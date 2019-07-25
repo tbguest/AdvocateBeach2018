@@ -13,6 +13,8 @@ from scipy import stats
 from scipy.signal import correlate
 import json
 
+# %matplotlib qt5
+
 plt.close('all')
 
 def save_figures(dn, fn, fig):
@@ -33,6 +35,8 @@ def save_figures(dn, fn, fig):
 
     fig.savefig(os.path.join(dn, fn + '.png'), dpi=1000, transparent=True)
     fig.savefig(os.path.join(dn, fn + '.pdf'), dpi=None, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.eps'), dpi=None, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.jpg'), dpi=1000, transparent=True)
 
 
 def find_fit_values(ys_orig, xs_orig, ys_line, xs_line):
@@ -57,6 +61,67 @@ def linear_regression(ys_orig, xs_orig):
     return lfit, r, tmpx
 
 
+def smooth_profile(profiles):
+
+    from src.data.regresstools import lowess
+
+    # for troubleshooting:
+    # profiles = mgs_line[:maxreal,:]
+    # ii=0
+
+    f0 = 3/len(profiles)
+    iters = 1
+
+    smooth_profiles = np.zeros(np.shape(profiles))
+
+    for ii in range(len(profiles[:,1])):
+        profile = profiles[ii,:]
+
+        smooth_profile = lowess.lowess(np.arange(len(profile)), profile, f=f0, iter=iters)
+        smooth_profiles[ii,:] = smooth_profile
+
+    return smooth_profiles
+
+
+def lin_fit_slope(z_line):
+
+    # for troubleshooting:
+    # ii=0
+
+    profiles = z_line#[:maxreal,:]
+
+    a = []
+
+    # append list of non nan values for each profile
+    for ii in range(len(profiles[1,:])):
+        a.append(len(profiles[~np.isnan(profiles[:,ii])]))
+
+    # index of longest profile
+    Ia = np.argmax(a)
+    # longest profile, without nans, from station 10 seaward
+    longest_profile = profiles[:,Ia][~np.isnan(profiles[:,Ia])]
+    lwr_slope = longest_profile[10:]
+
+    # fit line to lower beach
+    beach_fit_coeffs = np.polyfit(np.arange(10,len(lwr_slope)+10), lwr_slope, 1)
+    beach_fit = np.polyval(beach_fit_coeffs, np.arange(50))
+
+    plt.figure(888)
+    plt.plot(beach_fit[:len(longest_profile)])
+    plt.plot(longest_profile)
+
+    lindiff_profiles = np.zeros(np.shape(profiles[:maxreal,:])) #[~np.isnan(profiles)]
+
+    for ii in range(len(profiles[1,:])):
+        profile = profiles[:,ii][~np.isnan(profiles[:,ii])]
+
+        lindiff = profile[:maxreal] - beach_fit[:len(profile[:maxreal])]
+        lindiff_profiles[:,ii] = lindiff
+
+    return lindiff_profiles
+
+
+
 def main():
     saveFlag = 0
     saveCorr = 0
@@ -68,19 +133,24 @@ def main():
     figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
     'reports','figures')
 
-    grid_spec = "cross_shore"
-    # grid_spec = "longshore2"
+    # grid_spec = "cross_shore"
+    grid_spec = "longshore2"
     # grid_spec = "longshore1"
+
+    hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
 
     if grid_spec == 'cross_shore':
         start_tide = 13
     elif grid_spec == 'longshore1':
         start_tide = 15
+        hwl = hwl[2:]
     else:
         start_tide = 14
+        hwl = hwl[1:]
 
     tide_range = range(start_tide, 28)
     tide_axis = np.arange(start_tide+1,28) # for plotting later
+
 
     counter = 0
 
@@ -261,24 +331,29 @@ def main():
             corrcoeffs_dz_last_mgs.append(np.corrcoef(tmp_dz,tmp_last_mgs[:len(tmp_dz)])[0,1])
             corrcoeffs_dz_last_sort.append(np.corrcoef(tmp_dz,tmp_last_sort[:len(tmp_dz)])[0,1])
 
-    # plt.figure()
-    # plt.plot(tmp_dz)
-    # plt.figure()
-    # plt.plot(dmgs)
-            fig, ax1 = plt.subplots(2, 1, sharex=True, num='tide'+str(ii))
-            ax1[0].xcorr(tmp_dz, tmp_mgs[:len(tmp_dz)], usevlines=True, maxlags=10, normed=True, lw=2)
-            ax1[0].set_ylabel('correlation ($\Delta z, M_0$)')
+            # Istart = 5
+            # corrcoeffs_dz_mgs.append(np.corrcoef(tmp_dz[Istart:],tmp_mgs[Istart:len(tmp_dz)])[0,1])
+            # corrcoeffs_dz_dmgs.append(np.corrcoef(tmp_dz[Istart:],tmp_dmgs[Istart:len(tmp_dz)])[0,1])
+            # corrcoeffs_dz_sort.append(np.corrcoef(tmp_dz[Istart:],tmp_sort[Istart:len(tmp_dz)])[0,1])
+            # corrcoeffs_dz_dsort.append(np.corrcoef(tmp_dz[Istart:],tmp_dsort[Istart:len(tmp_dz)])[0,1])
+            # corrcoeffs_dz_last_mgs.append(np.corrcoef(tmp_dz[Istart:],tmp_last_mgs[Istart:len(tmp_dz)])[0,1])
+            # corrcoeffs_dz_last_sort.append(np.corrcoef(tmp_dz[Istart:],tmp_last_sort[Istart:len(tmp_dz)])[0,1])
 
-            ax1[1].xcorr(tmp_dz, tmp_dmgs[:len(tmp_dz)], usevlines=True, maxlags=10, normed=True, lw=2)
-            ax1[1].set_ylabel('correlation ($\Delta z, \Delta M_0$)')
-            ax1[1].set_xlabel('lag')
-
-            # EXPORT PLOTS
-            if saveCorr == 1:
-                savedn = os.path.join(figsdn,'beach_profile',grid_spec,'cross_correlation',tide)
-                savefn = 'dz_' + plt_tag
-
-                save_figures(savedn, savefn, fig)
+            ## cross-correlation
+            # fig, ax1 = plt.subplots(2, 1, sharex=True, num='tide'+str(ii))
+            # ax1[0].xcorr(tmp_dz, tmp_mgs[:len(tmp_dz)], usevlines=True, maxlags=10, normed=True, lw=2)
+            # ax1[0].set_ylabel('correlation ($\Delta z, M_0$)')
+            #
+            # ax1[1].xcorr(tmp_dz, tmp_dmgs[:len(tmp_dz)], usevlines=True, maxlags=10, normed=True, lw=2)
+            # ax1[1].set_ylabel('correlation ($\Delta z, \Delta M_0$)')
+            # ax1[1].set_xlabel('lag')
+            #
+            # # EXPORT PLOTS
+            # if saveCorr == 1:
+            #     savedn = os.path.join(figsdn,'beach_profile',grid_spec,'cross_correlation',tide)
+            #     savefn = 'dz_' + plt_tag
+            #
+            #     save_figures(savedn, savefn, fig)
 
 
         #tide 19: +1 more DGS obs than GPS
@@ -303,6 +378,15 @@ def main():
         candidate = np.count_nonzero(~np.isnan(col))
         if candidate > maxreal:
             maxreal = candidate
+
+    if grid_spec == "cross_shore":
+        # apply loess regression to MGS, sorting
+        smoothed_M0 = smooth_profile(mgs_line[:maxreal,:])
+        smoothed_M1 = smooth_profile(sort_line[:maxreal,:])
+        smoothed_dz = smooth_profile(sum_dz_line[:maxreal,:])
+
+        # express dz as difference from linear fitted slope
+        # z_lindiff = lin_fit_slope(z_line)
 
 
     # FIGURES
@@ -329,6 +413,35 @@ def main():
     clb2 = fig1.colorbar(ax1_2, ax=ax1[2])
     clb2.ax.set_title('$M_1$ [mm]')
     fig1.tight_layout()
+
+
+    if grid_spec == "cross_shore":
+        # plot change over time, smoothed, z lin fit
+        fig001, ax001 = plt.subplots(3,1, figsize=(3.5,6.5), num='smoothed mgs, sort')
+        # ax1_0 = ax001[0].imshow(sum_dz_line[:maxreal,:], cmap='bwr', vmin=-0.35, vmax=0.35, extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+        ax1_0 = ax001[0].imshow(smoothed_dz, cmap='bwr', vmin=-0.35, vmax=0.35, extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+        # ax1_0 = ax001[0].imshow(z_lindiff[:maxreal,:], cmap='bwr', vmin=-0.5, vmax=0.5, extent=[tide_range[1],tide_range[-1],15,-30], aspect='auto')
+        # plot HWL locations
+        ax001[0].plot(tide_axis,hwl,'kx')
+        clb0 = fig001.colorbar(ax1_0, ax=ax001[0])
+        clb0.ax.set_title('$\Delta z$ [m]', fontsize=10)
+        ax001[0].set_xticklabels([])
+        ax1_1 = ax001[1].imshow(smoothed_M0, cmap='inferno', vmin=5, vmax=35,extent=[tide_range[1],tide_range[-1],15,-30],aspect='auto')
+        # plot HWL locations
+        ax001[1].plot(tide_axis,hwl,'kx')
+        clb1 = fig001.colorbar(ax1_1, ax=ax001[1])
+        clb1.ax.set_title('$M_0$ [mm]', fontsize=10)
+        ax001[1].set_xticklabels([])
+        ax001[1].set_ylabel('cross-shore position [m]')
+        ax1_2 = ax001[2].imshow(smoothed_M1, cmap='inferno', vmin=5, vmax=35,extent=[tide_range[1],tide_range[-1],15,-30],aspect='auto')
+        # plot HWL locations
+        ax001[2].plot(tide_axis,hwl,'kx')
+        clb2 = fig001.colorbar(ax1_2, ax=ax001[2])
+        clb2.ax.set_title('$M_1$ [mm]', fontsize=10)
+        ax001[2].set_xlabel('tide')
+        # ax1_2.set_xlabel('cross-shore coordinate')
+        fig001.tight_layout()
+
 
 
     fig2, ax2 = plt.subplots(nrows=3, ncols=1, figsize=(3,6), num='cumulative change')
@@ -521,20 +634,25 @@ def main():
     # plot correlation coefficients against high tide elevation
     # plot changes in profile (z, mgs, ...) against hydrodynamics
     fig12, ax12 = plt.subplots(3,1,figsize=(5,9), num='correlation against high tide elevation')
-    ax12[0].plot(maxdepth[1:], corrcoeffs_dz_mgs, '.')
+    # ax12[0].plot(maxdepth[1:], corrcoeffs_dz_mgs, '.')
+    ax12[0].plot(hwl, corrcoeffs_dz_mgs, '.')
     ax12[0].set_ylabel(r'$R^2 (\Delta z,M_0)$')
-    ax12[1].plot(maxdepth[1:], corrcoeffs_dz_dmgs, '.')
+    # ax12[1].plot(maxdepth[1:], corrcoeffs_dz_dmgs, '.')
+    ax12[1].plot(hwl, corrcoeffs_dz_dmgs, '.')
     ax12[1].set_ylabel(r'$R^2 (\Delta z,\Delta M_0)$')
     ax12[1].set_xlabel('max depth [m]')
     fig12.tight_layout()
 
-
+    plt.figure(453)
+    plt.plot(maxdepth, 'o')
 
 
     # EXPORT PLOTS
     if saveFlag == 1:
 
         savedn = os.path.join(figsdn,'beach_profile',grid_spec)
+
+        save_figures(savedn, 'elevation_and_grainsize_smoothed', fig001)
 
         save_figures(savedn, 'elevation_and_grainsize', fig01)
         save_figures(savedn, 'cumulative_elevation_and_grainsize', fig1)

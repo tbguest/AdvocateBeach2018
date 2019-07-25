@@ -87,11 +87,13 @@ for position in positions:
     # for coarse-fine split
     split_image = np.zeros(np.shape(im[:,:,1]))
 
+    coarse_edgecount = 0.15
+
     for I_x in xgrid:
         for  I_y in ygrid:
             edgecount = np.sum(edges[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))])
             # print(edgecount)
-            if edgecount/len(edges[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))].flatten()) > 0.13:
+            if edgecount/len(edges[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))].flatten()) > coarse_edgecount:
                 coarsefine_split.append(1)
                 split_image[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))] = 1
             else:
