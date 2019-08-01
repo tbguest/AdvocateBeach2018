@@ -16,7 +16,7 @@ import json
 # use funtions from profile plotting script
 from src.visualization.plot_beach_profile_data import *
 
-# %matplotlib inline
+# %matplotlib qt5
 
 plt.close('all')
 

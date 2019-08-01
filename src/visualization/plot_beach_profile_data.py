@@ -123,7 +123,7 @@ def lin_fit_slope(z_line):
 
 
 def main():
-    saveFlag = 0
+    saveFlag = 1
     saveCorr = 0
 
     # for portability
@@ -133,8 +133,8 @@ def main():
     figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
     'reports','figures')
 
-    # grid_spec = "cross_shore"
-    grid_spec = "longshore2"
+    grid_spec = "cross_shore"
+    # grid_spec = "longshore2"
     # grid_spec = "longshore1"
 
     hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
@@ -432,7 +432,7 @@ def main():
         clb1 = fig001.colorbar(ax1_1, ax=ax001[1])
         clb1.ax.set_title('$M_0$ [mm]', fontsize=10)
         ax001[1].set_xticklabels([])
-        ax001[1].set_ylabel('cross-shore position [m]')
+        ax001[1].set_ylabel('distance offshore [m]')
         ax1_2 = ax001[2].imshow(smoothed_M1, cmap='inferno', vmin=5, vmax=35,extent=[tide_range[1],tide_range[-1],15,-30],aspect='auto')
         # plot HWL locations
         ax001[2].plot(tide_axis,hwl,'kx')
@@ -608,7 +608,7 @@ def main():
     fig9.tight_layout()
 
     # plot changes in profile (z, mgs, ...) against hydrodynamics
-    fig10, ax10 = plt.subplots(3,1,figsize=(5,9), num='profile change')
+    fig10, ax10 = plt.subplots(3,1,figsize=(4,9), num='profile change')
     ax10[0].plot(Hs[1:], np.nanmean(dz_line,axis=0), '.')
     ax10[0].set_ylabel(r'$\Delta z$ [m]')
     ax10[1].plot(Hs[1:], np.nanmean(mgs_line,axis=0), '.')
@@ -620,14 +620,17 @@ def main():
 
     # plot changes in profile (z, mgs, ...) against hydrodynamics
     fig11, ax11 = plt.subplots(2,1,figsize=(5,3), sharex=True,num='Hs and grainsize change')
-    ax11[0].plot(tide_axis, Hs[1:], '.')
+    ax11[0].plot(tide_axis, Hs[1:], 'k.')
     ax11[0].set_ylabel('$H_s$ [m]')
-    ax11[1].plot(tide_axis, np.nanmean(mgs_line,axis=0), '.')
+    ax11[0].tick_params(direction='in',top=1,right=1)
+    ax11[1].plot(tide_axis, np.nanmean(mgs_line,axis=0), 'k.')
+    ax11[1].plot([tide_axis, tide_axis], [np.nanmean(mgs_line,axis=0) - np.nanstd(mgs_line,axis=0), np.nanmean(mgs_line,axis=0) + np.nanstd(mgs_line,axis=0)], 'k-')
     # ax11[1].errorbar(tide_axis, np.nanmean(mgs_line,axis=0),
     #             xerr=0,
     #             yerr=np.nanmean(sort_line,axis=0))
-    ax11[1].set_ylabel('mean grain size [mm]')
+    ax11[1].set_ylabel('$M_0$ [mm]')
     ax11[1].set_xlabel('tide')
+    ax11[1].tick_params(direction='in',top=1,right=1)
     fig11.tight_layout()
 
 
@@ -653,19 +656,19 @@ def main():
         savedn = os.path.join(figsdn,'beach_profile',grid_spec)
 
         save_figures(savedn, 'elevation_and_grainsize_smoothed', fig001)
-
-        save_figures(savedn, 'elevation_and_grainsize', fig01)
-        save_figures(savedn, 'cumulative_elevation_and_grainsize', fig1)
-        save_figures(savedn, 'cumulative_elevation_and_grainsize_change', fig2)
-        save_figures(savedn, 'tidal_elevation_and_grainsize_change', fig3)
-        save_figures(savedn, 'Hs_corr_coeff', fig4)
-        save_figures(savedn, 'energy_corr_coeff', fig5)
-        save_figures(savedn, 'Tp_corr_coeff', fig6)
-        save_figures(savedn, 'steepness_corr_coeff', fig7)
-        save_figures(savedn, 'iribarren_corr_coeff', fig8)
-        save_figures(savedn, 'pearson_correlation_coefficients', fig9)
-        save_figures(savedn, 'profile_change', fig10)
-        save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
+        #
+        # save_figures(savedn, 'elevation_and_grainsize', fig01)
+        # save_figures(savedn, 'cumulative_elevation_and_grainsize', fig1)
+        # save_figures(savedn, 'cumulative_elevation_and_grainsize_change', fig2)
+        # save_figures(savedn, 'tidal_elevation_and_grainsize_change', fig3)
+        # save_figures(savedn, 'Hs_corr_coeff', fig4)
+        # save_figures(savedn, 'energy_corr_coeff', fig5)
+        # save_figures(savedn, 'Tp_corr_coeff', fig6)
+        # save_figures(savedn, 'steepness_corr_coeff', fig7)
+        # save_figures(savedn, 'iribarren_corr_coeff', fig8)
+        # save_figures(savedn, 'pearson_correlation_coefficients', fig9)
+        # save_figures(savedn, 'profile_change', fig10)
+        # save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
 
 
 if __name__ == '__main__':

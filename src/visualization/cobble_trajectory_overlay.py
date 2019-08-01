@@ -15,15 +15,15 @@ import os
 homechar = os.path.expanduser('~')
 
 tide = "tide19"
-position = "position3"
+position = "position2"
 # vidspec = "vid_1540304255" # pos1
-# vidspec = "vid_1540307860" # pos2
-vidspec = "vid_1540307860" # pos3
+vidspec = "vid_1540307860" # pos2
+# vidspec = "vid_1540307860" # pos3
 # vidspec = "vid_1540311466" # pos4
 colour = "yellow"
 # imgnum = "img001796.jpg" # p1
-# imgnum = "img010768.jpg" #p2
-imgnum = "img014226.jpg" #p3
+imgnum = "img010768.jpg" #p2
+# imgnum = "img014226.jpg" #p3
 # imgnum = "img003284.jpg" # p4
 
 cmap = cm.tab10

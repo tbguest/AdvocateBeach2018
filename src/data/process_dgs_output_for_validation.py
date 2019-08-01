@@ -5,12 +5,14 @@ Created on Wed Nov 21 14:31:00 2018
 @author: Owner
 """
 
+
+%reset -f
+%matplotlib qt5
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import csv
-
-%matplotlib qt5
 
 
 # for portability
@@ -18,7 +20,7 @@ import csv
 homechar = os.path.expanduser("~") # linux
 
 
-validation_dns = ["LabValidation_xpos05", "OutdoorValidation_xpos05"]
+# validation_dns = ["LabValidation_xpos05", "OutdoorValidation_xpos05"]
 # validation_dns = ["LabValidation_xmin05", "OutdoorValidation_xmin05"]
 # validation_dns = ["LabValidation_xmin05", "OutdoorValidation_xmin05_ms5p5"]
 # validation_dns = ["LabValidation_xmin05", "OutdoorValidation_xmin05_3pcwindowing"]
@@ -91,6 +93,10 @@ for n in range(0, 2):
 
             dgsjnk = np.load(os.path.join(gsizedir, allfiles[jj]), encoding='latin1', allow_pickle=True).item()
 
+            gsfreq = dgsjnk['grain size frequencies']
+            mgs_g = np.exp(np.sum(gsfreq*np.log(dgsjnk['grain size bins'])))
+            sort_g = np.exp(np.sqrt(np.sum(gsfreq*(np.log(dgsjnk['grain size bins']) - np.log(mgs_g))**2)))
+
             imgnum = str(int(allfiles[jj][4:8])) # removes leading zeros
 
             Iimg = imgnames.index(imgnum)
@@ -101,8 +107,8 @@ for n in range(0, 2):
                                        dates[Iimg][3:6] + dates[Iimg][:2] + '_' + \
                                        locs[Iimg] + '_' + depths[Iimg] + '.npy'), allow_pickle=True).item()
 
-            gsfreqs = bar['grain size frequencies']#[2:-1] # omitting 45 mm size
-            gsbins = bar['grain size bins']#[2:-1]
+            gsfreqs = bar['grain size frequencies'][1:]/np.sum(bar['grain size frequencies'][1:])#[2:-1] # omitting 45 mm size
+            gsbins = bar['grain size bins'][1:]
             cumsum = bar['cumulative sum']
             # rescale if necessary
     #            binsum = np.sum(gsfreqs)
@@ -113,19 +119,21 @@ for n in range(0, 2):
             xp_end = np.max(gsbins)
             xp = np.linspace(xp_stt, xp_end, 10000)
 
-            cumsum_interp = np.interp(xp, np.flipud(gsbins),  np.flipud(cumsum))
-            p05 = np.argmin(np.abs(0.05 - cumsum_interp))
-            p10 = np.argmin(np.abs(0.10 - cumsum_interp))
-            p16 = np.argmin(np.abs(0.16 - cumsum_interp))
-            p25 = np.argmin(np.abs(0.25 - cumsum_interp))
-            p50 = np.argmin(np.abs(0.50 - cumsum_interp))
-            p75 = np.argmin(np.abs(0.75 - cumsum_interp))
-            p84 = np.argmin(np.abs(0.84 - cumsum_interp))
-            p90 = np.argmin(np.abs(0.90 - cumsum_interp))
-            p95 = np.argmin(np.abs(0.95 - cumsum_interp))
+            # cumsum_interp = np.interp(xp, np.flipud(gsbins),  np.flipud(cumsum))
+            # p05 = np.argmin(np.abs(0.05 - cumsum_interp))
+            # p10 = np.argmin(np.abs(0.10 - cumsum_interp))
+            # p16 = np.argmin(np.abs(0.16 - cumsum_interp))
+            # p25 = np.argmin(np.abs(0.25 - cumsum_interp))
+            # p50 = np.argmin(np.abs(0.50 - cumsum_interp))
+            # p75 = np.argmin(np.abs(0.75 - cumsum_interp))
+            # p84 = np.argmin(np.abs(0.84 - cumsum_interp))
+            # p90 = np.argmin(np.abs(0.90 - cumsum_interp))
+            # p95 = np.argmin(np.abs(0.95 - cumsum_interp))
 
             mean_gs = np.sum(gsfreqs*gsbins)
+            # mean_gs = np.exp(np.sum(gsfreqs*np.log(gsbins)))
             std_gs = np.sqrt(np.sum(gsfreqs*(gsbins - mean_gs)**2))
+            # std_gs = np.exp(np.sqrt(np.sum(gsfreqs*(np.log(gsbins) - np.log(mean_gs))**2)))
             skew_gs = (np.sum(gsfreqs*(gsbins - mean_gs)**3))/(100*std_gs**3)
             kurt_gs = (np.sum(gsfreqs*(gsbins - mean_gs)**4))/(100*std_gs**4)
 
@@ -143,8 +151,10 @@ for n in range(0, 2):
             # fig1, ax1 = plt.subplots(nrows=2, ncols=1, num="compare mean and stdev")
             if n is 0:
                 l1, = ax1[0].plot(mean_gs, dgsjnk['mean grain size'], 'k.', label='no window')
+                # l1, = ax1[0].plot(mean_gs, mgs_g, 'k.', label='no window')
             else:
                 l2, = ax1[0].plot(mean_gs, dgsjnk['mean grain size'], 'r.', label='window')
+                # l2, = ax1[0].plot(mean_gs, mgs_g, 'r.', label='window')
             # plt.plot(mean_gs, dgsjnk['mean grain size'], 'k.')
     #            plt.plot(mean_gs, perc_freqs, 'c.')
             # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
@@ -152,9 +162,11 @@ for n in range(0, 2):
             ax1[0].set_ylabel('DGS mean [mm]')
             if n is 0:
                 ax1[1].plot(std_gs, dgsjnk['grain size sorting'], 'k.')
+                # ax1[1].plot(std_gs, sort_g, 'k.')
             else:
-                # ax1[1].plot(std_gs, dgsjnk['grain size sorting'], 'r.')
+                ## ax1[1].plot(std_gs, dgsjnk['grain size sorting'], 'r.')
                 ax1[1].plot(std_gs, np.mean(dgsjnk['grain size sorting']), 'r.')
+                # ax1[1].plot(std_gs, sort_g, 'r.')
             ax1[1].plot(np.arange(20), np.arange(20))
             ax1[1].set_xlabel('sieve [mm]')
             ax1[1].set_ylabel('DGS sorting [mm]')
