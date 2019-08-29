@@ -241,7 +241,7 @@ def main():
     overlap = 0.5
 
     for kk in yd:
-
+# kk=15
         fn = "tide" + str(kk + 1) + ".npy"
         fn_json = "tide" + str(kk + 1) + ".json"
         # t, d, hightide = return_data(os.path.join(dn, fn))
@@ -276,7 +276,7 @@ def main():
         wave_energy_swell = np.zeros(int(nintervals))
 
         for ii in range(0, int(nintervals)):
-
+# ii=0
             # define indices of interval limits
             mnind = np.argmin(np.abs(t - (t[0] + ii*dt)))
             mxind = np.argmin(np.abs(t - (t[0] + (ii+1)*dt)))
@@ -333,7 +333,7 @@ def main():
         rf[rf > 1] = 1
         M[M > 1] = 1
 
-        waves = {"yearday": timevec.tolist(),
+        wavesdat = {"yearday": timevec.tolist(),
                  "depth": depth.tolist(),
                  "Hs": Hs.tolist(),
                  "Hs_swell": Hs_swell.tolist(),
@@ -354,10 +354,10 @@ def main():
         # save new variables
         fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
                          "processed","pressure", "wavestats")
-        np.save(os.path.join(fout, fn), waves)
+        np.save(os.path.join(fout, fn), wavesdat)
 
         with open(os.path.join(fout, fn_json), 'w') as fp:
-            json.dump(waves, fp)
+            json.dump(wavesdat, fp)
 
 
 if __name__ == '__main__':

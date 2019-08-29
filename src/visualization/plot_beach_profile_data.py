@@ -5,6 +5,8 @@ Created on Thu Nov 22 15:47:31 2018
 @author: Owner
 """
 
+# %reset
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -133,9 +135,9 @@ def main():
     figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
     'reports','figures')
 
-    grid_spec = "cross_shore"
+    # grid_spec = "cross_shore"
     # grid_spec = "longshore2"
-    # grid_spec = "longshore1"
+    grid_spec = "longshore1"
 
     hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
 
@@ -179,6 +181,7 @@ def main():
     corrcoeffs_dz_dsort= []
     corrcoeffs_dz_last_mgs = []
     corrcoeffs_dz_last_sort = []
+    corrcoeffs_dz_last_dz = []
 
     Hs = []
     Tp = []
@@ -261,6 +264,7 @@ def main():
 
             last_z = z
             dz = z - last_z
+            last_dz = dz
 
             last_mgs = mgs
             last_sort = sort
@@ -277,6 +281,8 @@ def main():
             dz = z - last_z
     #        last_z = z
 
+            last_dz0 = last_dz
+
             last_mgs0 = last_mgs
             last_sort0 = last_sort
 
@@ -285,6 +291,7 @@ def main():
 
             # update
             last_z = z
+            last_dz = dz
             last_mgs = mgs
             last_sort = sort
 
@@ -312,7 +319,7 @@ def main():
             # correlate dz with mgs(t-1), mgs, dmgs
 
             tmp_dz = dz
-            tmp_dz = tmp_dz[~np.isnan(tmp_dz)] - np.nanmean(dz)
+            tmp_dz = tmp_dz[~np.isnan(tmp_dz)] - np.nanmean(dz) # why this?
 
             tmp_mgs = mgs
             tmp_dmgs = dmgs
@@ -320,6 +327,9 @@ def main():
             tmp_dsort = dsort
             tmp_last_mgs = last_mgs0
             tmp_last_sort = last_sort0
+
+            tmp_last_dz = last_dz0
+            # tmp_last_dz = tmp_last_dz[~np.isnan(tmp_last_dz)] - np.nanmean(last_dz0)
 
             plt_tag = 'mgs'
             tmp_mgs = tmp_mgs[~np.isnan(tmp_mgs)] - np.nanmean(mgs)
@@ -330,6 +340,8 @@ def main():
             corrcoeffs_dz_dsort.append(np.corrcoef(tmp_dz,tmp_dsort[:len(tmp_dz)])[0,1])
             corrcoeffs_dz_last_mgs.append(np.corrcoef(tmp_dz,tmp_last_mgs[:len(tmp_dz)])[0,1])
             corrcoeffs_dz_last_sort.append(np.corrcoef(tmp_dz,tmp_last_sort[:len(tmp_dz)])[0,1])
+
+            corrcoeffs_dz_last_dz.append(np.corrcoef(tmp_dz,tmp_last_dz[:len(tmp_dz)])[0,1])
 
             # Istart = 5
             # corrcoeffs_dz_mgs.append(np.corrcoef(tmp_dz[Istart:],tmp_mgs[Istart:len(tmp_dz)])[0,1])
@@ -569,6 +581,8 @@ def main():
     std_cc_dz_last_mgs = np.std(corrcoeffs_dz_last_mgs)
     mean_cc_dz_last_sort = np.mean(corrcoeffs_dz_last_sort)
     std_cc_dz_last_sort = np.std(corrcoeffs_dz_last_sort)
+    mean_cc_dz_last_dz = np.nanmean(corrcoeffs_dz_last_dz)
+    std_cc_dz_last_dz = np.nanstd(corrcoeffs_dz_last_dz)
 
     fig9, ax9 = plt.subplots(2,1,figsize=(3,7), gridspec_kw={'height_ratios': [3, 1]}, num='correlation coefficients')
     ax9[0].plot([0,0],[13,28],'k--')
@@ -578,12 +592,13 @@ def main():
     ax9[0].plot(corrcoeffs_dz_dsort, tide_axis, 'C3.')
     ax9[0].plot(corrcoeffs_dz_last_mgs, tide_axis, 'C4.')
     ax9[0].plot(corrcoeffs_dz_last_sort, tide_axis, 'C5.')
+    ax9[0].plot(corrcoeffs_dz_last_dz, tide_axis, 'C6.')
     ax9[0].autoscale(enable=True, axis='y', tight=True)
     ax9[0].invert_yaxis()
     ax9[0].set_ylabel('tide')
     ax90xlim = ax9[0].get_xlim()
 
-    ax9[1].plot([0,0],[-0.5,5.5],'k--')
+    ax9[1].plot([0,0],[-0.5,6.5],'k--')
     ax9[1].plot(mean_cc_dz_mgs, 0, 'C0.')
     ax9[1].plot([mean_cc_dz_mgs-std_cc_dz_mgs,mean_cc_dz_mgs+std_cc_dz_mgs], [0,0], 'C0-')
     ax9[1].plot(mean_cc_dz_sort, 1, 'C1.')
@@ -596,12 +611,14 @@ def main():
     ax9[1].plot([mean_cc_dz_last_mgs-std_cc_dz_last_mgs,mean_cc_dz_last_mgs+std_cc_dz_last_mgs], [4,4], 'C4-')
     ax9[1].plot(mean_cc_dz_last_sort, 5, 'C5.')
     ax9[1].plot([mean_cc_dz_last_sort-std_cc_dz_last_sort,mean_cc_dz_last_sort+std_cc_dz_last_sort], [5,5], 'C5-')
+    ax9[1].plot(mean_cc_dz_last_dz, 6, 'C6.')
+    ax9[1].plot([mean_cc_dz_last_dz-std_cc_dz_last_dz,mean_cc_dz_last_dz+std_cc_dz_last_dz], [6,6], 'C6-')
     ax9[1].autoscale(enable=True, axis='y', tight=True)
     ax9[1].invert_yaxis()
     ax9[1].set_xlabel('correlation coefficient')
     setstr = [r'$\Delta z,M_0$', r'$\Delta z,M_1$', r'$\Delta z,\Delta M_0$',\
-    r'$\Delta z,\Delta M_1$', r'$\Delta z,M_0[t-1]$', r'$\Delta z,M_1[t-1]$']
-    setind = [0, 1, 2, 3, 4, 5]
+    r'$\Delta z,\Delta M_1$', r'$\Delta z,M_0[t-1]$', r'$\Delta z,M_1[t-1]$', r'$\Delta z,\Delta z[t-1]$']
+    setind = [0, 1, 2, 3, 4, 5, 6]
     ax9[1].set_yticks(setind)
     ax9[1].set_yticklabels(setstr)
     ax9[1].set_xlim(ax90xlim)
@@ -655,7 +672,7 @@ def main():
 
         savedn = os.path.join(figsdn,'beach_profile',grid_spec)
 
-        save_figures(savedn, 'elevation_and_grainsize_smoothed', fig001)
+        # save_figures(savedn, 'elevation_and_grainsize_smoothed', fig001)
         #
         # save_figures(savedn, 'elevation_and_grainsize', fig01)
         # save_figures(savedn, 'cumulative_elevation_and_grainsize', fig1)
@@ -666,7 +683,7 @@ def main():
         # save_figures(savedn, 'Tp_corr_coeff', fig6)
         # save_figures(savedn, 'steepness_corr_coeff', fig7)
         # save_figures(savedn, 'iribarren_corr_coeff', fig8)
-        # save_figures(savedn, 'pearson_correlation_coefficients', fig9)
+        save_figures(savedn, 'pearson_correlation_coefficients', fig9)
         # save_figures(savedn, 'profile_change', fig10)
         # save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
 

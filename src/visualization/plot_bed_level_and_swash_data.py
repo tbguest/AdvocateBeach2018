@@ -11,6 +11,9 @@ array({'19_10_2018_A': 11, '27_10_2018_B': 27, '23_10_2018_B': 19, '22_10_2018_B
 
 """
 
+%reset -f
+
+
 import numpy as np
 import os
 from glob import glob
@@ -20,12 +23,14 @@ import sys
 from src.data.regresstools import lowess
 from src.data.regresstools import loess_1d
 from datetime import datetime
+from datetime import timedelta
 import time
 import matplotlib.dates as md
 import matplotlib.mlab as mlab
 from scipy.stats import norm
 
 # %matplotlib inline
+# %matplotlib qt5
 
 # change default font size
 plt.rcParams.update({'font.size': 12})
@@ -76,8 +81,8 @@ def loess_fit(time_data, grain_size_data):
     return smoothed_data
 
 # tide = '15'
-tide = '19'
-# tide = '27'
+# tide = '19'
+tide = '27'
 
 chunk = '2'
 
@@ -124,7 +129,7 @@ pinums = ['pi71', 'pi72', 'pi73', 'pi74']
 
 # initialize PLOTS
 fig01, ax01 = plt.subplots(4,1, figsize=(7,9), num='MSD timeseries chunk '+chunk)
-fig02, ax02 = plt.subplots(1,1, figsize=(5,7), num='swash depth vs $\Delta$ bed level. chunk '+chunk)
+fig02, ax02 = plt.subplots(1,2, figsize=(8,3.5), num='swash depth vs $\Delta$ bed level. chunk '+chunk)
 
 counter = -1
 piloc_counter = -1
@@ -228,44 +233,63 @@ for pinum in pinums:
 
 
     # scatter plot
-    ax02.plot(swash_depth*1000, np.abs(delta_bed),'.')
+    ax02[0].plot(swash_depth*1000, np.abs(delta_bed),'k.')
 
 
 
 
     # FIGURES TO BE SAVED IN LOOP:
 
-    fig101 = plt.figure(num=pinum + ' swash with marked peaks and bed level')
+    fig101 = plt.figure(num=pinum + ' swash with marked peaks and bed level', figsize=(7, 4))
     ax101 = fig101.add_subplot(211)
     # ax21.plot(newtt, cut_noise)
     # ax21.plot(date_good,bed_good, '.')
     # ax21.plot(newtt[Iall_max], cut_noise[Iall_max],'.')
-    ax101.plot(date_swash, swash_plus_bed, Linewidth=0.25)
-    ax101.plot(date_z_bed, z_bed, '.', Markersize=5)
-    ax101.plot(date_swash_peaks, swash_peaks_plus_bed,'.', Markersize=5)
-    ax101.set_xlabel('time [UTC]')
+    ax101.plot(date_swash, swash_plus_bed, 'k', Linewidth=0.5)
+    ax101.plot(date_z_bed, z_bed, 'C1.', Markersize=5)
+    ax101.plot(date_swash_peaks, swash_peaks_plus_bed,'C0.', Markersize=5)
+    # ax101.set_xlabel('time [UTC]')
     ax101.set_ylabel('z [m]')
     ax101.autoscale(enable=True, axis='x', tight=True)
     ax101.xaxis.set_major_formatter(xfmt)
+    ax101.tick_params(direction='in', top=0, right=0)
     # ax21.invert_yaxis()
     # xfmt = md.DateFormatter('%H:%M')
     # ax21.xaxis.set_major_formatter(xfmt)
+
+    minsoffset = 9
+
+    if tide == '19' and pinum == 'pi71':
+        ylims = [4.53, 4.68]
+    elif tide == '19' and pinum == 'pi72':
+        ylims = [4.53, 4.68]
+    elif tide == '19' and pinum == 'pi73':
+        ylims = [4.59, 4.7]
+    elif tide == '19' and pinum == 'pi74':
+        ylims = [4.53, 4.68]
+        minsoffset = 9
+    else:
+        ylims = [5.02, 5.18]
+        minsoffset = 15
 
     ax102 = fig101.add_subplot(212)
     # ax22.plot(newtt, cut_noise)
     # ax22.plot(date_good,bed_good, '.')
     # ax22.plot(newtt[Iall_max], cut_noise[Iall_max],'.')
-    ax102.plot(date_swash, swash_plus_bed)
-    ax102.plot(date_z_bed, z_bed, '.')
-    ax102.plot(date_swash_peaks, swash_peaks_plus_bed,'.')
-    ax102.set_xlabel('time [UTC]')
+    ax102.plot(date_swash, swash_plus_bed, 'k', Linewidth=0.5)
+    ax102.plot(date_z_bed, z_bed, 'C1.')
+    ax102.plot(date_swash_peaks, swash_peaks_plus_bed,'C0.')
+    ax102.set_xlabel('time, tide ' + tide + ' [UTC]')
     ax102.set_ylabel('z [m]')
     # ax22.set_xlim([datetime.fromtimestamp(np.min(t_swash)), \
     #     datetime.fromtimestamp(np.min(t_swash) + 1/10*(np.max(t_swash) - np.min(t_swash)))])
-    ax102.set_xlim([np.min(date_swash), np.min(date_swash) + 1/10*(np.max(date_swash) - np.min(date_swash))])
+    date_adj = timedelta(minutes=minsoffset)
+    ax102.set_xlim([date_adj+np.min(date_swash), date_adj+np.min(date_swash) + 1/15*(np.max(date_swash) - np.min(date_swash))])
     # ax22.autoscale(enable=True, axis='x', tight=True)
     ax102.autoscale(enable=True, axis='y', tight=True)
     ax102.xaxis.set_major_formatter(xfmt)
+    ax102.set_ylim(ylims)
+    ax102.tick_params(direction='in', top=0, right=0)
     # ax22.invert_yaxis()
     # ax22.xaxis.set_major_formatter(xfmt)
     fig101.tight_layout()
@@ -274,7 +298,7 @@ for pinum in pinums:
     fig103 = plt.figure(num=pinum + '$\Delta z$ histogram')
     plt.hist(delta_bed*1000, bins=20)
     plt.xlabel('bed level change [mm]')
-    plt.ylabel('occurrences')
+    plt.ylabel('frequency')
 
 
     fig301 = plt.figure(num=pinum + '; swash; swash peaks')
@@ -346,9 +370,9 @@ fig01.tight_layout()
 
 # FIGURE 02
 
-ax02.set_xlabel('swash depth [mm]')
-ax02.set_ylabel('absolute bed level change [mm]')
-fig02.tight_layout()
+ax02[0].set_xlabel('swash depth [mm]')
+ax02[0].set_ylabel('absolute bed level change [mm]')
+# fig02.tight_layout()
 
 # FIGURE 03
 
@@ -359,15 +383,29 @@ delta_bed_histogram = delta_bed_histogram[np.abs(delta_bed_histogram) < 30]
 (mu, sigma) = norm.fit(delta_bed_histogram)
 
 # the histogram of the data
-fig03 = plt.figure(num='$\Delta z$ histogram')
+fig03 = plt.figure(num='$\Delta z$ histogram', figsize=(5, 4))
 n, bins, patches = plt.hist(delta_bed_histogram, 30, density=1, alpha=0.75)
 y = mlab.normpdf(bins, mu, sigma)
-l = plt.plot(bins, y, 'r--', linewidth=2)
+l = plt.plot(bins, y, 'k--', linewidth=2)
 
 # fig03 = plt.figure(num='$\Delta z$ histogram')
 # plt.hist(delta_bed_histogram*1000, bins=30)
 plt.xlabel('bed level change [mm]')
-plt.ylabel('occurrences')
+plt.ylabel('frequency')
+fig03.tight_layout()
+
+
+# the histogram of the data
+# fig03 = plt.figure(num='$\Delta z$ histogram', figsize=(5, 4))
+n, bins, patches = ax02[1].hist(delta_bed_histogram, 30, density=1, alpha=0.75)
+y = mlab.normpdf(bins, mu, sigma)
+l = ax02[1].plot(bins, y, 'k--', linewidth=2)
+
+# fig03 = plt.figure(num='$\Delta z$ histogram')
+# plt.hist(delta_bed_histogram*1000, bins=30)
+ax02[1].set_xlabel('bed level change [mm]')
+ax02[1].set_ylabel('frequency')
+fig02.tight_layout()
 
 
 
@@ -376,5 +414,6 @@ if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','tide'+tide, 'chunk'+chunk)
 
     save_figures(savedn, 'MSD_timeseries', fig01)
-    save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
+    # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
+    save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
     save_figures(savedn, 'delta_bed_level_histogram', fig03)
