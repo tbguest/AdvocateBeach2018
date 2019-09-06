@@ -28,15 +28,20 @@ iribarren = []
 wave_energy = []
 wave_energy_wind = []
 wave_energy_swell = []
-maxdepth = []
+depth = []
 yearday = []
 tide_count = []
+miche = []
 
 yearday0 = []
 Hs0 = []
 Tp0 = []
 steepness0 = []
 iribarren0 = []
+miche0 = []
+depth0 = []
+
+
 
 counter = 0
 
@@ -74,7 +79,8 @@ for tide in tide_range:
     wave_energy.extend(np.array(bar["wave_energy"]))
     wave_energy_wind.extend(np.array(bar["wave_energy_wind"]))
     wave_energy_swell.extend(np.array(bar["wave_energy_swell"]))
-    # maxdepth.extend(np.max(bar["depth"]))
+    miche.extend(np.array(bar["Miche"]))
+    depth.extend(np.array(bar["depth"]))
 
     tide_count.append(counter)
 
@@ -83,37 +89,86 @@ for tide in tide_range:
     Tp0.append(np.array(bar["Tp"])[0])
     steepness0.append(np.array(bar["steepness"])[0])
     iribarren0.append(np.array(bar["Iribarren"])[0])
+    miche0.append(np.array(bar["Miche"])[0])
+    depth0.append(np.array(bar["depth"])[0])
 
-fig1, ax1 = plt.subplots(nrows=4, ncols=1, figsize=(8,6), num='wavedata')
-ax1[0].plot(yearday, Hs, '.')
-ax1[0].plot(yearday0, Hs0, 'r.')
+fig1, ax1 = plt.subplots(nrows=5, ncols=1, figsize=(8,6), num='wavedata')
+ax1[0].plot(yearday, depth, '.')
+ax1[0].plot(yearday0, depth0, 'r.')
 for n in range(len(tide_count)):
-    ax1[0].text(yearday0[n], 2, str(tide_count[n]))
-ax1[0].text(295,2.45,'tide')
-ax1[0].set_ylabel('$H_s$ [m]')
+    ax1[0].text(yearday0[n], 7.5, str(tide_count[n]))
+ax1[0].text(295,9.5,'tide')
+ax1[0].set_ylabel('$h$ [m]')
 ax1[0].set_xticklabels([])
 ax1[0].set_xlim(np.min(yearday), np.max(yearday))
 ax1[0].tick_params(direction='in',top=1,right=1)
-ax1[1].plot(yearday, Tp, '.')
-ax1[1].plot(yearday0, Tp0, 'r.')
-ax1[1].set_ylabel('$T_p$ [s]')
+ax1[1].plot(yearday, Hs, '.')
+ax1[1].plot(yearday0, Hs0, 'r.')
+ax1[1].set_ylabel('$H_s$ [m]')
 ax1[1].set_xticklabels([])
 ax1[1].set_xlim(np.min(yearday), np.max(yearday))
 ax1[1].tick_params(direction='in',top=1,right=1)
-ax1[2].plot(yearday, steepness, '.')
-ax1[2].plot(yearday0, steepness0, 'r.')
-ax1[2].set_ylabel('$H_0/L_0$')
-ax1[2].plot(yearday, 0.01*np.ones(len(yearday)), 'k--')
+ax1[2].plot(yearday, Tp, '.')
+ax1[2].plot(yearday0, Tp0, 'r.')
+ax1[2].set_ylabel('$T_p$ [s]')
 ax1[2].set_xticklabels([])
 ax1[2].set_xlim(np.min(yearday), np.max(yearday))
 ax1[2].tick_params(direction='in',top=1,right=1)
-ax1[3].plot(yearday, iribarren, '.')
-ax1[3].plot(yearday0, iribarren0, 'r.')
-ax1[3].set_ylabel(r'$\xi_0$')
-ax1[3].set_xlabel('yearday 2018')
+ax1[3].plot(yearday, steepness, '.')
+ax1[3].plot(yearday0, steepness0, 'r.')
+ax1[3].set_ylabel('$H_0/L_0$')
+ax1[3].plot(yearday, 0.01*np.ones(len(yearday)), 'k--')
+ax1[3].set_xticklabels([])
 ax1[3].set_xlim(np.min(yearday), np.max(yearday))
 ax1[3].tick_params(direction='in',top=1,right=1)
+ax1[4].plot(yearday, iribarren, '.')
+ax1[4].plot(yearday0, iribarren0, 'r.')
+ax1[4].set_ylabel(r'$\xi_0$')
+ax1[4].set_xlabel('yearday 2018')
+ax1[4].set_xlim(np.min(yearday), np.max(yearday))
+ax1[4].tick_params(direction='in',top=1,right=1)
 fig1.tight_layout()
+
+fig2, ax2 = plt.subplots(nrows=5, ncols=1, figsize=(8,6), num='wavedata 2')
+ax2[0].plot(yearday, Hs, '.')
+ax2[0].plot(yearday0, Hs0, 'r.')
+for n in range(len(tide_count)):
+    ax2[0].text(yearday0[n], 2, str(tide_count[n]))
+ax2[0].text(295,2.45,'tide')
+ax2[0].set_ylabel('$H_s$ [m]')
+ax2[0].set_xticklabels([])
+ax2[0].set_xlim(np.min(yearday), np.max(yearday))
+ax2[0].tick_params(direction='in',top=1,right=1)
+ax2[1].plot(yearday, Tp, '.')
+ax2[1].plot(yearday0, Tp0, 'r.')
+ax2[1].set_ylabel('$T_p$ [s]')
+ax2[1].set_xticklabels([])
+ax2[1].set_xlim(np.min(yearday), np.max(yearday))
+ax2[1].tick_params(direction='in',top=1,right=1)
+ax2[2].plot(yearday, steepness, '.')
+ax2[2].plot(yearday0, steepness0, 'r.')
+ax2[2].set_ylabel('$H_0/L_0$')
+ax2[2].plot(yearday, 0.01*np.ones(len(yearday)), 'k--')
+ax2[2].set_xticklabels([])
+ax2[2].set_xlim(np.min(yearday), np.max(yearday))
+ax2[2].tick_params(direction='in',top=1,right=1)
+ax2[3].plot(yearday, miche, '.')
+ax2[3].plot(yearday0, miche0, 'r.')
+ax2[3].set_ylabel('$R^{2}$')
+ax2[3].set_xticklabels([])
+ax2[3].set_xlim(np.min(yearday), np.max(yearday))
+ax2[3].set_yscale('log')
+ax2[3].set_ylim(1*10**-3, 10**0)
+ax2[3].tick_params(direction='in',top=1,right=1)
+ax2[4].plot(yearday, iribarren, '.')
+ax2[4].plot(yearday0, iribarren0, 'r.')
+ax2[4].set_ylabel(r'$\xi_0$')
+ax2[4].set_xlabel('yearday 2018')
+ax2[4].set_xlim(np.min(yearday), np.max(yearday))
+ax2[4].tick_params(direction='in',top=1,right=1)
+fig2.tight_layout()
+
+R_mean = np.nanmean(miche)
 
 
 saveFlag = 1
