@@ -45,24 +45,24 @@ def save_figures(dn, fn, fig):
     fig: figure handle
     '''
 
-    dn0 = os.path.join(dn, 'png')
-    dn1 = os.path.join(dn, 'pdf')
-    dn2 = os.path.join(dn, 'eps')
-    dn3 = os.path.join(dn, 'jpg')
+    # dn0 = os.path.join(dn, 'png')
+    # dn1 = os.path.join(dn, 'pdf')
+    # dn2 = os.path.join(dn, 'eps')
+    # dn3 = os.path.join(dn, 'jpg')
 
-    if not os.path.exists(dn0):
-        os.makedirs(dn0)
-    if not os.path.exists(dn1):
-        os.makedirs(dn1)
-    if not os.path.exists(dn2):
-        os.makedirs(dn2)
-    if not os.path.exists(dn3):
-        os.makedirs(dn3)
+    if not os.path.exists(dn):
+        os.makedirs(dn)
+    # if not os.path.exists(dn1):
+    #     os.makedirs(dn1)
+    # if not os.path.exists(dn2):
+    #     os.makedirs(dn2)
+    # if not os.path.exists(dn3):
+    #     os.makedirs(dn3)
 
-    fig.savefig(os.path.join(dn0, fn + '.png'), dpi=1000, transparent=True)
-    fig.savefig(os.path.join(dn1, fn + '.pdf'), dpi=None, transparent=True)
-    fig.savefig(os.path.join(dn2, fn + '.eps'), dpi=None, transparent=True)
-    fig.savefig(os.path.join(dn3, fn + '.jpg'), dpi=1000, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.png'), dpi=1000, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.pdf'), dpi=None, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.eps'), dpi=None, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.jpg'), dpi=1000, transparent=True)
 
 
 def utime2yearday(unixtime):
@@ -81,8 +81,8 @@ def loess_fit(time_data, grain_size_data):
     return smoothed_data
 
 # tide = '15'
-# tide = '19'
-tide = '27'
+tide = '19'
+# tide = '27'
 
 chunk = '2'
 
@@ -97,7 +97,7 @@ chunk = '2'
 
 
 # for saving plots
-saveFlag = 0
+saveFlag = 1
 
 post = 1.7 # survey post height
 
@@ -128,7 +128,7 @@ pilocs = np.load(pifile, allow_pickle=True).item()
 pinums = ['pi71', 'pi72', 'pi73', 'pi74']
 
 # initialize PLOTS
-fig01, ax01 = plt.subplots(4,1, figsize=(7,9), num='MSD timeseries chunk '+chunk)
+fig01, ax01 = plt.subplots(3,1, figsize=(7,6), num='MSD timeseries chunk '+chunk)
 fig02, ax02 = plt.subplots(1,2, figsize=(8,3.5), num='swash depth vs $\Delta$ bed level. chunk '+chunk)
 
 counter = -1
@@ -177,6 +177,9 @@ for pinum in pinums:
     t_z_bed = bedlevel_struct['data']['time_bed'][pinum] - 3*60*60
     date_z_bed = [datetime.fromtimestamp(x) for x in t_z_bed]
 
+    t_dz_bed = swash_struct['data']['time_swash_depth'][pinum] - 3*60*60
+    date_dz_bed = [datetime.fromtimestamp(x) for x in t_dz_bed]
+
 
     # swash definitions
 
@@ -196,6 +199,33 @@ for pinum in pinums:
     swash_depth = swash_struct['data']['swash_depth'][pinum]
     delta_bed = swash_struct['data']['delta_bed'][pinum]*1000
     delta_bed_histogram.extend(delta_bed) # for plotting histogram that includes all sensors
+
+
+    # find peaks within retrospective vicinity of bed level change:
+    pk_times = swash_struct['data']['time_swash_peaks'][pinum] - 3*60*60
+    bed_count = -1
+    num_peaks = []
+    d_bedlvl = []
+    for bedlvl in z_bed:
+        bed_count += 1
+
+        if bed_count > 0:
+
+            d_bedlvl.append(bedlvl - z_bed[bed_count - 1])
+            t_bedlvl = t_z_bed[bed_count]
+            t_last_bedlvl = t_z_bed[bed_count - 1]
+
+            # find peaks between t and t-1:
+            found_pks = np.where((pk_times < t_bedlvl) & (pk_times > t_last_bedlvl))
+            # found_pks = np.where((pk_times < t_bedlvl) & (pk_times > (t_bedlvl - 20)))
+            num_peaks.append(len(found_pks[0]))
+
+    plt.figure(num=pinum + ' dbed vs num peaks in last 20 s')
+    plt.plot(num_peaks,d_bedlvl, '.')
+    plt.ylabel('dz')
+    plt.xlabel('num. peaks in last 20 s')
+
+
 
     # plot limits
     tmin = t_z_bed[0]
@@ -228,20 +258,23 @@ for pinum in pinums:
     tmp_hndl = ax01[2].plot(date_gs, mgs_fit, '-', color=clr, Linewidth=2)
     handles01.extend(tmp_hndl)
 
-    ax01[3].plot(date_gs, sort, '.', color=clr, Markersize=3)
-    ax01[3].plot(date_gs, sort_fit, '-', color=clr, Linewidth=2)
+    # ax01[3].plot(date_gs, sort, '.', color=clr, Markersize=3)
+    # ax01[3].plot(date_gs, sort_fit, '-', color=clr, Linewidth=2)
 
 
     # scatter plot
-    ax02[0].plot(swash_depth*1000, np.abs(delta_bed),'k.')
+    ax02[0].plot(swash_depth*1000, delta_bed,'k.')
 
 
 
 
     # FIGURES TO BE SAVED IN LOOP:
 
-    fig101 = plt.figure(num=pinum + ' swash with marked peaks and bed level', figsize=(7, 4))
-    ax101 = fig101.add_subplot(211)
+
+    # Methods figure: bed level change, swash peaks, with zoom in
+
+    fig101 = plt.figure(num=pinum + ' swash with marked peaks and bed level', figsize=(6, 5))
+    ax101 = fig101.add_subplot(311)
     # ax21.plot(newtt, cut_noise)
     # ax21.plot(date_good,bed_good, '.')
     # ax21.plot(newtt[Iall_max], cut_noise[Iall_max],'.')
@@ -256,6 +289,7 @@ for pinum in pinums:
     # ax21.invert_yaxis()
     # xfmt = md.DateFormatter('%H:%M')
     # ax21.xaxis.set_major_formatter(xfmt)
+    ax101_xlims = ax101.get_xlim()
 
     minsoffset = 9
 
@@ -272,7 +306,28 @@ for pinum in pinums:
         ylims = [5.02, 5.18]
         minsoffset = 15
 
-    ax102 = fig101.add_subplot(212)
+
+    ax103 = fig101.add_subplot(312)
+    # ax103.plot(date_dz_bed, delta_bed/1000, 'C0.')
+    ax103.plot(date_z_bed[1:], np.diff(z_bed), 'k.', Markersize=5)
+    date_z_bed, z_bed
+    # ax103.set_xlabel('time, tide ' + tide + ' [UTC]')
+    ax103.set_ylabel('dz [m]')
+    ax103.set_xlim(ax101_xlims)
+    ax103.xaxis.set_major_formatter(xfmt)
+
+    # date_adj = timedelta(minutes=minsoffset)
+    # ax103.set_xlim([date_adj+np.min(date_swash), date_adj+np.min(date_swash) + 1/15*(np.max(date_swash) - np.min(date_swash))])
+    # ax103.autoscale(enable=True, axis='y', tight=True)
+    # # ax103.xaxis.set_major_formatter(xfmt)
+    # # ax103.set_ylim(ylims)
+    ax103.tick_params(direction='in', top=0, right=0)
+    # ax22.invert_yaxis()
+    # ax22.xaxis.set_major_formatter(xfmt)
+    # fig101.tight_layout()
+
+
+    ax102 = fig101.add_subplot(313)
     # ax22.plot(newtt, cut_noise)
     # ax22.plot(date_good,bed_good, '.')
     # ax22.plot(newtt[Iall_max], cut_noise[Iall_max],'.')
@@ -293,6 +348,67 @@ for pinum in pinums:
     # ax22.invert_yaxis()
     # ax22.xaxis.set_major_formatter(xfmt)
     fig101.tight_layout()
+
+
+
+    # Results figure: bed level change, swash peaks, dz
+
+    fig1011 = plt.figure(num=pinum + ' swash with marked peaks and bed level, for results', figsize=(7, 4))
+    ax1011 = fig1011.add_subplot(211)
+    # ax21.plot(newtt, cut_noise)
+    # ax21.plot(date_good,bed_good, '.')
+    # ax21.plot(newtt[Iall_max], cut_noise[Iall_max],'.')
+    ax1011.plot(date_swash, swash_plus_bed, 'k', Linewidth=0.5)
+    ax1011.plot(date_z_bed, z_bed, 'C1.', Markersize=5)
+    ax1011.plot(date_swash_peaks, swash_peaks_plus_bed,'C0.', Markersize=5)
+    # ax101.set_xlabel('time [UTC]')
+    ax1011.set_ylabel('z [m]')
+    ax1011.autoscale(enable=True, axis='x', tight=True)
+    ax1011.xaxis.set_major_formatter(xfmt)
+    ax1011.tick_params(direction='in', top=0, right=0)
+    # ax21.invert_yaxis()
+    # xfmt = md.DateFormatter('%H:%M')
+    # ax21.xaxis.set_major_formatter(xfmt)
+    ax1011_xlims = ax1011.get_xlim()
+
+    minsoffset = 9
+
+    if tide == '19' and pinum == 'pi71':
+        ylims = [4.53, 4.68]
+    elif tide == '19' and pinum == 'pi72':
+        ylims = [4.53, 4.68]
+    elif tide == '19' and pinum == 'pi73':
+        ylims = [4.59, 4.7]
+    elif tide == '19' and pinum == 'pi74':
+        ylims = [4.53, 4.68]
+        minsoffset = 9
+    else:
+        ylims = [5.02, 5.18]
+        minsoffset = 15
+
+
+    ax1013 = fig1011.add_subplot(212)
+    # ax103.plot(date_dz_bed, delta_bed/1000, 'C0.')
+    ax1013.plot(date_z_bed[1:], np.diff(z_bed), 'k.', Markersize=5)
+    ax1013.set_xlabel('time, tide ' + tide + ' [UTC]')
+    ax1013.set_ylabel('dz [m]')
+    ax1013.set_xlim(ax101_xlims)
+    ax1013.xaxis.set_major_formatter(xfmt)
+
+    # date_adj = timedelta(minutes=minsoffset)
+    # ax103.set_xlim([date_adj+np.min(date_swash), date_adj+np.min(date_swash) + 1/15*(np.max(date_swash) - np.min(date_swash))])
+    # ax103.autoscale(enable=True, axis='y', tight=True)
+    # # ax103.xaxis.set_major_formatter(xfmt)
+    # # ax103.set_ylim(ylims)
+    ax1013.tick_params(direction='in', top=0, right=0)
+    # ax22.invert_yaxis()
+    # ax22.xaxis.set_major_formatter(xfmt)
+    # fig101.tight_layout()
+
+    fig1011.tight_layout()
+
+
+
 
 
     fig103 = plt.figure(num=pinum + '$\Delta z$ histogram')
@@ -321,13 +437,24 @@ for pinum in pinums:
     fig301.tight_layout()
 
 
+    fig104 = plt.figure(num=pinum + '; blc')
+    ax104 = fig104.add_subplot(111)
+    ax104.plot(np.diff(t_z_bed), np.diff(z_bed), '.', Markersize=5)
+    ax104.set_ylabel('dz [m]')
+    ax104.set_xlabel(r'dt(z) [s]')
+
+# len(z_bed)
+
+
+
+
 
     # export figs
     if saveFlag == 1:
         loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','tide'+tide, 'chunk'+chunk)
 
-        save_figures(loopdn, pinum + '_swash_peaks_bed_level', fig101)
-        save_figures(loopdn, pinum + '_swash_peaks_no_bed_level', fig301)
+        save_figures(loopdn, pinum + '_swash_peaks_bed_level_with_dz', fig1011)
+        # save_figures(loopdn, pinum + '_swash_peaks_no_bed_level', fig301)
 
 
 
@@ -355,16 +482,16 @@ ax01[1].tick_params(direction='in')
 ax01[1].set_ylabel('$z$ [m]')
 ax01[2].set_xlim([datemin, datemax])
 ax01[2].xaxis.set_major_formatter(xfmt)
-ax01[2].xaxis.set_major_formatter(plt.NullFormatter())
+# ax01[2].xaxis.set_major_formatter(plt.NullFormatter())
 ax01[2].grid(alpha=gridalpha)
 ax01[2].tick_params(direction='in')
-ax01[2].set_ylabel('$M_0$ [mm]')
-ax01[3].set_xlim([datemin, datemax])
-ax01[3].xaxis.set_major_formatter(xfmt)
-ax01[3].grid(alpha=gridalpha)
-ax01[3].tick_params(direction='in')
-ax01[3].set_ylabel('$M_1$ [mm]')
-ax01[3].set_xlabel('time [UTC]')
+ax01[2].set_ylabel('MGS [mm]')
+# ax01[3].set_xlim([datemin, datemax])
+# ax01[3].xaxis.set_major_formatter(xfmt)
+# ax01[3].grid(alpha=gridalpha)
+# ax01[3].tick_params(direction='in')
+# ax01[3].set_ylabel('$M_1$ [mm]')
+ax01[2].set_xlabel('time, tide ' + tide + '  [UTC]')
 fig01.tight_layout()
 
 
@@ -414,6 +541,6 @@ if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','tide'+tide, 'chunk'+chunk)
 
     save_figures(savedn, 'MSD_timeseries', fig01)
-    # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
+    # # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
     save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
     save_figures(savedn, 'delta_bed_level_histogram', fig03)

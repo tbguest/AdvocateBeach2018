@@ -560,6 +560,15 @@ def main():
         fig001.tight_layout()
 
 
+        fig010, ax010 = plt.subplots(1,1, figsize=(3.5,4.5), num='mean mgs, cross-shore')
+        ax010.plot(np.mean(smoothed_M0, 1), np.linspace(-27, 9, 13), 'ko')
+        ax010.plot([np.mean(smoothed_M0, 1)-np.std(smoothed_M0, 1), np.mean(smoothed_M0, 1)+np.std(smoothed_M0, 1)], [np.linspace(-27, 9, 13), np.linspace(-27, 9, 13)], 'k-')
+        ax010.plot([np.min(smoothed_M0, 1), np.max(smoothed_M0, 1)], [np.linspace(-27, 9, 13), np.linspace(-27, 9, 13)], 'k|')
+        ax010.invert_yaxis()
+        ax010.set_xlabel('mean MGS [mm]')
+        ax010.set_ylabel('cross-shore coordinate [m]')
+        fig010.tight_layout()
+
 
         # for surface plotting:
         Xtmp = np.linspace(tide_range[1], tide_range[-1], tide_range[-1]-tide_range[1]+1)
@@ -913,6 +922,8 @@ def main():
         savedn = os.path.join(figsdn,'beach_profile',grid_spec)
 
         save_figures(savedn, 'surfaceplots_dz_grainsize', fig)
+
+        save_figures(savedn, 'mean_MGS_crossshore', fig010)
 
         # save_figures(savedn, 'elevation_and_grainsize_smoothed', fig001)
         #
