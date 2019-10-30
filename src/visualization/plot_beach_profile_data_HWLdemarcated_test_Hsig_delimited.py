@@ -165,7 +165,8 @@ def lin_fit_slope(z_line):
 saveFlag = 0
 saveCorr = 0
 
-wave_height_threshold = 0.1
+wave_height_threshold = 0.25 # set really high to omit
+steepness_threshold = 0.01 # set really high to omit
 
 # for portability
 # homechar = "C:\\"
@@ -174,19 +175,23 @@ homechar = os.path.expanduser("~") # linux
 figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures')
 
 # cross-shore HWL coord and tide index
-hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+# hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+hwl = [-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27]
 Ihwl = [14, 15, 16, 17, 18,19, 20, 21, 22, 23, 24, 25, 26, 27]
 
 # grid_specs = ["cross_shore"]#["longshore1", "longshore2"]#, "dense_array2"]
 # grid_specs = ["cross_shore","longshore1", "dense_array2"]
 grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
 # grid_specs = ["longshore1"]#, "longshore1", "longshore2", "dense_array2"]
+# grid_specs = ["longshore1"]
 
 # guess at cross-shore profile length
 npts = 150
 
-berm_zone_width = 9 # [m] should be multiple of 3
-hwl_adjust = -1
+# berm_zone_width = 6 # [m] should be multiple of 3
+# hwl_adjust = 3
+berm_zone_width = 16 # [m] should be multiple of 3
+hwl_adjust = -4
 
 above_HWL_dz = []
 above_HWL_mgs = []
@@ -217,10 +222,15 @@ below_HWL_last_dz = []
 below_HWL_dz_for_last_dz = []
 below_HWL_dmgs_for_last_dmgs = []
 
+
 # for tide comparison with wave data
 below_HWL_dz_tides = {}
 below_HWL_mgs_tides = {}
 below_HWL_dmgs_tides = {}
+
+at_HWL_dz_tides = {}
+at_HWL_mgs_tides = {}
+at_HWL_dmgs_tides = {}
 
 
 accretion_bin_dz = []
@@ -251,6 +261,8 @@ wave_energy = {}
 wave_energy_wind = {}
 wave_energy_swell = {}
 maxdepth = {}
+
+fig99, ax99 = plt.subplots(1,1, figsize=(4.2,3), num='regions')
 
 
 for grid_spec in grid_specs:
@@ -287,6 +299,10 @@ for grid_spec in grid_specs:
         below_HWL_dz_tides_tmp = []
         below_HWL_mgs_tides_tmp = []
         below_HWL_dmgs_tides_tmp = []
+
+        at_HWL_dz_tides_tmp = []
+        at_HWL_mgs_tides_tmp = []
+        at_HWL_dmgs_tides_tmp = []
 
         tide = "tide" + str(ii)
 
@@ -358,7 +374,8 @@ for grid_spec in grid_specs:
         z0 = np.array(foo['z'])
 
         x = np.pad(x0, (0, npts-len(x0)), 'constant', constant_values=(np.nan,np.nan))
-        y = np.pad(y0, (0, npts-len(y0)), 'constant', constant_values=(np.nan,np.nan))
+        yjunk = np.pad(y0, (0, npts-len(y0)), 'constant', constant_values=(np.nan,np.nan))
+        y = np.around(yjunk)
         z = np.pad(z0, (0, npts-len(z0)), 'constant', constant_values=(np.nan,np.nan))
 
         # averaged wave data
@@ -397,8 +414,11 @@ for grid_spec in grid_specs:
 
                     if y[yi] < (hwl[Ihwl.index(ii)] - hwl_adjust):
 
+                        ax99.plot(ii, y[yi], 'b.')
+
                         # wave height thresh
-                        if Hs[ii] < wave_height_threshold:
+                        if Hs[ii] > wave_height_threshold:
+                        # if steepness[ii] > steepness_threshold:
 
                             above_HWL_dz.append(dz[yi])
                             above_HWL_mgs.append(mgs[yi])
@@ -419,18 +439,28 @@ for grid_spec in grid_specs:
 
                         if y[yi] - hwl[Ihwl.index(ii)] < berm_zone_width:
 
+                            ax99.plot(ii, y[yi], 'g.')
+
                             # # for comparison with tide-averaged wave data PICK UP HERE...
                             # below_HWL_dz_tides_tmp.append(dz[yi])
                             # below_HWL_mgs_tides_tmp.append(mgs[yi])
                             # below_HWL_dmgs_tides_tmp.append(dmgs[yi])
 
                             # wave height thresh
-                            if Hs[ii] < wave_height_threshold:
+                            if Hs[ii] > wave_height_threshold:
+                            # if steepness[ii] > steepness_threshold:
+
+                                # if np.abs(dz[yi]) > 0.02:
 
                                 at_HWL_dz.append(dz[yi])
                                 at_HWL_mgs.append(mgs[yi])
                                 at_HWL_dmgs.append(dmgs[yi])
                                 at_HWL_last_mgs.append(last_mgs[yi])
+
+                                at_HWL_dz_tides_tmp.append(dz[yi])
+                                at_HWL_mgs_tides_tmp.append(mgs[yi])
+                                at_HWL_dmgs_tides_tmp.append(dmgs[yi])
+
                                 if counter > 1:
                                     at_HWL_last_dz.append(last_dz[yi])
                                     at_HWL_last_dmgs.append(last_dmgs[yi])
@@ -439,8 +469,13 @@ for grid_spec in grid_specs:
 
                         else:
 
+                            ax99.plot(ii, y[yi], 'r.')
+
                             # wave height thresh
-                            if Hs[ii] < wave_height_threshold:
+                            if Hs[ii] > wave_height_threshold:
+                            # if steepness[ii] > steepness_threshold:
+
+                                # if np.abs(dz[yi]) > 0.02:
 
                                 below_HWL_dz.append(dz[yi])
                                 below_HWL_mgs.append(mgs[yi])
@@ -459,19 +494,19 @@ for grid_spec in grid_specs:
                                     below_HWL_dz_for_last_dz.append(dz[yi])
                                     below_HWL_dmgs_for_last_dmgs.append(dmgs[yi])
 
-                                # for Masselink et al 2007 analysis:
-                                if dz[yi] > 0.02:
-                                    accretion_bin_dz.append(dz[yi])
-                                    accretion_bin_mgs.append(mgs[yi])
-                                    accretion_bin_dmgs.append(dmgs[yi])
-                                elif dz[yi] < -0.02:
-                                    erosion_bin_dz.append(dz[yi])
-                                    erosion_bin_mgs.append(mgs[yi])
-                                    erosion_bin_dmgs.append(dmgs[yi])
-                                else:
-                                    nochange_bin_dz.append(dz[yi])
-                                    nochange_bin_mgs.append(mgs[yi])
-                                    nochange_bin_dmgs.append(dmgs[yi])
+                            # for Masselink et al 2007 analysis:
+                            if dz[yi] > 0.02:
+                                accretion_bin_dz.append(dz[yi])
+                                accretion_bin_mgs.append(mgs[yi])
+                                accretion_bin_dmgs.append(dmgs[yi])
+                            elif dz[yi] < -0.02:
+                                erosion_bin_dz.append(dz[yi])
+                                erosion_bin_mgs.append(mgs[yi])
+                                erosion_bin_dmgs.append(dmgs[yi])
+                            else:
+                                nochange_bin_dz.append(dz[yi])
+                                nochange_bin_mgs.append(mgs[yi])
+                                nochange_bin_dmgs.append(dmgs[yi])
 
 
             # for comparison with tide-averaged wave data PICK UP HERE...
@@ -484,6 +519,15 @@ for grid_spec in grid_specs:
                 below_HWL_mgs_tides[ii].extend(below_HWL_mgs_tides_tmp)
                 below_HWL_dmgs_tides[ii].extend(below_HWL_dmgs_tides_tmp)
 
+            if ii not in at_HWL_dz_tides:
+                at_HWL_dz_tides[ii] = at_HWL_dz_tides_tmp
+                at_HWL_mgs_tides[ii] = at_HWL_mgs_tides_tmp
+                at_HWL_dmgs_tides[ii] = at_HWL_dmgs_tides_tmp
+            else:
+                at_HWL_dz_tides[ii].extend(at_HWL_dz_tides_tmp)
+                at_HWL_mgs_tides[ii].extend(at_HWL_mgs_tides_tmp)
+                at_HWL_dmgs_tides[ii].extend(at_HWL_dmgs_tides_tmp)
+
 
             # update
             last_z = np.copy(z)
@@ -495,6 +539,24 @@ for grid_spec in grid_specs:
 
 
         counter = counter + 1
+
+
+# this is for removing the mean from each chunk, though im not sure it;s the right thing to do... UNFINISHED
+below_HWL_dz_detrend = []
+below_HWL_dmgs_detrend = []
+below_HWL_mgs_detrend = []
+at_HWL_dz_detrend = []
+at_HWL_dmgs_detrend = []
+at_HWL_mgs_detrend = []
+
+for jj in range(tide_range[0]+1,tide_range[-1]):
+    below_HWL_dz_detrend.extend(below_HWL_dz_tides[jj] - np.nanmean(below_HWL_dz_tides[jj]))
+    below_HWL_dmgs_detrend.extend(below_HWL_dmgs_tides[jj] - np.nanmean(below_HWL_dmgs_tides[jj]))
+    below_HWL_mgs_detrend.extend(below_HWL_mgs_tides[jj])
+    at_HWL_dz_detrend.extend(at_HWL_dz_tides[jj] - np.nanmean(at_HWL_dz_tides[jj]))
+    at_HWL_dmgs_detrend.extend(at_HWL_dmgs_tides[jj] - np.nanmean(at_HWL_dmgs_tides[jj]))
+    at_HWL_mgs_detrend.extend(at_HWL_mgs_tides[jj])
+
 
 
 # len(below_HWL_dz_tides[16])
@@ -541,14 +603,14 @@ for jj in tide_range:
     wave_energy_swell_array.append(wave_energy_swell[jj])
     maxdepth_array.append(maxdepth[jj])
 
-    mean_dz_tides[count] = np.mean(below_HWL_dz_tides[jj])
-    mean_mgs_tides[count] = np.mean(below_HWL_mgs_tides[jj])
-    std_mgs_tides[count] = np.std(below_HWL_mgs_tides[jj])
-    mean_dmgs_tides[count] = np.mean(below_HWL_dmgs_tides[jj])
+    # mean_dz_tides[count] = np.mean(below_HWL_dz_tides[jj])
+    # mean_mgs_tides[count] = np.mean(below_HWL_mgs_tides[jj])
+    # std_mgs_tides[count] = np.std(below_HWL_mgs_tides[jj])
+    # mean_dmgs_tides[count] = np.mean(below_HWL_dmgs_tides[jj])
 
 
-    r_mgs_tides[count], p_mgs_tides[count], lo_mgs_tides[count], hi_mgs_tides[count] = pearsonr_ci(below_HWL_dz_tides[jj], below_HWL_mgs_tides[jj],alpha=0.05)
-    r_dmgs_tides[count], p_dmgs_tides[count], lo_dmgs_tides[count], hi_dmgs_tides[count] = pearsonr_ci(below_HWL_dz_tides[jj], below_HWL_dmgs_tides[jj],alpha=0.05)
+    # r_mgs_tides[count], p_mgs_tides[count], lo_mgs_tides[count], hi_mgs_tides[count] = pearsonr_ci(below_HWL_dz_tides[jj], below_HWL_mgs_tides[jj],alpha=0.05)
+    # r_dmgs_tides[count], p_dmgs_tides[count], lo_dmgs_tides[count], hi_dmgs_tides[count] = pearsonr_ci(below_HWL_dz_tides[jj], below_HWL_dmgs_tides[jj],alpha=0.05)
 
 
 
@@ -583,10 +645,14 @@ r_dmgs_tides_signif[I_p_small_dmgs] = np.nan
 #
 # np.array(test_data) - np.array(below_HWL_dmgs)
 
-len(below_HWL_dz)
-len(at_HWL_dz)
-len(above_HWL_dz)
+# len(below_HWL_dz)
+# len(at_HWL_dz)
+# len(above_HWL_dz)
 
+# r_mgs, p_mgs, lo_mgs, hi_mgs = pearsonr_ci(below_HWL_dz_detrend,below_HWL_mgs_detrend,alpha=0.05)
+# r_dmgs, p_dmgs, lo_dmgs, hi_dmgs = pearsonr_ci(below_HWL_dz_detrend,below_HWL_dmgs_detrend,alpha=0.05)
+# r_last_mgs, p_last_mgs, lo_last_mgs, hi_last_mgs = pearsonr_ci(below_HWL_dz,below_HWL_last_mgs,alpha=0.05)
+# r_last_dz, p_last_dz, lo_last_dz, hi_last_dz = pearsonr_ci(below_HWL_dz_for_last_dz,below_HWL_last_dz,alpha=0.05)
 r_mgs, p_mgs, lo_mgs, hi_mgs = pearsonr_ci(below_HWL_dz,below_HWL_mgs,alpha=0.05)
 r_dmgs, p_dmgs, lo_dmgs, hi_dmgs = pearsonr_ci(below_HWL_dz,below_HWL_dmgs,alpha=0.05)
 r_last_mgs, p_last_mgs, lo_last_mgs, hi_last_mgs = pearsonr_ci(below_HWL_dz,below_HWL_last_mgs,alpha=0.05)
@@ -595,6 +661,10 @@ r_mgs_last_mgs, p_mgs_last_mgs, lo_mgs_last_mgs, hi_mgs_last_mgs = pearsonr_ci(b
 r_dmgs_last_dmgs, p_dmgs_last_dmgs, lo_dmgs_last_dmgs, hi_dmgs_last_dmgs = pearsonr_ci(below_HWL_dmgs_for_last_dmgs,below_HWL_last_dmgs,alpha=0.05)
 
 
+# at_r_mgs, at_p_mgs, at_lo_mgs, at_hi_mgs = pearsonr_ci(at_HWL_dz_detrend,at_HWL_mgs_detrend,alpha=0.05)
+# at_r_dmgs, at_p_dmgs, at_lo_dmgs, at_hi_dmgs = pearsonr_ci(at_HWL_dz_detrend,at_HWL_dmgs_detrend,alpha=0.05)
+# at_r_last_mgs, at_p_last_mgs, at_lo_last_mgs, at_hi_last_mgs = pearsonr_ci(at_HWL_dz,at_HWL_last_mgs,alpha=0.05)
+# at_r_last_dz, at_p_last_dz, at_lo_last_dz, at_hi_last_dz = pearsonr_ci(at_HWL_dz_for_last_dz,at_HWL_last_dz,alpha=0.05)
 at_r_mgs, at_p_mgs, at_lo_mgs, at_hi_mgs = pearsonr_ci(at_HWL_dz,at_HWL_mgs,alpha=0.05)
 at_r_dmgs, at_p_dmgs, at_lo_dmgs, at_hi_dmgs = pearsonr_ci(at_HWL_dz,at_HWL_dmgs,alpha=0.05)
 at_r_last_mgs, at_p_last_mgs, at_lo_last_mgs, at_hi_last_mgs = pearsonr_ci(at_HWL_dz,at_HWL_last_mgs,alpha=0.05)
@@ -610,21 +680,20 @@ above_r_last_dz, above_p_last_dz, above_lo_last_dz, above_hi_last_dz = pearsonr_
 above_r_mgs_last_mgs, above_p_mgs_last_mgs, above_lo_mgs_last_mgs, above_hi_mgs_last_mgs = pearsonr_ci(above_HWL_mgs,above_HWL_last_mgs,alpha=0.05)
 above_r_dmgs_last_dmgs, above_p_dmgs_last_dmgs, above_lo_dmgs_last_dmgs, above_hi_dmgs_last_dmgs = pearsonr_ci(above_HWL_dmgs_for_last_dmgs,above_HWL_last_dmgs,alpha=0.05)
 
-
-r_mgs, p_mgs, lo_mgs, hi_mgs
-r_dmgs, p_dmgs, lo_dmgs, hi_dmgs
-r_last_mgs, p_last_mgs, lo_last_mgs, hi_last_mgs
-r_last_dz, p_last_dz, lo_last_dz, hi_last_dz
-
-at_r_mgs, at_p_mgs, at_lo_mgs, at_hi_mgs
-at_r_dmgs, at_p_dmgs, at_lo_dmgs, at_hi_dmgs
-at_r_last_mgs, at_p_last_mgs, at_lo_last_mgs, at_hi_last_mgs
-at_r_last_dz, at_p_last_dz, at_lo_last_dz, at_hi_last_dz
-
-above_r_mgs, above_p_mgs, above_lo_mgs, above_hi_mgs
-above_r_dmgs, above_p_dmgs, above_lo_dmgs, above_hi_dmgs
-above_r_last_mgs, above_p_last_mgs, above_lo_last_mgs, above_hi_last_mgs
-above_r_last_dz, above_p_last_dz, above_lo_last_dz, above_hi_last_dz
+# r_mgs, p_mgs, lo_mgs, hi_mgs
+# r_dmgs, p_dmgs, lo_dmgs, hi_dmgs
+# r_last_mgs, p_last_mgs, lo_last_mgs, hi_last_mgs
+# r_last_dz, p_last_dz, lo_last_dz, hi_last_dz
+#
+# at_r_mgs, at_p_mgs, at_lo_mgs, at_hi_mgs
+# at_r_dmgs, at_p_dmgs, at_lo_dmgs, at_hi_dmgs
+# at_r_last_mgs, at_p_last_mgs, at_lo_last_mgs, at_hi_last_mgs
+# at_r_last_dz, at_p_last_dz, at_lo_last_dz, at_hi_last_dz
+#
+# above_r_mgs, above_p_mgs, above_lo_mgs, above_hi_mgs
+# above_r_dmgs, above_p_dmgs, above_lo_dmgs, above_hi_dmgs
+# above_r_last_mgs, above_p_last_mgs, above_lo_last_mgs, above_hi_last_mgs
+# above_r_last_dz, above_p_last_dz, above_lo_last_dz, above_hi_last_dz
 
 
 # Masselink et al 2007 analysis:
@@ -648,10 +717,10 @@ np.std(erosion_bin_mgs)
 
 
 msg_positive_change = np.squeeze(np.where(np.array(accretion_bin_dmgs) > 0))
-msg_positive_change_pct = len(msg_positive_change)/len(accretion_bin_dmgs)
+# msg_positive_change_pct = len(msg_positive_change)/len(accretion_bin_dmgs)
 
 msg_negative_change = np.squeeze(np.where(np.array(erosion_bin_dmgs) < 0))
-msg_negative_change_pct = len(msg_negative_change)/len(erosion_bin_dmgs)
+# msg_negative_change_pct = len(msg_negative_change)/len(erosion_bin_dmgs)
 
 
 len(nochange_bin_mgs)
@@ -671,15 +740,44 @@ ax[0,3].plot(above_HWL_dz_for_last_dz,above_HWL_last_dz, '.')
 
 ax[1,0].plot(at_HWL_dz,at_HWL_mgs, '.')
 ax[1,1].plot(at_HWL_dz,at_HWL_dmgs, '.')
+# ax[1,0].plot(at_HWL_dz_detrend,at_HWL_mgs_detrend, '.')
+# ax[1,1].plot(at_HWL_dz_detrend,at_HWL_dmgs_detrend, '.')
 ax[1,2].plot(at_HWL_dz,at_HWL_last_mgs, '.')
 ax[1,3].plot(at_HWL_dz_for_last_dz,at_HWL_last_dz, '.')
 
 ax[2,0].plot(below_HWL_dz,below_HWL_mgs, '.')
 ax[2,1].plot(below_HWL_dz,below_HWL_dmgs, '.')
+# ax[2,0].plot(below_HWL_dz_detrend,below_HWL_mgs_detrend, '.')
+# ax[2,1].plot(below_HWL_dz_detrend,below_HWL_dmgs_detrend, '.')
 ax[2,2].plot(below_HWL_dz,below_HWL_last_mgs, '.')
 ax[2,3].plot(below_HWL_dz_for_last_dz,below_HWL_last_dz, '.')
 
 fig.tight_layout()
+
+
+# # plot
+# fig, ax = plt.subplots(3,4, figsize=(10,5), num='scatter plots - detrended')
+#
+# ax[0,0].plot(above_HWL_dz,above_HWL_mgs, '.')
+# ax[0,1].plot(above_HWL_dz,above_HWL_dmgs, '.')
+# ax[0,2].plot(above_HWL_dz,above_HWL_last_mgs, '.')
+# ax[0,3].plot(above_HWL_dz_for_last_dz,above_HWL_last_dz, '.')
+#
+# # ax[1,0].plot(at_HWL_dz,at_HWL_mgs, '.')
+# # ax[1,1].plot(at_HWL_dz,at_HWL_dmgs, '.')
+# ax[1,0].plot(at_HWL_dz_detrend,at_HWL_mgs_detrend, '.')
+# ax[1,1].plot(at_HWL_dz_detrend,at_HWL_dmgs_detrend, '.')
+# ax[1,2].plot(at_HWL_dz,at_HWL_last_mgs, '.')
+# ax[1,3].plot(at_HWL_dz_for_last_dz,at_HWL_last_dz, '.')
+#
+# # ax[2,0].plot(below_HWL_dz,below_HWL_mgs, '.')
+# # ax[2,1].plot(below_HWL_dz,below_HWL_dmgs, '.')
+# ax[2,0].plot(below_HWL_dz_detrend,below_HWL_mgs_detrend, '.')
+# ax[2,1].plot(below_HWL_dz_detrend,below_HWL_dmgs_detrend, '.')
+# ax[2,2].plot(below_HWL_dz,below_HWL_last_mgs, '.')
+# ax[2,3].plot(below_HWL_dz_for_last_dz,below_HWL_last_dz, '.')
+#
+# fig.tight_layout()
 
 
 
@@ -729,69 +827,67 @@ ax2.plot([lo_last_dz, hi_last_dz], [4.1, 4.1], '-b')
 
 
 ax2.invert_yaxis()
-ax2.plot([0,0], [0.8, 6.2], '--k')
+ax2.plot([0,0], [0.8, 4.2], '--k')
 ax2.autoscale(enable=True, axis='y', tight=True)
 ax2.set_xlabel('$r$')
 
-# setstr = [r'dz, MGS', r'dz, dMGS', r'dz, MGS$_{t-1}$', r'dz, dz$_{t-1}$', r'MGS, MGS$_{t-1}$', r'dMGS, dMGS$_{t-1}$']
-# setind = [1,2,3,4, 5,6]
 setstr = [r'$\Delta z$, MGS', r'$\Delta z$, $\Delta$MGS', r'$\Delta z$, MGS$_{t-1}$', r'$\Delta z$, $\Delta z_{t-1}$']#, r'MGS, MGS$_{t-1}$', r'dMGS, dMGS$_{t-1}$']
-setind = [1,2,3,4]
+setind = [1,2,3,4]#, 5,6]
 ax2.set_yticks(setind)
 ax2.set_yticklabels(setstr)
-ax2.legend(['above HWL', 'HWL', 'below HWL'])
+ax2.legend(['above HWL,' + ' n=' + str(len(above_HWL_dz)), 'HWL,' + ' n=' + str(len(at_HWL_dz)), 'below HWL,' + ' n=' + str(len(below_HWL_dz))])
 
 fig2.tight_layout()
 
 
 
-# tide dependent
-fig3, ax3 = plt.subplots(4,1, figsize=(4.2,9), num='tides')
+# # tide dependent
+# fig3, ax3 = plt.subplots(4,1, figsize=(4.2,9), num='tides')
+#
+# ax3[0].plot(mean_mgs_tides, Hs_array, '.')
+# # ax3[0].plot(mean_dmgs_tides, Hs_array, '.')
+# ax3[1].plot(mean_dz_tides, Hs_array, '.')
+#
+# ax3[2].plot(r_mgs_tides_signif[1:], Hs_array[:-1], '.')
+# ax3[3].plot(r_dmgs_tides_signif[1:], Hs_array[:-1], '.')
+#
+# fig3.tight_layout()
+#
+#
+# fig4, ax4 = plt.subplots(5,1, figsize=(4.2,10), num='tides 2')
+#
+# ax4[0].plot(p_mgs_tides, Hs_array, '.')
+# ax4[0].plot(p_dmgs_tides, Hs_array, '.')
+#
+# ax4[1].plot(p_mgs_tides, Tp_array, '.')
+# ax4[1].plot(p_dmgs_tides, Tp_array, '.')
+#
+# ax4[2].plot(p_mgs_tides, steepness_array, '.')
+# ax4[2].plot(p_dmgs_tides, steepness_array, '.')
+#
+# ax4[3].plot(p_mgs_tides, iribarren_array, '.')
+# ax4[3].plot(p_dmgs_tides, iribarren_array, '.')
+#
+# ax4[4].plot(p_mgs_tides, wave_energy_wind_array, '.')
+# ax4[4].plot(p_dmgs_tides, wave_energy_wind_array, '.')
+#
+# fig4.tight_layout()
+#
+#
+# fig5, ax5 = plt.subplots(4,1, figsize=(4.2,10), num='tides 3')
+#
+# ax5[0].plot(tide_range, Hs_array, '.')
+# ax5[1].plot(tide_range, r_mgs_tides, '.')
+#
+# ax5[2].plot(tide_range, r_dmgs_tides, '.')
+# ax5[3].plot(tide_range, p_dmgs_tides, '.')
 
-ax3[0].plot(mean_mgs_tides, Hs_array, '.')
-# ax3[0].plot(mean_dmgs_tides, Hs_array, '.')
-ax3[1].plot(mean_dz_tides, Hs_array, '.')
 
-ax3[2].plot(r_mgs_tides_signif[1:], Hs_array[:-1], '.')
-ax3[3].plot(r_dmgs_tides_signif[1:], Hs_array[:-1], '.')
-
-fig3.tight_layout()
-
-
-fig4, ax4 = plt.subplots(5,1, figsize=(4.2,10), num='tides 2')
-
-ax4[0].plot(p_mgs_tides, Hs_array, '.')
-ax4[0].plot(p_dmgs_tides, Hs_array, '.')
-
-ax4[1].plot(p_mgs_tides, Tp_array, '.')
-ax4[1].plot(p_dmgs_tides, Tp_array, '.')
-
-ax4[2].plot(p_mgs_tides, steepness_array, '.')
-ax4[2].plot(p_dmgs_tides, steepness_array, '.')
-
-ax4[3].plot(p_mgs_tides, iribarren_array, '.')
-ax4[3].plot(p_dmgs_tides, iribarren_array, '.')
-
-ax4[4].plot(p_mgs_tides, wave_energy_wind_array, '.')
-ax4[4].plot(p_dmgs_tides, wave_energy_wind_array, '.')
-
-fig4.tight_layout()
-
-
-fig5, ax5 = plt.subplots(4,1, figsize=(4.2,10), num='tides 3')
-
-ax5[0].plot(tide_range, Hs_array, '.')
-ax5[1].plot(tide_range, r_mgs_tides, '.')
-
-ax5[2].plot(tide_range, r_dmgs_tides, '.')
-ax5[3].plot(tide_range, p_dmgs_tides, '.')
-
-
-fig6, ax6 = plt.subplots(2,1, figsize=(4.2,6), num='Hsig and mgs')
-
-ax6[0].plot(tide_range, Hs_array, 'k.')
-ax6[1].plot(tide_range, mean_mgs_tides, 'k.')
-ax6[1].plot([tide_range, tide_range] , [mean_mgs_tides - std_mgs_tides, mean_mgs_tides + std_mgs_tides], 'k-')
+# fig6, ax6 = plt.subplots(2,1, figsize=(4.2,6), num='Hsig and mgs')
+#
+# ax6[0].plot(tide_range, Hs_array, 'k.')
+# ax6[1].plot(tide_range, mean_mgs_tides, 'k.')
+# ax6[1].plot([tide_range, tide_range] , [mean_mgs_tides - std_mgs_tides, mean_mgs_tides + std_mgs_tides], 'k-')
 
 
 saveFlag = 0

@@ -65,6 +65,8 @@ def implicit_wavenumber(F, hmean):
     wave dispersion relation.
     '''
 
+    g = 9.81
+
     # valid for freq range...
     kspace = np.linspace(0,10,1000)
 
@@ -104,6 +106,9 @@ def atten_correct(Pxx, F, krad, hmean):
 
 
 def compute_wavestats(Phh, F, hmean):
+
+    g = 9.81
+    beta_slope = 0.12
 
     # infragrav: 0.004:0.05 Hz (Lippmann et al 1999)
     # swell band: 0.05:0.15 Hz
@@ -179,7 +184,7 @@ def compute_wavestats(Phh, F, hmean):
     M = 16*g**2*(np.tan(beta_slope)**5)/((2*np.pi)**5*Hs**2*F[peakind]**4)
 
     # Iribarren number
-    xi_b = np.tan(beta_slope)/(steepness**0.5)
+    xi_0 = np.tan(beta_slope)/(steepness**0.5)
 
     # surf-scaling
     omeg = 2*np.pi/Tp
@@ -191,7 +196,18 @@ def compute_wavestats(Phh, F, hmean):
     wave_energy_wind = np.sum(Phh[I1_wind:I2_wind])*np.mean(np.diff(F))
     wave_energy_swel = np.sum(Phh[I1_swel:I2_swel])*np.mean(np.diff(F))
 
+    # breaker height estimation params
+    kap = 0.8
+    # C0 = (g*kpeak)**(1/2)
+    fwave = (g*k_peak*np.tanh(k_peak*hmean))**(1/2)#/(2*np.pi)
+    C0 = fwave/k_peak
+    Hb = (kap/g)**(1/5)*(Hs**2*C0/2)**2/5
+
+    steepness_break = Hb/L
+    xi_b = np.tan(beta_slope)/(steepness_break**0.5)
+
     waves = {"Hs": Hs,
+             "Hb": Hb,
              "Hs_swell": Hs_swell,
              "Hs_wind": Hs_wind,
              "Tmean": Tmean,
@@ -200,8 +216,10 @@ def compute_wavestats(Phh, F, hmean):
              "Tp": Tp,
              "wavelength": L,
              "steepness": steepness,
+             "steepness_b": steepness_break,
              "Miche": M,
-             "Iribarren": xi_b,
+             "Iribarren": xi_0,
+             "Iribarren_b": xi_b,
              "surf_scaling": eps_sc,
              "wave_energy": wave_energy,
              "wave_energy_wind": wave_energy_wind,
@@ -259,6 +277,7 @@ def main():
         Hs_swell = np.zeros(int(nintervals))
         Hs_wind = np.zeros(int(nintervals))
         Hs = np.zeros(int(nintervals))
+        Hb = np.zeros(int(nintervals))
         Tp = np.zeros(int(nintervals))
         Tmean_infr = np.zeros(int(nintervals))
         Tmean_swell = np.zeros(int(nintervals))
@@ -266,7 +285,9 @@ def main():
         Tmean = np.zeros(int(nintervals))
         L = np.zeros(int(nintervals))
         steepness = np.zeros(int(nintervals))
+        steepness_b = np.zeros(int(nintervals))
         M = np.zeros(int(nintervals))
+        xi_0 = np.zeros(int(nintervals))
         xi_b = np.zeros(int(nintervals))
         eps_sc = np.zeros(int(nintervals))
         depth = np.zeros(int(nintervals))
@@ -298,6 +319,7 @@ def main():
 
             waves = compute_wavestats(Phh, F, hmean)
             Hs[ii] = waves['Hs']
+            Hb[ii] = waves['Hb']
             Hs_swell[ii] = waves['Hs_swell']
             Hs_wind[ii] = waves['Hs_wind']
             Tmean[ii] = waves['Tmean']
@@ -306,8 +328,10 @@ def main():
             Tp[ii] = waves['Tp']
             L[ii] = waves['wavelength']
             steepness[ii] = waves['steepness']
+            steepness_b[ii] = waves['steepness_b']
             M[ii] = waves['Miche']
-            xi_b[ii] = waves['Iribarren']
+            xi_0[ii] = waves['Iribarren']
+            xi_b[ii] = waves['Iribarren_b']
             eps_sc[ii] = waves['surf_scaling']
             wave_energy[ii] = waves['wave_energy']
             wave_energy_wind[ii] = waves['wave_energy_wind']
@@ -319,7 +343,8 @@ def main():
             depth[ii] = np.mean(hh)
 
         plt.figure(1)
-        plt.plot(timevec, Hs)
+        plt.plot(timevec, Hs_wind, 'k')
+        plt.plot(timevec, Hb, 'r')
 
         plt.figure(2)
         plt.plot(timevec, Tp)

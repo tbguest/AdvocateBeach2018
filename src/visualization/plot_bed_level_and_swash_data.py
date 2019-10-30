@@ -35,6 +35,42 @@ from scipy.stats import norm
 # change default font size
 plt.rcParams.update({'font.size': 12})
 
+plt.close("all")
+
+
+
+def get_last_bed_levels(bedlevel_clumps, t_bedlevel_nonans):
+    ''' picks last value (and time) for each bed signal chunk '''
+
+    last_bedlevel = []
+    time_last_bedlevel = []
+
+    time_tally = 0
+    for clmp in bedlevel_clumps:
+        clump_len = len(clmp)
+
+        # in case I want to include a duration threshold (if so, set as > 1)
+        if clump_len < 1:
+            time_tally += clump_len
+            continue
+
+        clmp_time = t_bedlevel_nonans[time_tally:time_tally + clump_len]
+
+        last_bedlevel.append(clmp[-1])
+        time_last_bedlevel.append(clmp_time[-1])
+
+        time_tally += clump_len
+
+    return np.squeeze(last_bedlevel), np.squeeze(time_last_bedlevel)
+
+
+def using_clump(a):
+    '''takes a 1d array of values containing nans, and separates into list of
+    arrays demarcated by nans
+    '''
+    clumps = [a[s] for s in np.ma.clump_unmasked(np.ma.masked_invalid(a))]
+
+    return clumps
 
 def save_figures(dn, fn, fig):
     ''' Saves png and pdf of figure.
@@ -81,8 +117,8 @@ def loess_fit(time_data, grain_size_data):
     return smoothed_data
 
 # tide = '15'
-tide = '19'
-# tide = '27'
+# tide = '19'
+tide = '27'
 
 chunk = '2'
 
@@ -97,7 +133,7 @@ chunk = '2'
 
 
 # for saving plots
-saveFlag = 1
+saveFlag = 0
 
 post = 1.7 # survey post height
 
@@ -180,6 +216,34 @@ for pinum in pinums:
     t_dz_bed = swash_struct['data']['time_swash_depth'][pinum] - 3*60*60
     date_dz_bed = [datetime.fromtimestamp(x) for x in t_dz_bed]
 
+    # bed level demarcated by nans
+    bedlevel = bedlevel_struct['data']['bed_level'][pinum]
+    t_bedlevel = bedlevel_struct['data']['date_bed_level'][pinum] - 3*60*60
+
+
+
+    # indices of non nan values
+    I = np.argwhere(~np.isnan(bedlevel))
+    # apply to time vector
+    t_bedlevel_nonans = t_bedlevel[I]
+
+
+    # last value and time of each bed level chunk (between instances of runup)
+    bedlevel_clumps = using_clump(bedlevel)
+    last_bedlevel, time_last_bedlevel = get_last_bed_levels(bedlevel_clumps, t_bedlevel_nonans)
+    date_last_bedlevel = [datetime.fromtimestamp(x) for x in time_last_bedlevel]
+
+    dbedlevel = np.diff(last_bedlevel)
+    time_dbedlevel = time_last_bedlevel[1:]
+    date_dbedlevel = date_last_bedlevel[1:]
+
+    # one more refinement step to omit high freq bed level changes
+    Idbed_good0 = np.where(np.diff(time_dbedlevel) > 5/6)
+    # Idbed_good = (Idbed_good + np.ones(np.shape(Idbed_good))).astype(int)
+    dbedlevel2 = dbedlevel[Idbed_good0]
+    time_dbedlevel2 = time_dbedlevel[Idbed_good0]
+    # date_dbedlevel2 = date_dbedlevel[Idbed_good0]
+    date_dbedlevel2 = [datetime.fromtimestamp(x) for x in time_dbedlevel2]
 
     # swash definitions
 
@@ -219,6 +283,49 @@ for pinum in pinums:
             found_pks = np.where((pk_times < t_bedlvl) & (pk_times > t_last_bedlvl))
             # found_pks = np.where((pk_times < t_bedlvl) & (pk_times > (t_bedlvl - 20)))
             num_peaks.append(len(found_pks[0]))
+
+
+
+    # # RMS bed level change addtion:
+    # # compute in ~5 min increments with overlap?
+    # dz_bed = np.diff(z_bed)
+    # binlen = 60*5 # 5 mins
+    # ovrlap = 0.5
+    # fs = 4
+    # nbins = int(len(date_z_bed[1:])/binlen/ovrlap)
+    # for kk in range(nbins):
+    #     RMSblc = np.sqrt(np.mean(dz_bed[nbins])**2)
+
+    # (date_z_bed[1:], np.diff(z_bed)
+
+    binlen = 60*4 # 5 mins
+    ovrlap = 0.66
+    # tmin_dz = np.min(date_dz_bed)
+    # tmax_dz = np.max(date_dz_bed)
+    tmin_dz = np.min(date_z_bed[1:])
+    tmax_dz = np.max(date_z_bed[1:])
+    tlen_dz = tmax_dz - tmin_dz
+    tlen_dz_seconds = tlen_dz.total_seconds()
+    nbins = int(tlen_dz_seconds/binlen/(1-ovrlap))
+
+    RMSblc = []
+    t_RMS = []
+
+    for kk in range(nbins):
+        t0 = tmin_dz + timedelta(seconds=kk*binlen*(1-ovrlap))
+        t1 = t0 + timedelta(seconds=binlen)
+
+        # compute RMS of dz within time range
+        Igood = np.where(np.logical_and(np.array(date_dz_bed)>t0, np.array(date_dz_bed)<t1))
+        # Igood = np.where(np.logical_and(np.array(date_z_bed[1:])>t0, np.array(date_z_bed[1:])<t1))
+        if len(Igood[0])<1:
+            RMSblc.append(0.)
+        else:
+            RMSblc.append(np.sqrt(np.mean(delta_bed[Igood]/1000)**2))
+            # RMSblc.append(np.sqrt(np.mean(np.diff(z_bed)[Igood]/1000)**2))
+        t_RMS.append(t1 - timedelta(seconds=binlen*0.5))
+
+
 
     plt.figure(num=pinum + ' dbed vs num peaks in last 20 s')
     plt.plot(num_peaks,d_bedlvl, '.')
@@ -310,7 +417,8 @@ for pinum in pinums:
     ax103 = fig101.add_subplot(312)
     # ax103.plot(date_dz_bed, delta_bed/1000, 'C0.')
     ax103.plot(date_z_bed[1:], np.diff(z_bed), 'k.', Markersize=5)
-    date_z_bed, z_bed
+    ax103.plot(t_RMS, RMSblc, 'r.')
+    # date_z_bed, z_bed
     # ax103.set_xlabel('time, tide ' + tide + ' [UTC]')
     ax103.set_ylabel('dz [m]')
     ax103.set_xlim(ax101_xlims)
@@ -389,7 +497,8 @@ for pinum in pinums:
 
     ax1013 = fig1011.add_subplot(212)
     # ax103.plot(date_dz_bed, delta_bed/1000, 'C0.')
-    ax1013.plot(date_z_bed[1:], np.diff(z_bed), 'k.', Markersize=5)
+    # ax1013.plot(date_z_bed[1:], np.diff(z_bed), 'k.', Markersize=5)
+    ax1013.plot(date_dbedlevel2, dbedlevel2, 'k.', Markersize=5)
     ax1013.set_xlabel('time, tide ' + tide + ' [UTC]')
     ax1013.set_ylabel('dz [m]')
     ax1013.set_xlim(ax101_xlims)
@@ -518,7 +627,8 @@ l = plt.plot(bins, y, 'k--', linewidth=2)
 # fig03 = plt.figure(num='$\Delta z$ histogram')
 # plt.hist(delta_bed_histogram*1000, bins=30)
 plt.xlabel('bed level change [mm]')
-plt.ylabel('frequency')
+plt.ylabel('frequency [Hz]')
+plt.ylim([0, 0.095])
 fig03.tight_layout()
 
 
@@ -531,7 +641,7 @@ l = ax02[1].plot(bins, y, 'k--', linewidth=2)
 # fig03 = plt.figure(num='$\Delta z$ histogram')
 # plt.hist(delta_bed_histogram*1000, bins=30)
 ax02[1].set_xlabel('bed level change [mm]')
-ax02[1].set_ylabel('frequency')
+ax02[1].set_ylabel('frequency [Hz]')
 fig02.tight_layout()
 
 

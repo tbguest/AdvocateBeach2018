@@ -41,6 +41,12 @@ iribarren0 = []
 miche0 = []
 depth0 = []
 
+# # breaker height estimation params
+# kap = 0.8
+# g = 9.81
+#
+# Hb = kap
+
 
 
 counter = 0

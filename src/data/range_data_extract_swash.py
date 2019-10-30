@@ -124,6 +124,7 @@ def extract_bed(tt, raw):
     bed_vec = [float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan')]
 
     # populate bed vector
+    # Checks the 9 previous points to see if they meet threshold criterion
     for ii in range(t_thresh, len(raw)):
         for jj in range(1, t_thresh):
             if abs(raw[ii] - raw[ii-jj]) > d_thresh:
@@ -139,7 +140,10 @@ def extract_bed(tt, raw):
     bed_good = bed_vec[Ibed]
     date_good = tt[Ibed]
 
-    return np.squeeze(bed_good), np.squeeze(date_good)
+    bed_with_nans = bed_vec
+    date_with_nans = date1
+
+    return np.squeeze(bed_good), np.squeeze(date_good), np.squeeze(bed_with_nans), np.squeeze(date_with_nans)
 
 
 def get_swash(bed_good, date_good, raw, tt):
@@ -215,6 +219,10 @@ for chunk in chunks:
     time_bed = {}
     date_bed = {}
 
+    bed_level = {}
+    date_bed_level = {}
+    time_bed_level = {}
+
     # structures to be saved
     swash_data = {}
     bed_level_data = {}
@@ -235,7 +243,9 @@ for chunk in chunks:
 
     bed_level_data['comments'] = ['bed [m]: bed level signal (uncorrected for pi locations)',
                             'time_bed: unix timestamp for each bed point',
-                            'date_bed: date object for each bed point']
+                            'date_bed: date object for each bed point',
+                            'dbed: change in bed level based on last bed point in each sequence',
+                            'time_dbed: time associated with dbed']
 
     for pino in pinums:
 
@@ -246,7 +256,7 @@ for chunk in chunks:
         tt = bbb[pino]['tvec_raw']
 
         # extract bed
-        bed_good, date_good = extract_bed(tt, raw)
+        bed_good, date_good, bed_with_nans, date_with_nans = extract_bed(tt, raw)
 
         # extract swash
         newtt, bed_interp, cut_noise, Iall_max = get_swash(bed_good, date_good, raw, tt)
@@ -263,6 +273,7 @@ for chunk in chunks:
         tt_date_good = [datetime.fromtimestamp(x) for x in date_good]
         tt_Iall_max = [datetime.fromtimestamp(x) for x in newtt[Iall_max]]
         date_swash_dep = [datetime.fromtimestamp(x) for x in t_swash_dep]
+        tt_date_with_nans = [datetime.fromtimestamp(x) for x in date_with_nans]
 
         # consolidate vbles to save
         swash[pino] = np.abs(cut_noise-bed_interp)/1000
@@ -284,6 +295,12 @@ for chunk in chunks:
         time_bed[pino] = date_good
         date_bed[pino] = tt_date_good
 
+        # bed level data with nans included - leaving more flexibility for bed level change computation
+        bed_level[pino] = bed_with_nans/1000.
+        date_bed_level[pino] = date_with_nans
+        time_bed_level[pino] = tt_date_with_nans
+
+
 
 
     swash_data['data'] = {'swash':swash, 'swash_plus_bed':swash_plus_bed, 'time_swash':time_swash, 'date_swash':date_swash, \
@@ -292,7 +309,9 @@ for chunk in chunks:
                         'time_swash_depth':time_swash_depth, 'date_swash_depth':date_swash_depth, \
                         'delta_bed':delta_bed}
 
-    bed_level_data['data'] = {'bed':bed, 'time_bed':time_bed, 'date_bed':date_bed}
+    bed_level_data['data'] = {'bed':bed, 'time_bed':time_bed, 'date_bed':date_bed, \
+                        'bed_level':bed_level, 'time_bed_level':time_bed_level, \
+                        'date_bed_level':date_bed_level}
 
 
     #### EXPORT DATA DICTS ###############
