@@ -174,13 +174,14 @@ homechar = os.path.expanduser("~") # linux
 figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures')
 
 # cross-shore HWL coord and tide index
-hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+# hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+hwl = [-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27]
 Ihwl = [14, 15, 16, 17, 18,19, 20, 21, 22, 23, 24, 25, 26, 27]
 
 # grid_specs = ["cross_shore"]#["longshore1", "longshore2"]#, "dense_array2"]
 # grid_specs = ["cross_shore","longshore1", "dense_array2"]
-grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-# grid_specs = ["longshore1"]#, "longshore1", "longshore2", "dense_array2"]
+# grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
+grid_specs = ["longshore1"]#, "longshore1", "longshore2", "dense_array2"]
 
 # guess at cross-shore profile length
 npts = 150
@@ -771,7 +772,7 @@ ax4[2].plot(p_dmgs_tides, steepness_array, '.')
 
 ax4[3].plot(p_mgs_tides, iribarren_array, '.')
 ax4[3].plot(p_dmgs_tides, iribarren_array, '.')
-
+18
 ax4[4].plot(p_mgs_tides, wave_energy_wind_array, '.')
 ax4[4].plot(p_dmgs_tides, wave_energy_wind_array, '.')
 

@@ -165,7 +165,7 @@ def lin_fit_slope(z_line):
 saveFlag = 0
 saveCorr = 0
 
-wave_height_threshold = 0.25 # set really high to omit
+wave_height_threshold = 25 # set really high to omit
 steepness_threshold = 0.01 # set really high to omit
 
 # for portability
@@ -181,17 +181,18 @@ Ihwl = [14, 15, 16, 17, 18,19, 20, 21, 22, 23, 24, 25, 26, 27]
 
 # grid_specs = ["cross_shore"]#["longshore1", "longshore2"]#, "dense_array2"]
 # grid_specs = ["cross_shore","longshore1", "dense_array2"]
-grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
+# grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
+# grid_specs = ["longshore1", "longshore2", "dense_array2"]
 # grid_specs = ["longshore1"]#, "longshore1", "longshore2", "dense_array2"]
-# grid_specs = ["longshore1"]
+grid_specs = ["longshore1"]
 
 # guess at cross-shore profile length
 npts = 150
 
 # berm_zone_width = 6 # [m] should be multiple of 3
 # hwl_adjust = 3
-berm_zone_width = 16 # [m] should be multiple of 3
-hwl_adjust = -4
+berm_zone_width = 20 # [m] should be multiple of 3
+hwl_adjust = 0
 
 above_HWL_dz = []
 above_HWL_mgs = []
@@ -417,7 +418,7 @@ for grid_spec in grid_specs:
                         ax99.plot(ii, y[yi], 'b.')
 
                         # wave height thresh
-                        if Hs[ii] > wave_height_threshold:
+                        if Hs[ii] < wave_height_threshold:
                         # if steepness[ii] > steepness_threshold:
 
                             above_HWL_dz.append(dz[yi])
@@ -447,7 +448,7 @@ for grid_spec in grid_specs:
                             # below_HWL_dmgs_tides_tmp.append(dmgs[yi])
 
                             # wave height thresh
-                            if Hs[ii] > wave_height_threshold:
+                            if Hs[ii] < wave_height_threshold:
                             # if steepness[ii] > steepness_threshold:
 
                                 # if np.abs(dz[yi]) > 0.02:
@@ -472,7 +473,7 @@ for grid_spec in grid_specs:
                             ax99.plot(ii, y[yi], 'r.')
 
                             # wave height thresh
-                            if Hs[ii] > wave_height_threshold:
+                            if Hs[ii] < wave_height_threshold:
                             # if steepness[ii] > steepness_threshold:
 
                                 # if np.abs(dz[yi]) > 0.02:
@@ -717,13 +718,16 @@ np.std(erosion_bin_mgs)
 
 
 msg_positive_change = np.squeeze(np.where(np.array(accretion_bin_dmgs) > 0))
-# msg_positive_change_pct = len(msg_positive_change)/len(accretion_bin_dmgs)
+msg_positive_change_pct = len(msg_positive_change)/len(accretion_bin_dmgs)
 
 msg_negative_change = np.squeeze(np.where(np.array(erosion_bin_dmgs) < 0))
-# msg_negative_change_pct = len(msg_negative_change)/len(erosion_bin_dmgs)
+msg_negative_change_pct = len(msg_negative_change)/len(erosion_bin_dmgs)
 
 
+len(accretion_bin_mgs)
 len(nochange_bin_mgs)
+len(erosion_bin_mgs)
+
 len(msg_positive_change) - len(accretion_bin_dmgs)
 len(msg_negative_change) - len(erosion_bin_dmgs)
 
@@ -738,17 +742,17 @@ ax[0,1].plot(above_HWL_dz,above_HWL_dmgs, '.')
 ax[0,2].plot(above_HWL_dz,above_HWL_last_mgs, '.')
 ax[0,3].plot(above_HWL_dz_for_last_dz,above_HWL_last_dz, '.')
 
-ax[1,0].plot(at_HWL_dz,at_HWL_mgs, '.')
-ax[1,1].plot(at_HWL_dz,at_HWL_dmgs, '.')
-# ax[1,0].plot(at_HWL_dz_detrend,at_HWL_mgs_detrend, '.')
-# ax[1,1].plot(at_HWL_dz_detrend,at_HWL_dmgs_detrend, '.')
+# ax[1,0].plot(at_HWL_dz,at_HWL_mgs, '.')
+# ax[1,1].plot(at_HWL_dz,at_HWL_dmgs, '.')
+ax[1,0].plot(at_HWL_dz_detrend,at_HWL_mgs_detrend, '.')
+ax[1,1].plot(at_HWL_dz_detrend,at_HWL_dmgs_detrend, '.')
 ax[1,2].plot(at_HWL_dz,at_HWL_last_mgs, '.')
 ax[1,3].plot(at_HWL_dz_for_last_dz,at_HWL_last_dz, '.')
 
-ax[2,0].plot(below_HWL_dz,below_HWL_mgs, '.')
-ax[2,1].plot(below_HWL_dz,below_HWL_dmgs, '.')
-# ax[2,0].plot(below_HWL_dz_detrend,below_HWL_mgs_detrend, '.')
-# ax[2,1].plot(below_HWL_dz_detrend,below_HWL_dmgs_detrend, '.')
+# ax[2,0].plot(below_HWL_dz,below_HWL_mgs, '.')
+# ax[2,1].plot(below_HWL_dz,below_HWL_dmgs, '.')
+ax[2,0].plot(below_HWL_dz_detrend,below_HWL_mgs_detrend, '.')
+ax[2,1].plot(below_HWL_dz_detrend,below_HWL_dmgs_detrend, '.')
 ax[2,2].plot(below_HWL_dz,below_HWL_last_mgs, '.')
 ax[2,3].plot(below_HWL_dz_for_last_dz,below_HWL_last_dz, '.')
 
