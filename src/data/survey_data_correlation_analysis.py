@@ -172,16 +172,17 @@ homechar = os.path.expanduser("~") # linux
 dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data')
 
 # grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-grid_specs = ["longshore2"]#,"longshore2"]
+grid_specs = ["longshore1","longshore2"]
 # grid_specs = ["dense_array2"]#,"longshore2"]
 # grid_specs = ["dense_array2"]
 
 # 0 through  5
-dense_array_row = 5
+dense_array_row = 4
 
 
 
 fig1, ax1 = plt.subplots(1,2,figsize=(6,3), num='tide only correlations')
+fig01, ax01 = plt.subplots(1,1,figsize=(3,2.5), num='tide only correlations - for RCEM')
 fig2, ax2 = plt.subplots(1,2,figsize=(6,3), num='scatter')
 
 foobar = []
@@ -337,7 +338,8 @@ for grid_spec in grid_specs:
         if counter > 0:
             r3 = pearsonr_ci(dz_tide, last_mgs_tide, alpha=0.05)
             # r4 = pearsonr_ci(dz_tide, last_dz_tide, alpha=0.05)
-            r4 = pearsonr_ci(dz_mean_removed0, last_dz_mean_removed0, alpha=0.05)
+            if y1[0] > jnk['hwl'][ii]:
+                r4 = pearsonr_ci(dz_mean_removed0, last_dz_mean_removed0, alpha=0.05)
             r5 = pearsonr_ci(mgs_tide, last_mgs_tide, alpha=0.05)
             r6 = pearsonr_ci(dmgs_tide, last_dmgs_tide, alpha=0.05)
             # recompute r4 with |dz|<0.02
@@ -348,7 +350,8 @@ for grid_spec in grid_specs:
 
             # append to list to disentangle and plot later
             corr3.append(r3)
-            corr4.append(r4)
+            if y1[0] > jnk['hwl'][ii]:
+                corr4.append(r4)
             corr5.append(r5)
             corr6.append(r6)
             if len(Icommon) > 4:
@@ -363,7 +366,8 @@ for grid_spec in grid_specs:
     r1_tides = [corr1[n][0] for n in range(len(corr1))]
     r2_tides = [corr2[n][0] for n in range(len(corr2))]
     r3_tides = [corr3[n][0] for n in range(len(corr3))]
-    r4_tides = [corr4[n][0] for n in range(len(corr4))]
+    if y1[0] > jnk['hwl'][ii]:
+        r4_tides = [corr4[n][0] for n in range(len(corr4))]
     r5_tides = [corr5[n][0] for n in range(len(corr5))]
     r6_tides = [corr6[n][0] for n in range(len(corr6))]
     r4b_tides = [corr4b[n][0] for n in range(len(corr4b))]
@@ -395,7 +399,7 @@ for grid_spec in grid_specs:
     outFlag = 0
     if outFlag == 1:
 
-        output = {'correlation':r1_all, 'y':y1[0]}
+        output = {'correlation':r1_all, 'y':y1[0], 'correlation_lowenergy':r1_all_lowenergy, 'correlation_highenergy':r1_all_highenergy}
         # save new variables
         fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
                          "processed","survey_data", "dz_dmgs_correlations")
@@ -458,22 +462,45 @@ for grid_spec in grid_specs:
     fig1.tight_layout()
 
 
+    if grid_spec == 'longshore1':
+        ax01.plot([0,0],[-0.5,2.5],'k--')
+        # ax01[1].plot(r1_tides, 0*np.ones(len(r1_tides)), 'kx')
+        ax01.plot(r2_tides, 0*np.ones(len(r2_tides)), 'kx')
+        ax01.plot(r3_tides, 1*np.ones(len(r3_tides)), 'kx')
+        ax01.plot(r4_tides, 2*np.ones(len(r4_tides)), 'kx')
+        # ax01[1].plot(r4b_tides, 3*np.ones(len(r4b_tides)), 'rx')
+        # ax1.plot(r5_tides, 4*np.ones(len(r5_tides)), 'kx')
+        # ax1.plot(r6_tides, 5*np.ones(len(r6_tides)), 'kx')
+        ax01.autoscale(enable=True, axis='y', tight=True)
+        ax01.invert_yaxis()
+        ax01.set_xlabel('correlation coefficient')
+        setstr = [r'$\Delta z$,$\Delta$MGS', r'$\Delta z$,MGS$_{t-1}$', \
+                r'$\Delta z$,$\Delta z_{t-1}$']#, r'$mgs,mgs_{t-1}$', r'$\Delta mgs,\Delta mgs_{t-1}$']
+        setind = [0, 1, 2]#, 4, 5]
+        ax01.set_yticks(setind)
+        ax01.set_yticklabels([])
+        # ax1[1].set_yticklabels(setstr)
+        # ax9[1].set_xlim(ax90xlim)
+        fig01.tight_layout()
+
 
     # fig2, ax2 = plt.subplots(1,2,figsize=(6,4), num='scatter')
     if grid_spec == 'longshore2':
-        ax2[0].plot(dz_mean_removed, dmgs_mean_removed, 'k.')
+        ax2[0].plot(dz_mean_removed, dmgs_mean_removed, 'C0.')
+        ax2[0].grid()
         ax2[0].set_ylabel(r'$\Delta$MGS [mm]')
         ax2[0].set_xlabel(r'$\Delta z$ [m]')
         # yl = ax2[0].get_ylim()
         xl = ax2[0].get_xlim()
     elif grid_spec == 'longshore1':
-        ax2[1].plot(dz_mean_removed, dmgs_mean_removed, 'k.')
+        ax2[1].plot(dz_mean_removed, dmgs_mean_removed, 'C1.')
+        ax2[1].grid()
         # ax2[1].set_ylabel(r'$\Delta$MGS [mm]')
         ax2[1].set_xlabel(r'$\Delta z$ [m]')
         yl = ax2[1].get_ylim()
         ax2[0].set_ylim(yl)
         # xl = ax2[0].get_xlim()
-        # ax2[1].set_xlim(xl)
+        ax2[1].set_xlim(xl)
     fig2.tight_layout()
 
 
@@ -501,8 +528,9 @@ saveFlag = 0
 if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD')
 
-    save_figures(savedn, 'correlation_spatialonly', fig1)
-    save_figures(savedn, 'dz_dmgs_scatter', fig2)
-    # # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
-    save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
-    save_figures(savedn, 'delta_bed_level_histogram', fig03)
+    # save_figures(savedn, 'correlation_spatialonly', fig1)
+    save_figures(savedn, 'correlation_spatialonly_RCEM', fig01)
+    # save_figures(savedn, 'dz_dmgs_scatter', fig2)
+    # # # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
+    # save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
+    # save_figures(savedn, 'delta_bed_level_histogram', fig03)

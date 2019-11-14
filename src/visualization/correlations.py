@@ -28,7 +28,7 @@ import glob
 plt.close('all')
 
 # change default font size
-plt.rcParams.update({'font.size': 10})
+plt.rcParams.update({'font.size': 12})
 
 
 def save_figures(dn, fn, fig):
@@ -72,6 +72,30 @@ lo = []
 hi = []
 y = []
 
+r_highenergy = []
+p_highenergy = []
+lo_highenergy = []
+hi_highenergy = []
+y_highenergy = []
+
+r_lowenergy = []
+p_lowenergy = []
+lo_lowenergy = []
+hi_lowenergy = []
+y_lowenergy = []
+
+r_1 = []
+p_1 = []
+lo_1 = []
+hi_1 = []
+y_1 = []
+
+r_2 = []
+p_2 = []
+lo_2 = []
+hi_2 = []
+y_2 = []
+
 for file in glob.glob(os.path.join(dn, "*.npy")):
 
     jnk = np.load(file, allow_pickle=True).item()
@@ -81,27 +105,82 @@ for file in glob.glob(os.path.join(dn, "*.npy")):
     lo.append(jnk['correlation'][2])
     hi.append(jnk['correlation'][3])
 
+    r_highenergy.append(jnk['correlation_highenergy'][0])
+    p_highenergy.append(jnk['correlation_highenergy'][1])
+    lo_highenergy.append(jnk['correlation_highenergy'][2])
+    hi_highenergy.append(jnk['correlation_highenergy'][3])
+
+    r_lowenergy.append(jnk['correlation_lowenergy'][0])
+    p_lowenergy.append(jnk['correlation_lowenergy'][1])
+    lo_lowenergy.append(jnk['correlation_lowenergy'][2])
+    hi_lowenergy.append(jnk['correlation_lowenergy'][3])
+
+    # for highlighting LT1 and LT2 in plot
+    if 'longshore1' in file:
+        r_1.append(jnk['correlation'][0])
+        p_1.append(jnk['correlation'][1])
+        lo_1.append(jnk['correlation'][2])
+        hi_1.append(jnk['correlation'][3])
+        y_1.append(jnk['y'])
+
+    if 'longshore2' in file:
+        r_2.append(jnk['correlation'][0])
+        p_2.append(jnk['correlation'][1])
+        lo_2.append(jnk['correlation'][2])
+        hi_2.append(jnk['correlation'][3])
+        y_2.append(jnk['y'] + 0.25)
+
+
     if 'longshore2' not in file:
         y.append(jnk['y'])
+        y_highenergy.append(jnk['y'])
+        y_lowenergy.append(jnk['y'])
     else:
         y.append(jnk['y'] + 0.25)
+        y_highenergy.append(jnk['y'] + 0.25)
+        y_lowenergy.append(jnk['y'] + 0.25)
 
 
 
 fig, ax = plt.subplots(1,1,figsize=(3,4), num='corrs')
 ax.plot(r, y, 'k.')
 ax.plot([lo, hi], [y, y], 'k-')
+ax.plot(r_1, y_1, 'C1.')
+ax.plot([lo_1, hi_1], [y_1, y_1], 'C1-')
+ax.plot(r_2, y_2, 'C0.')
+ax.plot([lo_2, hi_2], [y_2, y_2], 'C0-')
 yl = ax.get_ylim()
 xl = ax.get_xlim()
 ax.plot([0,0], yl, 'k--')
-ax.axhspan(-9, yl[0], alpha=0.25, color='grey')
+ax.plot(xl, [-14.14, -14.14], 'k-', linewidth=0.5)
+# ax.axhspan(-9, yl[0], alpha=0.25, color='grey')
 ax.invert_yaxis()
 ax.set_xlabel('r')
 ax.set_ylabel('y [m]')
 ax.autoscale(enable=True, axis='y', tight=True)
+ax.autoscale(enable=True, axis='x', tight=True)
 fig.tight_layout()
 
+fig2, ax2 = plt.subplots(1,1,figsize=(3,4), num='corrs2')
+ax2.plot(r_highenergy, y_highenergy, 'r.')
+ax2.plot([lo_highenergy, hi_highenergy], [y_highenergy, y_highenergy], 'r-')
+ax2.plot(r_lowenergy, y_lowenergy, 'k.')
+ax2.plot([lo_lowenergy, hi_lowenergy], [y_lowenergy, y_lowenergy], 'k-')
+# ax.plot(r_1, y_1, 'k.')
+# ax.plot([lo_1, hi_1], [y_1, y_1], 'k-')
+# ax.plot(r_2, y_2, 'k.')
+# ax.plot([lo_2, hi_2], [y_2, y_2], 'k-')
+yl = ax2.get_ylim()
+xl = ax2.get_xlim()
+ax2.plot([0,0], yl, 'k--')
+ax2.axhspan(-9, yl[0], alpha=0.25, color='grey')
+ax2.invert_yaxis()
+ax2.set_xlabel('r')
+ax2.set_ylabel('y [m]')
+ax2.autoscale(enable=True, axis='y', tight=True)
+fig2.tight_layout()
 
+(9+13*5+15*6+17*2)/14
 
 saveFlag = 1
 # export figs

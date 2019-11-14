@@ -165,6 +165,7 @@ pinums = ['pi71', 'pi72', 'pi73', 'pi74']
 
 # initialize PLOTS
 fig01, ax01 = plt.subplots(3,1, figsize=(7,6), num='MSD timeseries chunk '+chunk)
+fig001, ax001 = plt.subplots(3,1, figsize=(6,4), num='MSD 1 timeseries chunk '+chunk)
 fig02, ax02 = plt.subplots(1,2, figsize=(8,3.5), num='swash depth vs $\Delta$ bed level. chunk '+chunk)
 
 counter = -1
@@ -355,6 +356,16 @@ for pinum in pinums:
         clr = 'C3'
         zorder = 0
 
+        # plot MSD time series
+        ax001[0].plot(date_swash, swash, '-', color='k', Linewidth=0.25)
+        # ax01[0].plot(date_swash, swash, '-', color=clr, Linewidth=0.25)
+
+        ax001[1].plot(date_z_bed, z_bed, '.', color='k', Markersize=5)
+
+        ax001[2].plot(date_gs, mgs, '.', color='k', Markersize=5)
+        tmp_hndl = ax001[2].plot(date_gs, mgs_fit, '-', color='k', Linewidth=3)
+        # handles001.extend(tmp_hndl)
+
     # plot MSD time series
     ax01[0].plot(date_swash, swash, '-', color=clr, Linewidth=0.25, zorder=zorder)
     # ax01[0].plot(date_swash, swash, '-', color=clr, Linewidth=0.25)
@@ -367,6 +378,12 @@ for pinum in pinums:
 
     # ax01[3].plot(date_gs, sort, '.', color=clr, Markersize=3)
     # ax01[3].plot(date_gs, sort_fit, '-', color=clr, Linewidth=2)
+
+
+
+
+
+
 
 
     # scatter plot
@@ -604,6 +621,39 @@ ax01[2].set_xlabel('time, tide ' + tide + '  [UTC]')
 fig01.tight_layout()
 
 
+# FIGURE 001
+
+ax001[0].set_xlim([datemin, datemax])
+ax001[0].xaxis.set_major_formatter(xfmt)
+ax001[0].xaxis.set_major_formatter(plt.NullFormatter())
+ax001[0].grid(alpha=gridalpha)
+ax001[0].tick_params(direction='in')
+# ax001[0].legend(handles01, legend_xcoords, loc="upper right")
+# ax01[0].autoscale(enable=True, axis='y', tight=True)
+# ax01[0].set_ylim([0, __])
+ax001[0].set_ylabel('$h_{s}$ [m]')
+ax001[1].set_xlim([datemin, datemax])
+ax001[1].xaxis.set_major_formatter(xfmt)
+ax001[1].xaxis.set_major_formatter(plt.NullFormatter())
+ax001[1].grid(alpha=gridalpha)
+ax001[1].tick_params(direction='in')
+ax001[1].set_ylabel('$z$ [m]')
+ax001[2].set_xlim([datemin, datemax])
+ax001[2].xaxis.set_major_formatter(xfmt)
+# ax01[2].xaxis.set_major_formatter(plt.NullFormatter())
+ax001[2].grid(alpha=gridalpha)
+ax001[2].tick_params(direction='in')
+ax001[2].set_ylabel('MGS [mm]')
+# ax01[3].set_xlim([datemin, datemax])
+# ax01[3].xaxis.set_major_formatter(xfmt)
+# ax01[3].grid(alpha=gridalpha)
+# ax01[3].tick_params(direction='in')
+# ax01[3].set_ylabel('$M_1$ [mm]')
+ax001[2].set_xlabel('time, tide ' + tide + '  [UTC]')
+fig001.tight_layout()
+
+
+
 # FIGURE 02
 
 ax02[0].set_xlabel('swash depth [mm]')
@@ -651,6 +701,7 @@ if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','tide'+tide, 'chunk'+chunk)
 
     save_figures(savedn, 'MSD_timeseries', fig01)
+    save_figures(savedn, 'MSD_timeseries_pi4', fig001)
     # # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
     save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
     save_figures(savedn, 'delta_bed_level_histogram', fig03)
