@@ -84,8 +84,8 @@ def binTrajectoryData(stones):
 
 # VARIABLE DEFINITIONS
 
-# homechar = "C:\\"
-homechar = os.path.expanduser('~')
+homechar = "C:\\"
+# homechar = os.path.expanduser('~')
 
 stone_class = 'yellows'
 # for tide 19, position 1: scaling = 421.0550841144531 pix/m

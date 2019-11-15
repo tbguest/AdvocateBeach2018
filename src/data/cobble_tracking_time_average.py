@@ -19,19 +19,33 @@ import cv2 as cv
 
 
 homechar = "C:\\"
+ext_drive = "F:\\"
+use_ext_drive = 1 # 0 or 1: don't or do use ext drive
 
-tide = "tide19"
-position = "position1"
-vidspec = "vid_1540304255" # pos1
-# vidspec = "vid_1540307860" # pos2
-# vidspec = "vid_1540307860" # pos2
-# vidspec = "vid_1540311466" # pos4
+tide = "tide15"
+# tide = "tide19"
+position = "position2"
 
-savedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-                           "images","timeAverage", tide, position, vidspec, 'tenframeaverage')
+if tide == "tide19":
+    # vidspec = "vid_1540304255" # pos1
+    vidspec = "vid_1540307860" # pos2
+    # vidspec = "vid_1540307860" # pos3
+    # vidspec = "vid_1540311466" # pos4
+elif tide == "tide15":
+    # vidspec = "vid_1540125835" # pos1
+    vidspec = "vid_1540129441" # pos2
+    # vidspec = "vid_1540129441" # pos3
 
-imgdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-                      "images", "fromVideo", tide, position, vidspec)
+if use_ext_drive == 1:
+    savedir = os.path.join(ext_drive, "data", "interim", \
+                               "images","timeAverage", tide, position, vidspec, 'tenframeaverage')
+    imgdir = os.path.join(ext_drive, "data", "interim", \
+                          "images", "fromVideo", tide, position, vidspec)
+else:
+    savedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+                               "images","timeAverage", tide, position, vidspec, 'tenframeaverage')
+    imgdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+                          "images", "fromVideo", tide, position, vidspec)
 
 imgs = sorted(glob.glob(os.path.join(imgdir, 'img*.jpg')))
 
