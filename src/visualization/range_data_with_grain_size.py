@@ -13,23 +13,24 @@ from glob import glob
 import matplotlib.pyplot as plt
 
 
-tide = '21'
+tide = '27'
 pinum = '71'
 
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser('~')
 rangedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
             "range_data", "bed_level", "tide" + tide)
 #
 #gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
 #            "grainsize_dists", "pi_array", "tide" + tide, 'pi' + pinum)
 gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-            "grainsize_dists", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level")
+            "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level")
 
 #C:\Projects\AdvocateBeach2018\data\interim\grainsize_dists\pi_array\tide19\pi71
 
 #for file in glob(os.path.join(rangedir, 'sonar*.npy')):
 for file in glob(os.path.join(rangedir, 'sonar' + pinum + '.npy')):
-    jnk = np.load(file).item()
+    jnk = np.load(file, allow_pickle=True).item()
 
 rng = jnk['raw bed level'][1]
 tt = jnk['raw bed level'][0]
@@ -40,7 +41,7 @@ timg = []
 
 for file in glob(os.path.join(gsizedir, 'img*.npy')):
 
-    foo = np.load(file, encoding='latin1').item()
+    foo = np.load(file, allow_pickle=True, encoding='latin1').item()
     timg.append(float(file[-29:-19] + '.' + file[-18:-12]))
     mean_gs.append(foo['mean grain size'])
     std_gs.append(foo['grain size sorting'])

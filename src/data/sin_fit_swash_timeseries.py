@@ -36,7 +36,8 @@ def utime2yearday(unixtime):
     return yearday
 
 
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser('~')
 
 stone_class = 'yellows'
 
@@ -83,24 +84,24 @@ nbins = 8
 # nbins = 8
 
 
-# # for tide 19, position 2: scaling = 458.05166513842414 pix/m
-# tide = "tide19"
-# position = "position4"
-# vidspec = "vid_1540311466" # pos 4
-# navg = 10 # 10 frames were averaged
-# startframe = 701 + np.int(navg/2)
-# # this is obtained using "exrtact_scaling_from_swash_images.py"
-# scaling = 436.65137206616646
-# # this range must be determined manually be inspecting the timeseries for
-# # region of little/no cutoff
-# goodrange = (295.6416811342593, 295.64982060185184)
-# nbins = 8
+# for tide 19, position 2: scaling = 458.05166513842414 pix/m
+tide = "tide19"
+position = "position4"
+vidspec = "vid_1540311466" # pos 4
+navg = 10 # 10 frames were averaged
+startframe = 701 + np.int(navg/2)
+# this is obtained using "exrtact_scaling_from_swash_images.py"
+scaling = 436.65137206616646
+# this range must be determined manually be inspecting the timeseries for
+# region of little/no cutoff
+goodrange = (295.6416811342593, 295.64982060185184)
+nbins = 8
 
 
 # pressure data for determining mean shoreline
 pressurefn = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim','pressure',tide + '.npy')
-p = np.load(pressurefn).item()
-tt = p['t']
+p = np.load(pressurefn, allow_pickle=True).item()
+tt = np.array(p['t'])
 dep = p['d']
 mean_shoreline = smooth_pressure(dep) # not yet aligned with swash
 
@@ -108,7 +109,7 @@ mean_shoreline = smooth_pressure(dep) # not yet aligned with swash
 tstackdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', 'interim', 'swash', tide, position)
 dn1 = os.path.join(tstackdir, 'timeseries', vidspec)
 # dn2 = os.path.join(tstackdir, 'timestacks', vidspec)
-jnk = np.load(os.path.join(dn1, 'timeseries.npy')).item()
+jnk = np.load(os.path.join(dn1, 'timeseries.npy'), allow_pickle=True).item()
 tvec = jnk['timevec']
 t_swash = utime2yearday(tvec) + 3*60*60/86400 # convert to UTC
 # rescale:
@@ -194,7 +195,7 @@ posixtime0 = float(vidspec[-10:])
 t_cobble = {}
 pixloc = {}
 for stone in sorted(stone_clr):
-    jnk = np.load(stone).item()
+    jnk = np.load(stone, allow_pickle=True).item()
     count = jnk['count']
     t_cobble[int(stone[-6:-4])] = utime2yearday(posixtime0) + 3*60*60/86400 + (np.array(count) + startframe)/4/86400
     # t_cobble[int(stone[-6:-4])] = utime2yearday(posixtime0) + (np.array(count) + 6801.0)/4/86400

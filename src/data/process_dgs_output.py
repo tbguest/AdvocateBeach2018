@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import json
+import math
 
 
 def build_gsize_arrays(gsizedir):
@@ -25,15 +26,72 @@ def build_gsize_arrays(gsizedir):
     skew = []
     kurt = []
 
+    mean_gsize_geo = []
+    sort_geo = []
+    skew_geo = []
+    kurt_geo = []
+
+    mean_gsize_phi = []
+    sort_phi = []
+    skew_phi = []
+    kurt_phi = []
+
     for fn in allfn:
 
         jnk = np.load(os.path.join(gsizedir, fn), encoding='latin1',  allow_pickle=True).item() # unpickle python 2 -> 3
         # jnk = np.load(os.path.join(gsizedir, fn), allow_pickle=True).item() # unpickle python
 
-        mean_gsize.append(jnk['mean grain size'])
-        sort.append(jnk['grain size sorting'])
-        skew.append(jnk['grain size skewness'])
-        kurt.append(jnk['grain size kurtosis'])
+        ################## LATER ADDITION
+        gsfreq = jnk['grain size frequencies']
+
+        logmgs = []
+        for elem in jnk['grain size bins']:
+            logmgs.append(-math.log2(elem))
+
+        # plt.figure(1)
+        # plt.plot(logmgs, gsfreq,'.')
+        # plt.plot(lnmgs, gsfreq,'.')
+
+        # arithmetic
+        mgs_a = np.sum(gsfreq*jnk['grain size bins'])
+        sort_a = np.sqrt(np.sum(gsfreq*(jnk['grain size bins'] - mgs_a)**2))
+        skew_a = np.sum(gsfreq*(jnk['grain size bins'] - mgs_a)**3)/sort_a**3
+        kurt_a = np.sum(gsfreq*(jnk['grain size bins'] - mgs_a)**4)/sort_a**4
+
+        # geometric
+        mgs_g = np.exp(np.sum(gsfreq*np.log(jnk['grain size bins'])))
+        sort_g = np.exp(np.sqrt(np.sum(gsfreq*(np.log(jnk['grain size bins']) - np.log(mgs_g))**2)))
+        skew_g = np.sum(gsfreq*(np.log(jnk['grain size bins']) - np.log(mgs_g))**3)/np.log(sort_g)**3
+        kurt_g = np.sum(gsfreq*(np.log(jnk['grain size bins']) - np.log(mgs_g))**4)/np.log(sort_g)**4
+
+        # logarithmic (phi-scaled)
+        mgs_p = np.sum(gsfreq*logmgs)
+        sort_p = np.sqrt(np.sum(gsfreq*(logmgs - mgs_p)**2))
+        skew_p = np.sum(gsfreq*(logmgs - mgs_p)**3)/sort_p**3
+        kurt_p = np.sum(gsfreq*(logmgs - mgs_p)**4)/sort_p**4
+
+        ##########################
+
+
+        # mean_gsize.append(jnk['mean grain size'])
+        # sort.append(jnk['grain size sorting'])
+        # skew.append(jnk['grain size skewness'])
+        # kurt.append(jnk['grain size kurtosis'])
+
+        mean_gsize.append(mgs_a)
+        sort.append(sort_a)
+        skew.append(skew_a)
+        kurt.append(kurt_a)
+
+        mean_gsize_geo.append(mgs_g)
+        sort_geo.append(sort_g)
+        skew_geo.append(skew_g)
+        kurt_geo.append(kurt_g)
+
+        mean_gsize_phi.append(mgs_p)
+        sort_phi.append(sort_p)
+        skew_phi.append(skew_p)
+        kurt_phi.append(kurt_p)
 
     # reshape the data into relevant grid
     # assumes I haven't missed any repeat/additional data points in my QC
@@ -41,8 +99,18 @@ def build_gsize_arrays(gsizedir):
 
         mean_gsize = np.array(mean_gsize).reshape(6, 24)
         sort = np.array(sort).reshape(6, 24)
-        skew = np.array(mean_gsize).reshape(6, 24)
-        kurt = np.array(sort).reshape(6, 24)
+        skew = np.array(skew).reshape(6, 24)
+        kurt = np.array(kurt).reshape(6, 24)
+
+        mean_gsize_geo = np.array(mean_gsize_geo).reshape(6, 24)
+        sort_geo = np.array(sort_geo).reshape(6, 24)
+        skew_geo = np.array(skew_geo).reshape(6, 24)
+        kurt_geo = np.array(kurt_geo).reshape(6, 24)
+
+        mean_gsize_phi = np.array(mean_gsize_phi).reshape(6, 24)
+        sort_phi = np.array(sort_phi).reshape(6, 24)
+        skew_phi = np.array(skew_phi).reshape(6, 24)
+        kurt_phi = np.array(kurt_phi).reshape(6, 24)
 
     else:
 
@@ -51,18 +119,36 @@ def build_gsize_arrays(gsizedir):
         skew = np.array(mean_gsize).reshape(len(mean_gsize),)
         kurt = np.array(sort).reshape(len(mean_gsize),)
 
+        mean_gsize_geo = np.array(mean_gsize_geo).reshape(len(mean_gsize_geo),)
+        sort_geo = np.array(sort_geo).reshape(len(mean_gsize_geo),)
+        skew_geo = np.array(skew_geo).reshape(len(mean_gsize_geo),)
+        kurt_geo = np.array(kurt_geo).reshape(len(mean_gsize_geo),)
+
+        mean_gsize_phi = np.array(mean_gsize_phi).reshape(len(mean_gsize_phi),)
+        sort_phi = np.array(sort_phi).reshape(len(mean_gsize_phi),)
+        skew_phi = np.array(skew_phi).reshape(len(mean_gsize_phi),)
+        kurt_phi = np.array(kurt_phi).reshape(len(mean_gsize_phi),)
+
     gsize = {"mean_grain_size": mean_gsize.tolist(), \
              "sorting": sort.tolist(), \
              "skewness": skew.tolist(), \
-             "kurtosis": kurt.tolist()}
+             "kurtosis": kurt.tolist(), \
+             "mean_grain_size_geo": mean_gsize_geo.tolist(), \
+             "sorting_geo": sort_geo.tolist(), \
+             "skewness_geo": skew_geo.tolist(), \
+             "kurtosis_geo": kurt_geo.tolist(), \
+             "mean_grain_size_phi": mean_gsize_phi.tolist(), \
+             "sorting_phi": sort_phi.tolist(), \
+             "skewness_phi": skew_phi.tolist(), \
+             "kurtosis_phi": kurt_phi.tolist()}
 
     return gsize
 
 
 def main():
 
-    # tide_range = range(28)
-    tide_range = [14]
+    tide_range = range(28)
+    # tide_range = [14]
 
     ## load key:value dict to convert from yearday to tide num.
     #tidekeydn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "external", "tide_key_values.npy")
@@ -72,9 +158,9 @@ def main():
     # homechar = "C:\\"
     homechar = os.path.expanduser("~") # linux
 
-    grid_specs = ["longshore1"]
+    # grid_specs = ["longshore1"]
     # grid_spec = "longshore1"
-    # grid_specs = ['cross_shore', 'longshore1', 'longshore2', 'dense_array1', 'dense_array2']
+    grid_specs = ['cross_shore', 'longshore1', 'longshore2', 'dense_array1', 'dense_array2']
 
     for grid_spec in grid_specs:
 

@@ -35,18 +35,21 @@ def utime2yearday(unixtime):
     return yearday
 
 
+# tide = '15'
 tide = '19'
+tide = '27'
 chunk = '2'
 
 post = 1.7 # survey post height
 
-homechar = "C:\\"
+# homechar = "C:\\"
+homechar = os.path.expanduser('~')
 
 gsdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
                            'processed', 'grainsize', 'pi_array', 'tide' + tide)
 
 rngdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'range_data', 'bed_level', 'tide' + tide)
+                           'processed', 'range_data', 'tide' + tide)
 
 # pi locations
 pifile = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
@@ -54,22 +57,22 @@ pifile = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
                            'array_position' + chunk + '.npy')
 
 
-aaa = np.load(os.path.join(gsdir, 'chunk' + chunk + '.npy')).item()
-bbb = np.load(os.path.join(rngdir, 'chunk' + chunk + '.npy')).item()
+aaa = np.load(os.path.join(gsdir, 'chunk' + chunk + '.npy'), allow_pickle=True).item()
+bbb = np.load(os.path.join(rngdir, 'chunk' + chunk + '.npy'), allow_pickle=True).item()
 
-pilocs = np.load(pifile).item()
+pilocs = np.load(pifile, allow_pickle=True).item()
 
-f0 = 0.25
-iters = 2
+f0 = 0.125
+iters = 3
 
 ff = len(aaa['pi71']['tvec'])
 tmin = aaa['pi71']['tvec'][0]
 tmax = aaa['pi71']['tvec'][-1]
 
-t71 = aaa['pi71']['tvec']
+t71 = aaa['pi71']['tvec'] - 3*60*60
 # t72 = aaa['pi72']['tvec']
-t73 = aaa['pi73']['tvec']
-t74 = aaa['pi74']['tvec']
+t73 = aaa['pi73']['tvec'] - 3*60*60
+t74 = aaa['pi74']['tvec']  - 3*60*60
 
 
 if tide == '27':
@@ -86,27 +89,39 @@ if tide == '27':
     sort_fit3 = lowess.lowess(aaa['pi73']['tvec'], aaa['pi73']['sort'], f=f0, iter=iters)
     sort_fit4 = lowess.lowess(aaa['pi74']['tvec'], aaa['pi74']['sort'], f=f0, iter=iters)
 
+    z71 = pilocs['z'][0] + post - bbb['pi71']['range']/1000
+    z73 = pilocs['z'][0] + post - bbb['pi73']['range']/1000
+    z74 = pilocs['z'][0] + post - bbb['pi74']['range']/1000
+
+
+    # z71_fit = lowess.lowess(bbb['pi71']['tvec'], z71, f=0.008, iter=1)
+    # z73_fit = lowess.lowess(bbb['pi73']['tvec'], z73, f=0.008, iter=1)
+    # z74_fit = lowess.lowess(bbb['pi74']['tvec'], z74, f=0.008, iter=1)
 
     fig1 = plt.figure(1, figsize=(8,6))
 
     ax1 = fig1.add_subplot(311)
-    ax1.plot(utime2yearday(bbb['pi71']['tvec']), pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0')
+    ax1.plot((bbb['pi71']['tvec']), z71, '.C0', Markersize=3)
     #ax1.plot(bbb['pi72']['tvec'], bbb['pi72']['range'], '.C1')
-    ax1.plot(utime2yearday(bbb['pi73']['tvec']), pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2')
-    ax1.plot(utime2yearday(bbb['pi74']['tvec']), pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3')
+    ax1.plot((bbb['pi73']['tvec']), z73, '.C2', Markersize=3)
+    ax1.plot((bbb['pi74']['tvec']), z74, '.C3', Markersize=3)
+    # ax1.plot((bbb['pi71']['tvec']), z71_fit, 'C0', Linewidth=2)
+    # #ax1.plot(bbb['pi72']['tvec'], bbb['pi72']['range'], '.C1')
+    # ax1.plot((bbb['pi73']['tvec']), z73_fit, 'C2', Linewidth=2)
+    # ax1.plot((bbb['pi74']['tvec']), z74_fit, 'C3', Linewidth=2)
     ax1.autoscale(enable=True, axis='x', tight=True)
     ax1.set_ylabel('elevation [m]')
     ax1.xaxis.set_major_formatter(plt.NullFormatter())
 
     ax2 = fig1.add_subplot(312)
-    ax2.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['mgs'], '.C0')
+    ax2.plot((t71), aaa['pi71']['mgs'], '.C0', Markersize=3)
     #ax2.plot(aaa['pi72']['tvec'], aaa['pi72']['mgs'], '.C1')
-    ax2.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['mgs'], '.C2')
-    ax2.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['mgs'], '.C3')
-    ax2.plot(utime2yearday(aaa['pi71']['tvec']), mgs_fit1, 'C0', Linewidth=2)
+    ax2.plot((t73), aaa['pi73']['mgs'], '.C2', Markersize=3)
+    ax2.plot((t74), aaa['pi74']['mgs'], '.C3', Markersize=3)
+    ax2.plot((t71), mgs_fit1, 'C0', Linewidth=2)
     #ax2.plot(aaa['pi72']['tvec'], mgs_fit2, 'C1', Linewidth=2)
-    ax2.plot(utime2yearday(aaa['pi73']['tvec']), mgs_fit3, 'C2', Linewidth=2)
-    ax2.plot(utime2yearday(aaa['pi74']['tvec']), mgs_fit4, 'C3', Linewidth=2)
+    ax2.plot((t73), mgs_fit3, 'C2', Linewidth=2)
+    ax2.plot((t74), mgs_fit4, 'C3', Linewidth=2)
     ax2.autoscale(enable=True, axis='x', tight=True)
     ax2.set_ylabel('mean grain size [mm]')
     ax2.xaxis.set_major_formatter(plt.NullFormatter())
@@ -114,16 +129,15 @@ if tide == '27':
 
 
 
-
     ax3 = fig1.add_subplot(313)
-    ax3.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['sort'], '.C0')
+    ax3.plot((t71), aaa['pi71']['sort'], '.C0', Markersize=3)
     #ax3.plot(aaa['pi72']['tvec'], aaa['pi72']['sort'], '.C1')
-    ax3.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['sort'], '.C2')
-    ax3.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['sort'], '.C3')
-    ax3.plot(utime2yearday(aaa['pi71']['tvec']), sort_fit1, 'C0', Linewidth=2)
+    ax3.plot((t73), aaa['pi73']['sort'], '.C2', Markersize=3)
+    ax3.plot((t74), aaa['pi74']['sort'], '.C3', Markersize=3)
+    ax3.plot((t71), sort_fit1, 'C0', Linewidth=2)
     #ax3.plot(aaa['pi72']['tvec'], sort_fit2, 'C1', Linewidth=2)
-    ax3.plot(utime2yearday(aaa['pi73']['tvec']), sort_fit3, 'C2', Linewidth=2)
-    ax3.plot(utime2yearday(aaa['pi74']['tvec']), sort_fit4, 'C3', Linewidth=2)
+    ax3.plot((t73), sort_fit3, 'C2', Linewidth=2)
+    ax3.plot((t74), sort_fit4, 'C3', Linewidth=2)
     ax3.autoscale(enable=True, axis='x', tight=True)
     ax3.set_ylabel('sorting [mm]')
     ax3.set_xlabel('yearday')
@@ -132,9 +146,9 @@ if tide == '27':
     fig2 = plt.figure(2)
 
     ax1 = fig2.add_subplot(311)
-    ax1.plot(bbb['pi71']['tvec'], pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0')
-    ax1.plot(bbb['pi73']['tvec'], pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2')
-    ax1.plot(bbb['pi74']['tvec'], pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3')
+    ax1.plot(bbb['pi71']['tvec'], pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0', Markersize=3)
+    ax1.plot(bbb['pi73']['tvec'], pilocs['z'][0] + post - bbb['pi73']['range']/1000, '.C2', Markersize=3)
+    ax1.plot(bbb['pi74']['tvec'], pilocs['z'][0] + post - bbb['pi74']['range']/1000, '.C3', Markersize=3)
     ax1.autoscale(enable=True, axis='x', tight=True)
     ax1.set_ylabel('elevation [m]')
 
@@ -166,19 +180,19 @@ else:
     fig1 = plt.figure(1, figsize=(8,6))
 
     ax1 = fig1.add_subplot(311)
-    ax1.plot(utime2yearday(bbb['pi71']['tvec']), pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0')
-    ax1.plot(utime2yearday(bbb['pi72']['tvec']), pilocs['z'][1] + post - bbb['pi72']['range']/1000, '.C1')
-    ax1.plot(utime2yearday(bbb['pi73']['tvec']), pilocs['z'][2] + post - bbb['pi73']['range']/1000, '.C2')
-    ax1.plot(utime2yearday(bbb['pi74']['tvec']), pilocs['z'][3] + post - bbb['pi74']['range']/1000, '.C3')
+    ax1.plot(utime2yearday(bbb['pi71']['tvec']), pilocs['z'][0] + post - bbb['pi71']['range']/1000, '.C0', Markersize=3)
+    ax1.plot(utime2yearday(bbb['pi72']['tvec']), pilocs['z'][1] + post - bbb['pi72']['range']/1000, '.C1', Markersize=3)
+    ax1.plot(utime2yearday(bbb['pi73']['tvec']), pilocs['z'][2] + post - bbb['pi73']['range']/1000, '.C2', Markersize=3)
+    ax1.plot(utime2yearday(bbb['pi74']['tvec']), pilocs['z'][3] + post - bbb['pi74']['range']/1000, '.C3', Markersize=3)
     ax1.autoscale(enable=True, axis='x', tight=True)
     ax1.set_ylabel('elevation [m]')
     ax1.xaxis.set_major_formatter(plt.NullFormatter())
 
     ax2 = fig1.add_subplot(312)
-    ax2.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['mgs'], '.C0')
-    ax2.plot(utime2yearday(aaa['pi72']['tvec']), aaa['pi72']['mgs'], '.C1')
-    ax2.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['mgs'], '.C2')
-    ax2.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['mgs'], '.C3')
+    ax2.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['mgs'], '.C0', Markersize=3)
+    ax2.plot(utime2yearday(aaa['pi72']['tvec']), aaa['pi72']['mgs'], '.C1', Markersize=3)
+    ax2.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['mgs'], '.C2', Markersize=3)
+    ax2.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['mgs'], '.C3', Markersize=3)
     ax2.plot(utime2yearday(aaa['pi71']['tvec']), mgs_fit1, 'C0', Linewidth=2)
     ax2.plot(utime2yearday(aaa['pi72']['tvec']), mgs_fit2, 'C1', Linewidth=2)
     ax2.plot(utime2yearday(aaa['pi73']['tvec']), mgs_fit3, 'C2', Linewidth=2)
@@ -189,10 +203,10 @@ else:
     ax2.xaxis.set_major_formatter(plt.NullFormatter())
 
     ax3 = fig1.add_subplot(313)
-    ax3.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['sort'], '.C0')
-    ax3.plot(utime2yearday(aaa['pi72']['tvec']), aaa['pi72']['sort'], '.C1')
-    ax3.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['sort'], '.C2')
-    ax3.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['sort'], '.C3')
+    ax3.plot(utime2yearday(aaa['pi71']['tvec']), aaa['pi71']['sort'], '.C0', Markersize=3)
+    ax3.plot(utime2yearday(aaa['pi72']['tvec']), aaa['pi72']['sort'], '.C1', Markersize=3)
+    ax3.plot(utime2yearday(aaa['pi73']['tvec']), aaa['pi73']['sort'], '.C2', Markersize=3)
+    ax3.plot(utime2yearday(aaa['pi74']['tvec']), aaa['pi74']['sort'], '.C3', Markersize=3)
     ax3.plot(utime2yearday(aaa['pi71']['tvec']), sort_fit1, 'C0', Linewidth=2)
     ax3.plot(utime2yearday(aaa['pi72']['tvec']), sort_fit2, 'C1', Linewidth=2)
     ax3.plot(utime2yearday(aaa['pi73']['tvec']), sort_fit3, 'C2', Linewidth=2)

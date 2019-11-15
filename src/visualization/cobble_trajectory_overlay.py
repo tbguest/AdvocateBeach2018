@@ -11,19 +11,19 @@ import os
 
 %matplotlib qt5
 
-homechar = "C:\\"
+# homechar = "C:\\"
 homechar = os.path.expanduser('~')
 
 tide = "tide19"
-position = "position3"
+position = "position2"
 # vidspec = "vid_1540304255" # pos1
-# vidspec = "vid_1540307860" # pos2
-vidspec = "vid_1540307860" # pos3
+vidspec = "vid_1540307860" # pos2
+# vidspec = "vid_1540307860" # pos3
 # vidspec = "vid_1540311466" # pos4
 colour = "yellow"
 # imgnum = "img001796.jpg" # p1
-# imgnum = "img010768.jpg" #p2
-imgnum = "img014226.jpg" #p3
+imgnum = "img010768.jpg" #p2
+# imgnum = "img014226.jpg" #p3
 # imgnum = "img003284.jpg" # p4
 
 cmap = cm.tab10
@@ -32,6 +32,13 @@ cmap = cm.tab10
 #                            "images", "fromVideo", tide,position,vidspec,imgnum)
 imgfile = os.path.join('/media', 'tristan2','Advocate2018_backup2', "data", "interim", \
                            "images", "fromVideo", tide,position,vidspec,imgnum)
+
+splitdn = os.path.join(homechar,'Projects','AdvocateBeach2018','data','processed','images',\
+        'coarsefine_split',tide,position)
+splitfn = os.listdir(splitdn)[0]
+
+splitimg = np.load(os.path.join(splitdn,splitfn), allow_pickle=True)
+
 im = plt.imread(imgfile)
 
 
@@ -48,6 +55,14 @@ pixloc = {}
 
 fig, ax = plt.subplots(nrows=1,ncols=1, num="trajectory overlay")
 ax.imshow(im)
+ax.imshow(splitimg, alpha=0.4)
+
+# ax.plot(925, 436, 'wo')
+# #841
+# # 413
+# # -1.904219368567567
+# # 925
+# # 436
 
 rescale_pix_x = 1640/1000
 rescale_pix_y = 1232/1000

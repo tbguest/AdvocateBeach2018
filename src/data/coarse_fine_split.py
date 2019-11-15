@@ -27,6 +27,7 @@ for position in positions:
 
     plt.close("all")
 
+    # for tide 19 only
     if position == "position1":
         vidspec = "vid_1540304255" # pos1
         imgnum = 'img010413.jpg' #1
@@ -47,6 +48,9 @@ for position in positions:
     #                            "images", "fromVideo", tide,position,vidspec,imgnum)
     imgfile = os.path.join('/media', 'tristan2','Advocate2018_backup2', "data", "interim", \
                                "images", "fromVideo", tide,position,vidspec,imgnum)
+
+
+
     im = plt.imread(imgfile)
 
     posixtime0 = float(vidspec[-10:])
@@ -83,11 +87,13 @@ for position in positions:
     # for coarse-fine split
     split_image = np.zeros(np.shape(im[:,:,1]))
 
+    coarse_edgecount = 0.15
+
     for I_x in xgrid:
         for  I_y in ygrid:
             edgecount = np.sum(edges[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))])
             # print(edgecount)
-            if edgecount/len(edges[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))].flatten()) > 0.13:
+            if edgecount/len(edges[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))].flatten()) > coarse_edgecount:
                 coarsefine_split.append(1)
                 split_image[I_y:I_y+int(np.floor(ystep)),I_x:I_x+int(np.floor(xstep))] = 1
             else:
@@ -108,6 +114,19 @@ for position in positions:
     saveFlag = 1
     if saveFlag == 1:
 
+        # split data (binary)
+        outputdn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+                "images", "coarsefine_split", tide,position)
+        if not os.path.exists(outputdn):
+            try:
+                os.makedirs(outputdn)
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
+        np.save(os.path.join(outputdn, imgnum[:-4] + '_split' + '.npy'), split_image)
+
+        # figures
         savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','cobble_transport','coarsefine_split',tide)
         if not os.path.exists(savedn):
             try:

@@ -62,10 +62,10 @@ for ii in tide_range:
     # sediment data
     jnk = np.load(gsizefn, allow_pickle=True).item()
 
-    mgs = jnk['mean_grain_size']
-    sort = jnk['sorting']
-    skew = jnk['skewness']
-    kurt = jnk['kurtosis']
+    mgs = np.array(jnk['mean_grain_size'])
+    sort = np.array(jnk['sorting'])
+    skew = np.array(jnk['skewness'])
+    kurt = np.array(jnk['kurtosis'])
 
     # GPS data
     if not os.path.exists(gpsfn):
@@ -73,9 +73,9 @@ for ii in tide_range:
 
     foo = np.load(gpsfn, allow_pickle=True).item()
 
-    x = foo['x'].reshape(6, 24)
-    y = foo['y'].reshape(6, 24)
-    z = foo['z'].reshape(6, 24)
+    x = np.array(foo['x']).reshape(6, 24)
+    y = np.array(foo['y']).reshape(6, 24)
+    z = np.array(foo['z']).reshape(6, 24)
 
     # for first iteration
     if counter == 0:
@@ -165,7 +165,7 @@ for ii in tide_range:
             dsort_line01[:,counter-1] = sum_dsort[:,surv_col]
 
 
-        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(9,7), num=tide)
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(7,5), num=tide)
         pos1 = ax1.imshow(dz, cmap='bwr', vmin=-0.25, vmax=0.25)
         fig.colorbar(pos1, ax=ax1)
         pos2 = ax2.imshow(dmgs, cmap='bwr', vmin=-15, vmax=15)

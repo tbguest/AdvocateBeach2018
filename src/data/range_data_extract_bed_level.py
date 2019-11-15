@@ -8,9 +8,9 @@ Created on Fri Jan  4 10:34:20 2019
 
 Extracts bed level from the altimeter time series using a simple criterion.
 Saves the full raw range series, the full extracted bed series, bed series
-divided in to chunks, and a smoothed bed series for each chunk. The smooth 
-time series chunks are used to reduce noise when computing mm/pixel in dgs 
-calculation. One more pass over these data is done by ____ to save the chunks 
+divided in to chunks, and a smoothed bed series for each chunk. The smooth
+time series chunks are used to reduce noise when computing mm/pixel in dgs
+calculation. One more pass over these data is done by ____ to save the chunks
 in more usable form.
 """
 
@@ -23,11 +23,13 @@ import os
 from scipy import interpolate
 
 
+#### DEFUNCT ################
+
 def build_unixtime(year, month, day, hour, minute, second):
-    
+
     dt = datetime(int(year), int(month), int(day), int(hour), int(minute), 0)
     utime = time.mktime(dt.timetuple()) + second
-    
+
     return utime
 
 
@@ -43,7 +45,7 @@ find_points_of_interest = False
 
 
 # tide 13
-# 20 
+# 20
 #fn1 = "sonar71_2018-10-20-13_08.dat"
 #fn1 = "sonar72_2018-10-20-13_08.dat"
 #fn1 = "sonar73_2018-10-20-13_08.dat"
@@ -72,7 +74,7 @@ find_points_of_interest = False
 #tide = '19'
 
 ## tide 21
-## 24 
+## 24
 #fn1 = "sonar71_2018-10-24-14_14.dat"
 #fn1 = "sonar72_2018-10-24-14_14.dat"
 #fn1 = "sonar73_2018-10-24-14_14.dat"
@@ -98,27 +100,27 @@ timesdir = os.path.join("C:\\", "Projects", "AdvocateBeach2018", "data", \
 
 # defines start and end times of array sampling chunks
 if not os.path.exists(timesdir):
-    find_points_of_interest = True 
+    find_points_of_interest = True
 
 with open(dn+fn1, 'rb') as f:
-    
+
     if tide is '13': # tide 13 was logged differently - no subsecond, different date format
         clean_lines = ( line.replace(b'R',b'').replace(b':',b' ') for line in f )
-        rng = np.genfromtxt(clean_lines,usecols=(2,3,4,5,),delimiter=' ')  
+        rng = np.genfromtxt(clean_lines,usecols=(2,3,4,5,),delimiter=' ')
     else:
         clean_lines = ( line.replace(b'R',b'').replace(b'-',b' ') for line in f )
-        rng = np.genfromtxt(clean_lines,usecols=(0,1,2,3,4,5,6,),delimiter=' ')   
- 
+        rng = np.genfromtxt(clean_lines,usecols=(0,1,2,3,4,5,6,),delimiter=' ')
+
 if tide is '13':
     range1 = rng[:,3]
     npts = len(range1)
     tmin = build_unixtime(2018, 10, 20, rng[0,0], rng[0,1], rng[0,2])
     tmax = build_unixtime(2018, 10, 20, rng[-1,0], rng[-1,1], rng[-1,2])
     date1 = np.linspace(tmin, tmax, npts)
-    
-else:    
+
+else:
     range1 = rng[:,6]
-    
+
     # bilud unix time vector
     date1 = []
     for i in range(0, len(rng[:,0])):
@@ -137,8 +139,8 @@ for ii in range(b_range, len(range1)):
             bval = float('nan')
             break
         bval = np.mean(range1[ii-b_range+1:ii])
-    bed_vec.append(bval)    
-    
+    bed_vec.append(bval)
+
 bed_vec = np.array(bed_vec)
 date1 = np.array(date1)
 Ibed = np.argwhere(~np.isnan(bed_vec))#.item()
@@ -148,7 +150,7 @@ date_good = date1[Ibed]
 raw_bed_level = np.array([date_good, bed_good])
 raw_range = np.array([date1, range1])
 
-                
+
 
 plt.figure(6)
 plt.plot(date1,range1)
@@ -161,7 +163,7 @@ plt.ylabel('Range [mm]')
 plt.show()
 
 if find_points_of_interest is True:
-    
+
     plt.figure(7)
     plt.plot(date_good,bed_good, '.')
     plt.xlabel('time [s]')
@@ -170,54 +172,54 @@ if find_points_of_interest is True:
     # plt.xlim([5000, 7000])
     plt.show()
     POI = plt.ginput(-1, timeout=0, show_clicks=True)
-    
+
     POI = np.array(POI)
-    
+
     plt.figure(77)
     plt.plot(date_good,bed_good, '.')
     plt.xlabel('time [s]')
     plt.ylabel('Range [mm]')
     plt.plot(POI[:,0], POI[:,1], 'r.')
-    
+
     np.save(timesdir, POI)
-    
+
 else:
-    
+
     POI = np.load(timesdir)
-    
-    
+
+
 # SMOOTH CHUNKS:
-    
+
 raw_chunks = {}
 smoothed_chunks = np.empty((0))
 chunk_time = np.empty((0))
 
-    
+
 for ii in range(0, int(len(POI)/2)):
-        
+
     start_time = POI[ii*2][0]
     end_time = POI[1 + ii*2][0]
 
     time_chunk_indices = np.where(np.logical_and(date_good > start_time, date_good < end_time))
     time_chunk = date_good[time_chunk_indices]
     bed_chunk = bed_good[time_chunk_indices]
-    
+
 #    plt.figure(78)
 #    plt.plot(date_good,bed_good, '.')
 #    plt.xlabel('time [s]')
 #    plt.ylabel('Range [mm]')
 #    plt.plot(time_chunk,bed_chunk, 'r.')
-    
+
     # interpolate, then smooth
     f = interpolate.interp1d(time_chunk, bed_chunk)
     time_chunk_reg = np.linspace(np.min(time_chunk), np.max(time_chunk), len(time_chunk)*5)
     bed_chunk_reg = f(time_chunk_reg)
-    
+
     cutoff = 6 #[mins]
     cutoff_freq = 1/60/cutoff/(1/np.mean(np.diff(time_chunk_reg))/2) # normalized: (1/60/cutoff) / Nyquist
     b, a = signal.butter(2, cutoff_freq)
     bed_chunk_filt = signal.filtfilt(b, a, bed_chunk_reg, padlen=150)
-    
+
     plt.figure(1000+ii)
 #    plt.subplot(211)
     plt.plot(date_good,bed_good, '.')
@@ -226,20 +228,20 @@ for ii in range(0, int(len(POI)/2)):
     plt.plot(time_chunk_reg, bed_chunk_reg, 'r-')
 #    plt.subplot(212)
     plt.plot(time_chunk_reg, bed_chunk_filt, 'k-')
-    
+
     raw_bed = np.array([time_chunk, bed_chunk])
 #    smooth_bed = np.array([time_chunk_reg, bed_chunk_filt])
-    
+
     raw_chunks['chunk' + str(int(ii+1))] = raw_bed
 #    smoothed_chunks['chunk' + str(int(ii+1))] = smooth_bed
     smoothed_chunks = np.append(smoothed_chunks, bed_chunk_filt)
     chunk_time = np.append(chunk_time, time_chunk_reg)
 
 
-# SAVE:    
-    
+# SAVE:
+
 smooth_chunks = np.array([np.array(chunk_time), np.array(smoothed_chunks)])
-    
+
 bed_level = {"raw range": raw_range, "raw bed level": raw_bed_level, "bed level chunks": raw_chunks, "smoothed chunks": smooth_chunks}
 
 ## save
@@ -253,8 +255,8 @@ if not os.path.exists(outdir):
     except OSError as exc: # Guard against race condition
         if exc.errno != errno.EEXIST:
             raise
-   
-            
+
+
 #np.save(os.path.join(outdir, fn1[:7] + ".npy"), bed_level)
 
 
@@ -268,4 +270,3 @@ if not os.path.exists(outdir):
 #
 #plt.figure(2)
 #plt.plot(rtime, sonar_range, '.')
-    
