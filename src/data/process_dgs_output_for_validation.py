@@ -27,7 +27,8 @@ homechar = os.path.expanduser("~") # linux
 # validation_dns = ["LabValidation_xmin05", "OutdoorValidation_xmin05_3pcwindowing"]
 
 # validation_dns = ["OutdoorValidation_xmin05", "OutdoorValidation_xpos05"]
-validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_xpos05"]
+# validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_xpos05"]
+validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_x2"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_x0_maxscale5"]
 
 
@@ -259,39 +260,39 @@ for n in range(0, 2):
     #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
             # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
             ax1[0,0].plot(np.arange(30), np.arange(30))
-            ax1[0,0].set_ylabel('DGS arith. mgs [mm]')
-            ax1[0,0].set_xlabel('sieve arith. mgs [mm]')
+            ax1[0,0].set_ylabel('DGS arith. MGS [mm]')
+            ax1[0,0].set_xlabel('sieve arith. MGS [mm]')
             if n is 0:
-                # ax1[1,0].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'k.')
-                ax1[1,0].plot(mgs_g_sieve, mgs_g, 'k.')
+                ax1[0,1].plot(sort_a_sieve, sort_a, 'k.')
+                # ax1[1,0].plot(mgs_g_sieve, mgs_g, 'k.')
             else:
-                # ax1[1,0].plot(sort_a_sieve, np.mean(dgsjnk['grain size sorting']), 'r.')
-                ax1[1,0].plot(mgs_g_sieve, mgs_g, 'r.')
-            ax1[1,0].plot(np.arange(20), np.arange(20))
-            ax1[1,0].set_xlabel('sieve geom. mgs [mm]')
-            ax1[1,0].set_ylabel('DGS geom. mgs [mm]')
-
-            if n is 0:
-                ax1[0,1].plot(mgs_p_sieve, mgs_p, 'k.')
-                # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
-            else:
-                ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
-                ax1[0,1].plot(mgs_p_sieve, mgs_p, 'r.')
-                # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
+                ax1[0,1].plot(sort_a_sieve, sort_a, 'r.')
+                # ax1[1,0].plot(mgs_g_sieve, mgs_g, 'r.')
             ax1[0,1].plot(np.arange(20), np.arange(20))
-            ax1[0,1].set_xlabel('sieve phi mgs')
-            ax1[0,1].set_ylabel('DGS phi mgs')
+            ax1[0,1].set_xlabel('sieve arith. sorting [mm]')
+            ax1[0,1].set_ylabel('DGS arith. sorting [mm]')
 
             if n is 0:
-                ax1[1,1].plot(d50_sieve, d50_dgs, 'k.', markersize=12)
+                ax1[1,0].plot(mgs_g_sieve, mgs_g, 'k.')
                 # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
             else:
                 ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
-                ax1[1,1].plot(d50_sieve, d50_dgs, 'r.')
+                ax1[1,0].plot(mgs_g_sieve, mgs_g, 'r.')
+                # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
+            ax1[1,0].plot(np.arange(20), np.arange(20))
+            ax1[1,0].set_xlabel('sieve geom. MGS [mm]')
+            ax1[1,0].set_ylabel('DGS geom. MGS [mm]')
+
+            if n is 0:
+                ax1[1,1].plot(sort_g_sieve, sort_g, 'k.', markersize=12)
+                # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
+            else:
+                ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
+                ax1[1,1].plot(sort_g_sieve, sort_g, 'r.')
                 # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
             ax1[1,1].plot(np.arange(20), np.arange(20))
-            ax1[1,1].set_xlabel('sieve d50 [mm]')
-            ax1[1,1].set_ylabel('DGS d50 [mm]')
+            ax1[1,1].set_xlabel('sieve geom. sorting [mm]')
+            ax1[1,1].set_ylabel('DGS geom. sorting [mm]')
 
             # ax1[1].title('sorting. RMSE = ' + str(rmse_sort))
             fig1.tight_layout()

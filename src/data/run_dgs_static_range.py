@@ -15,8 +15,8 @@ homechar = os.path.expanduser("~") # linux
 # imset = "longshore2"
 imset = "longshore1"
 
-# tides = range(28)
-tides = [14]
+tides = range(28)
+# tides = [14]
 
 for n in tides:
 
@@ -30,7 +30,7 @@ for n in tides:
         continue
 
     outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
-            'processed','grainsize','beach_surveys',tidenum,imset)
+            'processed','grainsize','beach_surveys_reprocessed',tidenum,imset)
 
     if not os.path.exists(outdir):
         try:
@@ -53,7 +53,7 @@ for n in tides:
         notes = 8 # notes per octave
         maxscale = 8 #Max scale as inverse fraction of data length
         verbose = 0 # print stuff to screen
-        x = 0.5
+        x = 2
         dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
 
         np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)

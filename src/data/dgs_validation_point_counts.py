@@ -129,7 +129,7 @@ for n in range(len(tide0)):
     imgind = str(int(imgind0.split('-')[0][4:]))
     Idepth = imgnames.index(imgind)
 
-    np.save(os.path.join(savedn, date_str0[n] + tide0[n] + '_' + depths[Idepth] + '.npy'), particle_edges)
+    # np.save(os.path.join(savedn, date_str0[n] + tide0[n] + '_' + depths[Idepth] + '.npy'), particle_edges)
 
 
 plt.figure(88)
