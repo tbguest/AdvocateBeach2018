@@ -138,21 +138,33 @@ saveFlag = 0
 post = 1.7 # survey post height
 
 # homechar = "C:\\"
-homechar = os.path.expanduser('~')
+# homechar = os.path.expanduser('~')
+homechar = "F:\\NovBackup"
 
-gsdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'grainsize', 'pi_array', 'tide' + tide)
+# gsdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
+#                            'processed', 'grainsize', 'pi_array', 'tide' + tide)
+#
+# beddir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
+#                            'processed', 'range_data', 'bed_level', 'tide' + tide)
+#
+# swshdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
+#                            'processed', 'range_data', 'swash', 'tide' + tide)
+#
+# # pi locations
+# pifile = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
+#                            'processed', 'GPS', 'array', 'tide' + tide, \
+#                            'array_position' + chunk + '.npy')
 
-beddir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'range_data', 'bed_level', 'tide' + tide)
+gsdir = os.path.join(homechar, 'processed', 'grainsize', 'pi_array', 'tide' + tide)
 
-swshdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'range_data', 'swash', 'tide' + tide)
+beddir = os.path.join(homechar, 'processed', 'range_data', 'bed_level', 'tide' + tide)
+
+swshdir = os.path.join(homechar, 'processed', 'range_data', 'swash', 'tide' + tide)
 
 # pi locations
-pifile = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'GPS', 'array', 'tide' + tide, \
+pifile = os.path.join(homechar, 'processed', 'GPS', 'array', 'tide' + tide, \
                            'array_position' + chunk + '.npy')
+
 
 
 gs_struct = np.load(os.path.join(gsdir, 'chunk' + chunk + '.npy'), allow_pickle=True).item()
