@@ -18,13 +18,22 @@ import glob
 # python opencv_cobble_tracker.py --video .\timeavg_test.webm --tracker kcf
 # cd Projects\AdvocateBeach2018\src\data\openCV
 
-homechar = os.path.expanduser('~')
+# homechar = os.path.expanduser('~')
+homechar = "C:\\"
 
-tide = 'tide19'
+tide = 'tide15'
+# tide = 'tide19'
 vidchunk = 'position2'
-vid = 'vid_1540304255' # pos1
-# vid = 'vid_1540307860' # pos2, 3
-# vid = 'vid_1540311466' # pos4
+
+if tide == 'tide19':
+	# vid = 'vid_1540304255' # pos1
+	vid = 'vid_1540307860' # pos2, 3
+	# vid = 'vid_1540311466' # pos4
+elif tide == 'tide15':
+	# vid = 'vid_1540125835' # pos1
+	vid = 'vid_1540129441' # pos2, 3
+	# vid = '' # pos4
+
 stonefile = 'yellow_01.npy'
 # stonefile = 'red_01.npy'
 # stonefile = 'blue_18.npy'
@@ -32,6 +41,12 @@ stonefile = 'yellow_01.npy'
 # 5 is questionable
 
 #pos1 - did 7 move?
+#pos2 - 8 is questionable (larger one, gone offshore early); 14?
+# - yellow_19+ are separate cobble injection
+
+# tide15, yellow  pos6 questionable
+# tide15, yellow  pos14: made a mistake - will introduce some longshore bias
+
 
 # load in trajectories already logged
 traj_dir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim','cobble_tracking',tide,vidchunk,vid)

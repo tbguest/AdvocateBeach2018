@@ -10,10 +10,16 @@ import numpy as np
 # os.chdir('/home/tristan2/code/pyDGS/DGS')
 
 homechar = os.path.expanduser("~") # linux
+homechar = "C:\\"
+
+# drive dir
+drivechar = "/mnt/g"
 
 # imset = "cross_shore" #
 # imset = "longshore2"
-imset = "longshore1"
+# imset = "longshore1"
+imset = "dense_array2"
+
 
 tides = range(28)
 # tides = [14]
@@ -22,14 +28,20 @@ for n in tides:
 
     tidenum = 'tide' + str(n)
 
-    imdir = os.path.join('/media','tristan2','Advocate2018_backup2','data',\
+    # imdir = os.path.join('/media','tristan2','Advocate2018_backup2','data',\
+            # 'processed','images','cropped','beach_surveys',tidenum,imset)
+
+    imdir = os.path.join(drivechar,'data',\
             'processed','images','cropped','beach_surveys',tidenum,imset)
 
     # move on if the input imgs don't exist
     if not os.path.exists(imdir):
         continue
 
-    outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
+    # outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
+    #         'processed','grainsize','beach_surveys',tidenum,imset)
+
+    outdir = os.path.join(drivechar,'data',\
             'processed','grainsize','beach_surveys_reprocessed',tidenum,imset)
 
     if not os.path.exists(outdir):

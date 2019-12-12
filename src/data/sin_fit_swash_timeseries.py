@@ -54,19 +54,19 @@ stone_class = 'yellows'
 # goodrange = (295.56834780092595, 295.57413483796296)
 # nbins = 8
 
-# # for tide 19, position 2: scaling = 458.05166513842414 pix/m
-# tide = "tide19"
-# position = "position2"
-# #vidspec = "vid_1540304255" # pos1
-# vidspec = "vid_1540307860" # pos2
-# navg = 30 # 10 frames were averaged
-# startframe = 6801 + np.int(navg/2)
-# # this is obtained using "exrtact_scaling_from_swash_images.py"
-# scaling = 458.05166513842414
-# # this range must be determined manually be inspecting the timeseries for
-# # region of little/no cutoff
-# goodrange = (295.616, 295.622)
-# nbins = 8
+# for tide 19, position 2: scaling = 458.05166513842414 pix/m
+tide = "tide19"
+position = "position2"
+#vidspec = "vid_1540304255" # pos1
+vidspec = "vid_1540307860" # pos2
+navg = 10 # 10 frames were averaged
+startframe = 6801 + np.int(navg/2)
+# this is obtained using "exrtact_scaling_from_swash_images.py"
+scaling = 458.05166513842414
+# this range must be determined manually be inspecting the timeseries for
+# region of little/no cutoff
+goodrange = (295.616, 295.622)
+nbins = 8
 
 
 # # for tide 19, position 3: scaling = 458.05166513842414 pix/m
