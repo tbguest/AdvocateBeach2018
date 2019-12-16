@@ -168,17 +168,25 @@ def main():
 
             tide = "tide" + str(ii)
 
-            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys", tide, grid_spec)
+            # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys", tide, grid_spec)
+
+            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed", tide, grid_spec)
 
             # if the survey doesn't exist for this day...
             if not os.path.exists(gsizedir):
                 continue
 
+            # outdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+            #                   "grainsize", "beach_surveys", tide, grid_spec + ".npy")
+            #
+            # outdir_json = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+            #                   "grainsize", "beach_surveys", tide, grid_spec + ".json")
+
             outdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys", tide, grid_spec + ".npy")
+                              "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".npy")
 
             outdir_json = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys", tide, grid_spec + ".json")
+                              "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
 
             gsize = build_gsize_arrays(gsizedir)
 

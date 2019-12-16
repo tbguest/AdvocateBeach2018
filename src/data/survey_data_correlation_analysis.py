@@ -169,15 +169,16 @@ def lin_fit_slope(z_line):
 # homechar = "C:\\"
 homechar = os.path.expanduser("~") # linux
 
-dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data')
+# dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data')
+dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed')
 
-# grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-grid_specs = ["longshore1","longshore2"]
+grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
+# grid_specs = ["longshore2","longshore1"]
 # grid_specs = ["dense_array2"]#,"longshore2"]
 # grid_specs = ["dense_array2"]
 
 # 0 through  5
-dense_array_row = 4
+dense_array_row = 0
 
 
 
@@ -215,6 +216,8 @@ for grid_spec in grid_specs:
         start_tide = 14
     elif grid_spec == 'longshore1':
         start_tide = 16
+    elif grid_spec == 'dense_array2':
+        start_tide = 19
     else:
         start_tide = 15
 
@@ -396,13 +399,15 @@ for grid_spec in grid_specs:
     rwaves34 = pearsonr_ci(mean_dmgs_tide, iribarren_array, alpha=0.05)
 # np.mean(Hs_array)
 # np.mean(Tp_array)
-    outFlag = 0
+    outFlag = 1
     if outFlag == 1:
 
         output = {'correlation':r1_all, 'y':y1[0], 'correlation_lowenergy':r1_all_lowenergy, 'correlation_highenergy':r1_all_highenergy}
         # save new variables
+        # fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
+        #                  "processed","survey_data", "dz_dmgs_correlations")
         fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                         "processed","survey_data", "dz_dmgs_correlations")
+                         "processed","survey_data", "reprocessed", "dz_dmgs_correlations")
         if grid_spec == 'dense_array2':
             fn = grid_spec + '-' + str(dense_array_row)
         else:

@@ -117,8 +117,8 @@ def loess_fit(time_data, grain_size_data):
     return smoothed_data
 
 # tide = '15'
-# tide = '19'
-tide = '27'
+tide = '19'
+# tide = '27'
 
 chunk = '2'
 
@@ -133,13 +133,15 @@ chunk = '2'
 
 
 # for saving plots
-saveFlag = 0
+saveFlag = 1
 
 post = 1.7 # survey post height
 
 # homechar = "C:\\"
 # homechar = os.path.expanduser('~')
-homechar = "F:\\NovBackup"
+# homechar = "F:\\NovBackup"
+homechar = os.path.join('/media','tristan2','Advocate2018_backup2')
+
 
 # gsdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
 #                            'processed', 'grainsize', 'pi_array', 'tide' + tide)
@@ -155,14 +157,15 @@ homechar = "F:\\NovBackup"
 #                            'processed', 'GPS', 'array', 'tide' + tide, \
 #                            'array_position' + chunk + '.npy')
 
-gsdir = os.path.join(homechar, 'processed', 'grainsize', 'pi_array', 'tide' + tide)
+# gsdir = os.path.join(homechar, 'processed', 'grainsize', 'pi_array', 'tide' + tide)
+gsdir = os.path.join(homechar, 'data','processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed')
 
-beddir = os.path.join(homechar, 'processed', 'range_data', 'bed_level', 'tide' + tide)
+beddir = os.path.join(homechar, 'data', 'processed', 'range_data', 'bed_level', 'tide' + tide)
 
-swshdir = os.path.join(homechar, 'processed', 'range_data', 'swash', 'tide' + tide)
+swshdir = os.path.join(homechar, 'data', 'processed', 'range_data', 'swash', 'tide' + tide)
 
 # pi locations
-pifile = os.path.join(homechar, 'processed', 'GPS', 'array', 'tide' + tide, \
+pifile = os.path.join(homechar, 'data', 'processed', 'GPS', 'array', 'tide' + tide, \
                            'array_position' + chunk + '.npy')
 
 
@@ -589,7 +592,7 @@ for pinum in pinums:
 
     # export figs
     if saveFlag == 1:
-        loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','tide'+tide, 'chunk'+chunk)
+        loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed','tide'+tide, 'chunk'+chunk)
 
         save_figures(loopdn, pinum + '_swash_peaks_bed_level_with_dz', fig1011)
         # save_figures(loopdn, pinum + '_swash_peaks_no_bed_level', fig301)
@@ -710,7 +713,7 @@ fig02.tight_layout()
 
 # export figs
 if saveFlag == 1:
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','tide'+tide, 'chunk'+chunk)
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed','tide'+tide, 'chunk'+chunk)
 
     save_figures(savedn, 'MSD_timeseries', fig01)
     save_figures(savedn, 'MSD_timeseries_pi4', fig001)

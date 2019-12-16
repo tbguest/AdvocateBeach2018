@@ -162,7 +162,7 @@ def lin_fit_slope(z_line):
 
 
 # def main():
-saveFlag = 0
+saveFlag = 1
 saveCorr = 0
 
 # for portability
@@ -254,8 +254,11 @@ for ii in tide_range:
 
     tide = "tide" + str(ii)
 
+    # gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+    #                       "grainsize", "beach_surveys", tide, grid_spec + ".json")
+
     gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                          "grainsize", "beach_surveys", tide, grid_spec + ".json")
+                          "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
 
     gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                           "GPS", "by_tide", tide, grid_spec + ".json")
@@ -927,7 +930,8 @@ ax987[1].set_xlabel('tide')
 # EXPORT PLOTS
 if saveFlag == 1:
 
-    savedn = os.path.join(figsdn,'beach_profile',grid_spec)
+    # savedn = os.path.join(figsdn,'beach_profile',grid_spec)
+    savedn = os.path.join(figsdn,'beach_profile','reprocessed',grid_spec)
 
     save_figures(savedn, 'surfaceplots_dz_grainsize', fig)
 

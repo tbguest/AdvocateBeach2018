@@ -52,19 +52,14 @@ def save_figures(dn, fn, fig):
     fig.savefig(os.path.join(dn, fn + '.eps'), dpi=None, transparent=True)
     fig.savefig(os.path.join(dn, fn + '.jpg'), dpi=1000, transparent=True)
 
+
 homechar = os.path.expanduser("~") # linux
 
-
-        # output = {'correlation':r1_all, 'y':y1[0]}
-        # # save new variables
-        # fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-        #                  "processed","survey_data", "dz_dmgs_correlations")
-        #
-        # np.save(os.path.join(fout, fn), output)
-
+# dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
+#                  "processed","survey_data", "dz_dmgs_correlations")
 
 dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                 "processed","survey_data", "dz_dmgs_correlations")
+                 "processed","survey_data", "reprocessed", "dz_dmgs_correlations")
 
 r = []
 p = []
@@ -97,6 +92,9 @@ hi_2 = []
 y_2 = []
 
 for file in glob.glob(os.path.join(dn, "*.npy")):
+
+    if 'cross_shore' in file:
+        continue
 
     jnk = np.load(file, allow_pickle=True).item()
 
@@ -182,9 +180,10 @@ fig2.tight_layout()
 
 (9+13*5+15*6+17*2)/14
 
-saveFlag = 1
+saveFlag = 0
 # export figs
 if saveFlag == 1:
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD')
+    # savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD')
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed')
 
     save_figures(savedn, 'dz_dmgs_correlations_vs_y', fig)

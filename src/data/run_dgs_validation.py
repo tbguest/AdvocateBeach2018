@@ -25,7 +25,7 @@ for nn in range(len(tide0)):
     allfiles = sorted(glob.glob(os.path.join(imgdir,'*cropped.jpg')))
 
     outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
-            'processed','grainsize','validation', 'OutdoorValidation_x2', date_str0[nn] + tide0[nn])
+            'processed','grainsize','validation', 'OutdoorValidation_x1', date_str0[nn] + tide0[nn])
 
     if not os.path.exists(outdir):
         try:
@@ -46,26 +46,26 @@ for nn in range(len(tide0)):
         notes = 8 # notes per octave
         maxscale = 8 #Max scale as inverse fraction of data length
         verbose = 0 # print stuff to screen
-        x = 2
+        x = 1
         dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
 
         np.save(outdir + file[len(imgdir):-4] + '.npy', dgs_stats)
 
-import matplotlib.pyplot as plt
-im = plt.imread('/media/tristan2/Advocate2018_backup2/data/raw/images/OutdoorValidation/IMG_0206.JPG')
-
-%matplotlib qt5
-
-plt.imshow(im)
-print("Click on targets, top to bottom.")
-x = plt.ginput(2)
-print("clicked", x)
-plt.show()
-
-# pixdiff = x[1][0] - x[0][0]
-pixdiff = x[0][1] - x[1][1]
-squarelen = 0.4064*1000 # 16 inches in mm
-phonelen =  155# 16 inches in mm
-
-mmperpix = squarelen/pixdiff
-mmperpix = phonelen/pixdiff
+# import matplotlib.pyplot as plt
+# im = plt.imread('/media/tristan2/Advocate2018_backup2/data/raw/images/OutdoorValidation/IMG_0206.JPG')
+#
+# %matplotlib qt5
+#
+# plt.imshow(im)
+# print("Click on targets, top to bottom.")
+# x = plt.ginput(2)
+# print("clicked", x)
+# plt.show()
+#
+# # pixdiff = x[1][0] - x[0][0]
+# pixdiff = x[0][1] - x[1][1]
+# squarelen = 0.4064*1000 # 16 inches in mm
+# phonelen =  155# 16 inches in mm
+#
+# mmperpix = squarelen/pixdiff
+# mmperpix = phonelen/pixdiff

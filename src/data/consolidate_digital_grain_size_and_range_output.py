@@ -61,22 +61,24 @@ def make_range_chunk(rng, tvec_rng, raw, tvec_raw, tt_start, tt_end):
 # homechar = "C:\\"
 homechar = os.path.expanduser('~')
 
+drivechar = os.path.join('/media','tristan2','Advocate2018_backup2')
+
 # # tide 15
 # tide = '15'
 # skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
 # skip_last_chunk = 0
 
-# tide 19
-tide = '19'
-skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
-skip_last_chunk = 0
+# # tide 19
+# tide = '19'
+# skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
+# skip_last_chunk = 0
 
 # tide 21 ?
 
-# # tide 27
-# tide = '27'
-# skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
-# skip_last_chunk = 1
+# tide 27
+tide = '27'
+skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
+skip_last_chunk = 1
 
 pinums = ['71', '72', '73', '74']
 
@@ -111,9 +113,12 @@ for pinum in pinums:
 
     # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                # "grainsize", "pi_array", "tide" + tide, 'pi' + pinum)
-    gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
-                "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level")
-
+    # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+    #             "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level")
+    # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
+    #             "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level_reprocessed")
+    gsizedir = os.path.join(drivechar, "data", "interim", \
+                "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level_reprocessed")
     mean_gs = []
     std_gs = []
     timg = []
@@ -174,11 +179,16 @@ for jj in range(0 + skip_first_chunk, nchunks - skip_last_chunk):
     chunkdata_gs = make_gs_chunk(mgs, std, tvec, tt_start, tt_end)
     chunkdata_rng = make_range_chunk(rng, tvec_rng, raw, tvec_raw, tt_start, tt_end)
 
-    savedir_gs = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'grainsize', 'pi_array', 'tide' + tide)
+    # savedir_gs = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
+    #                        'processed', 'grainsize', 'pi_array', 'tide' + tide)
+    #
+    # savedir_rng = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
+    #                        'processed', 'range_data', 'tide' + tide)
+    savedir_gs = os.path.join(drivechar, 'data', \
+                           'processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed')
 
-    savedir_rng = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
-                           'processed', 'range_data', 'tide' + tide)
+    savedir_rng = os.path.join(drivechar, 'data', \
+                           'processed', 'range_data', 'tide' + tide, 'reprocessed')
 
     if not os.path.exists(savedir_gs):
         try:

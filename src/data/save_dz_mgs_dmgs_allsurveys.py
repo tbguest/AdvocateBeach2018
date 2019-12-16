@@ -57,7 +57,7 @@ saveFlag = 0
 # homechar = "C:\\"
 homechar = os.path.expanduser("~") # linux
 
-dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data')
+dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed')
 
 # cross-shore HWL coord and tide index
 hwl0 = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
@@ -120,8 +120,11 @@ for grid_spec in grid_specs:
 
         tide = "tide" + str(ii)
 
+        # gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+        #                       "grainsize", "beach_surveys", tide, grid_spec + ".json")
+
         gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys", tide, grid_spec + ".json")
+                              "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
 
         gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                               "GPS", "by_tide", tide, grid_spec + ".json")
@@ -241,9 +244,9 @@ for grid_spec in grid_specs:
 
         fn_out = os.path.join(dn_out, grid_spec + '.npy')
 
-        if not os.path.exists(savedn):
+        if not os.path.exists(dn_out):
             try:
-                os.makedirs(savedn)
+                os.makedirs(dn_out)
             except OSError as exc: # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise

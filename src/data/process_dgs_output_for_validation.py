@@ -28,7 +28,7 @@ homechar = os.path.expanduser("~") # linux
 
 # validation_dns = ["OutdoorValidation_xmin05", "OutdoorValidation_xpos05"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_xpos05"]
-validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_x2"]
+validation_dns = ["OutdoorValidation_x1", "OutdoorValidation_x15"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_x0_maxscale5"]
 
 
