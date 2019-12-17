@@ -15,57 +15,60 @@ homechar = "C:\\"
 # drive dir
 drivechar = "/mnt/g"
 
-# imset = "cross_shore" #
+# imset = "cross_shore"
 # imset = "longshore2"
 # imset = "longshore1"
-imset = "dense_array2"
+# imset = "dense_array2"
 
+imsets = ["cross_shore","longshore2", "longshore1", "dense_array2"]
 
-tides = range(28)
-# tides = [14]
+for imset in imsets:
 
-for n in tides:
+    tides = range(28)
+    # tides = [14]
 
-    tidenum = 'tide' + str(n)
+    for n in tides:
 
-    # imdir = os.path.join('/media','tristan2','Advocate2018_backup2','data',\
-            # 'processed','images','cropped','beach_surveys',tidenum,imset)
+        tidenum = 'tide' + str(n)
 
-    imdir = os.path.join(drivechar,'data',\
-            'processed','images','cropped','beach_surveys',tidenum,imset)
+        # imdir = os.path.join('/media','tristan2','Advocate2018_backup2','data',\
+                # 'processed','images','cropped','beach_surveys',tidenum,imset)
 
-    # move on if the input imgs don't exist
-    if not os.path.exists(imdir):
-        continue
+        imdir = os.path.join(drivechar,'data',\
+                'processed','images','cropped','beach_surveys',tidenum,imset)
 
-    # outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
-    #         'processed','grainsize','beach_surveys',tidenum,imset)
+        # move on if the input imgs don't exist
+        if not os.path.exists(imdir):
+            continue
 
-    outdir = os.path.join(drivechar,'data',\
-            'processed','grainsize','beach_surveys_reprocessed',tidenum,imset)
+        # outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
+        #         'processed','grainsize','beach_surveys',tidenum,imset)
 
-    if not os.path.exists(outdir):
-        try:
-            os.makedirs(outdir)
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
+        outdir = os.path.join(drivechar,'data',\
+                'processed','grainsize','beach_surveys_reprocessed_x15',tidenum,imset)
 
-    for file in sorted(glob.glob(os.path.join(imdir,'*-cropped.jpg'))):
+        if not os.path.exists(outdir):
+            try:
+                os.makedirs(outdir)
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
 
-        image_file = file
+        for file in sorted(glob.glob(os.path.join(imdir,'*-cropped.jpg'))):
 
-        # change camera height on the 18th (tide 9)
-        if n < 9:
-            resolution = 0.162
-        else:
-            resolution = 0.13
-        density = 10 # process every 10 lines
-        dofilter = 1 # filter the imagei
-        notes = 8 # notes per octave
-        maxscale = 8 #Max scale as inverse fraction of data length
-        verbose = 0 # print stuff to screen
-        x = 2
-        dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
+            image_file = file
 
-        np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)
+            # change camera height on the 18th (tide 9)
+            if n < 9:
+                resolution = 0.162
+            else:
+                resolution = 0.13
+            density = 10 # process every 10 lines
+            dofilter = 1 # filter the imagei
+            notes = 8 # notes per octave
+            maxscale = 8 #Max scale as inverse fraction of data length
+            verbose = 0 # print stuff to screen
+            x = 1.5
+            dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
+
+            np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)
