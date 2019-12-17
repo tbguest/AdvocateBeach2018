@@ -170,15 +170,15 @@ def lin_fit_slope(z_line):
 homechar = os.path.expanduser("~") # linux
 
 # dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data')
-dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed')
+dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed_x15')
 
 grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-# grid_specs = ["longshore2","longshore1"]
+grid_specs = ["longshore2","longshore1"]
 # grid_specs = ["dense_array2"]#,"longshore2"]
 # grid_specs = ["dense_array2"]
 
 # 0 through  5
-dense_array_row = 0
+dense_array_row = 5
 
 
 
@@ -407,7 +407,15 @@ for grid_spec in grid_specs:
         # fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
         #                  "processed","survey_data", "dz_dmgs_correlations")
         fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                         "processed","survey_data", "reprocessed", "dz_dmgs_correlations")
+                         "processed","survey_data", "reprocessed_x15", "dz_dmgs_correlations")
+
+        if not os.path.exists(fout):
+            try:
+                os.makedirs(fout)
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
         if grid_spec == 'dense_array2':
             fn = grid_spec + '-' + str(dense_array_row)
         else:

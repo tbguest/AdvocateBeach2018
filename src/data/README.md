@@ -13,6 +13,9 @@ Comment headers need to be added to all these scripts.
 - run `crop_images.py` to reduce size of all raw survey images, saving output in folders according to tide number (1-27) rather than date.
 - run `run_dgs_static_range.py` to produce a grain size distribution for each image (specify imageset -- e.g. dense_array1)
 - run `process_dgs_output.py`
+- run `save_dz_mgs_dmgs_allsurveys.py`
+- run `survey_data_correlation_analysis.py`
+- run `correlations.py`
 
 #### 1.2 Validation
 - sieve samples
@@ -28,7 +31,7 @@ Comment headers need to be added to all these scripts.
 - crop images in matlab (crop_images.m -- now crop_images.py)
 - run image set through DGS pipeline for images with variable height (process_grain_images_variable_range.py). This must be done via the Ubuntu shell on my machine, since problems with package dependencies have not allowed me to successfully install the DGS package alongside anaconda. (fixed, now running on Ubuntu)
 - run consolidate_digital_grain_size_and_range_output.py for relevant tide to organize data into more accessible format. i.e. chunks associated with each position (this assumes some work has already been done with the range data, I think).
-- 
+-
 
 ## Cobble tracking
 

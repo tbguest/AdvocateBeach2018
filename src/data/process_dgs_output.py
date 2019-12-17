@@ -170,7 +170,7 @@ def main():
 
             # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys", tide, grid_spec)
 
-            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed", tide, grid_spec)
+            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed_x15", tide, grid_spec)
 
             # if the survey doesn't exist for this day...
             if not os.path.exists(gsizedir):
@@ -183,16 +183,24 @@ def main():
             #                   "grainsize", "beach_surveys", tide, grid_spec + ".json")
 
             outdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".npy")
+                              "grainsize", "beach_surveys_reprocessed_x15", tide)
 
-            outdir_json = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
+            if not os.path.exists(outdir):
+                try:
+                    os.makedirs(outdir)
+                except OSError as exc: # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+
+            outfn = os.path.join(outdir, grid_spec + ".npy")
+
+            outfn_json = os.path.join(outdir, grid_spec + ".json")
 
             gsize = build_gsize_arrays(gsizedir)
 
-            np.save(outdir, gsize)
+            np.save(outfn, gsize)
 
-            with open(outdir_json, 'w') as fp:
+            with open(outfn_json, 'w') as fp:
                 json.dump(gsize, fp)
 
 #    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(9,7))

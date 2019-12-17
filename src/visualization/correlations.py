@@ -59,7 +59,7 @@ homechar = os.path.expanduser("~") # linux
 #                  "processed","survey_data", "dz_dmgs_correlations")
 
 dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                 "processed","survey_data", "reprocessed", "dz_dmgs_correlations")
+                 "processed","survey_data", "reprocessed_x15", "dz_dmgs_correlations")
 
 r = []
 p = []
