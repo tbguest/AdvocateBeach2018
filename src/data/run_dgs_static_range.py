@@ -45,7 +45,7 @@ for imset in imsets:
         #         'processed','grainsize','beach_surveys',tidenum,imset)
 
         outdir = os.path.join(drivechar,'data',\
-                'processed','grainsize','beach_surveys_reprocessed_x15',tidenum,imset)
+                'processed','grainsize','beach_surveys_reprocessed_x10',tidenum,imset)
 
         if not os.path.exists(outdir):
             try:
@@ -68,7 +68,7 @@ for imset in imsets:
             notes = 8 # notes per octave
             maxscale = 8 #Max scale as inverse fraction of data length
             verbose = 0 # print stuff to screen
-            x = 1.5
+            x = 1.0
             dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
 
             np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)
