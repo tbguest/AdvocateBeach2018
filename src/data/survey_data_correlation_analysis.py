@@ -170,10 +170,10 @@ def lin_fit_slope(z_line):
 homechar = os.path.expanduser("~") # linux
 
 # dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data')
-dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed_x15')
+dn_in = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed_x10')
 
 grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-grid_specs = ["longshore2","longshore1"]
+# grid_specs = ["longshore2","longshore1"]
 # grid_specs = ["dense_array2"]#,"longshore2"]
 # grid_specs = ["dense_array2"]
 
@@ -407,7 +407,7 @@ for grid_spec in grid_specs:
         # fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
         #                  "processed","survey_data", "dz_dmgs_correlations")
         fout = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                         "processed","survey_data", "reprocessed_x15", "dz_dmgs_correlations")
+                         "processed","survey_data", "reprocessed_x10", "dz_dmgs_correlations")
 
         if not os.path.exists(fout):
             try:

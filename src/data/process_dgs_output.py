@@ -170,7 +170,7 @@ def main():
 
             # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys", tide, grid_spec)
 
-            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed_x15", tide, grid_spec)
+            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed_x10", tide, grid_spec)
 
             # if the survey doesn't exist for this day...
             if not os.path.exists(gsizedir):
@@ -183,7 +183,7 @@ def main():
             #                   "grainsize", "beach_surveys", tide, grid_spec + ".json")
 
             outdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys_reprocessed_x15", tide)
+                              "grainsize", "beach_surveys_reprocessed_x10", tide)
 
             if not os.path.exists(outdir):
                 try:

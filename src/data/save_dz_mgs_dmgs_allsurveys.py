@@ -58,7 +58,7 @@ saveFlag = 0
 homechar = os.path.expanduser("~") # linux
 
 # dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed')
-dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed_x15')
+dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed_x10')
 
 # cross-shore HWL coord and tide index
 hwl0 = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
@@ -125,7 +125,7 @@ for grid_spec in grid_specs:
         #                       "grainsize", "beach_surveys", tide, grid_spec + ".json")
 
         gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys_reprocessed_x15", tide, grid_spec + ".json")
+                              "grainsize", "beach_surveys_reprocessed_x10", tide, grid_spec + ".json")
 
         gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                               "GPS", "by_tide", tide, grid_spec + ".json")

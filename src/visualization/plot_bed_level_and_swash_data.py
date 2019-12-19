@@ -158,7 +158,7 @@ homechar = os.path.join('/media','tristan2','Advocate2018_backup2')
 #                            'array_position' + chunk + '.npy')
 
 # gsdir = os.path.join(homechar, 'processed', 'grainsize', 'pi_array', 'tide' + tide)
-gsdir = os.path.join(homechar, 'data','processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed')
+gsdir = os.path.join(homechar, 'data','processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed_x15')
 
 beddir = os.path.join(homechar, 'data', 'processed', 'range_data', 'bed_level', 'tide' + tide)
 
@@ -592,7 +592,7 @@ for pinum in pinums:
 
     # export figs
     if saveFlag == 1:
-        loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed','tide'+tide, 'chunk'+chunk)
+        loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x15','tide'+tide, 'chunk'+chunk)
 
         save_figures(loopdn, pinum + '_swash_peaks_bed_level_with_dz', fig1011)
         # save_figures(loopdn, pinum + '_swash_peaks_no_bed_level', fig301)
@@ -713,7 +713,7 @@ fig02.tight_layout()
 
 # export figs
 if saveFlag == 1:
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed','tide'+tide, 'chunk'+chunk)
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x15','tide'+tide, 'chunk'+chunk)
 
     save_figures(savedn, 'MSD_timeseries', fig01)
     save_figures(savedn, 'MSD_timeseries_pi4', fig001)

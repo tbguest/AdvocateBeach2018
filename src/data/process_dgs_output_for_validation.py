@@ -178,6 +178,8 @@ for n in range(0, 2):
             ###
 
 
+
+
             imgnum = str(int(allfiles[jj][4:8])) # removes leading zeros
 
             Iimg = imgnames.index(imgnum)
@@ -420,7 +422,11 @@ for n in range(0, 2):
 
             if os.path.exists(os.path.join(pointcountdir,  date_str0[ii] + tide0[ii] + '_' + depths[Igarbo] + '.npy')):
                 if n is 0:
-                    l1, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'k.', label='no window')
+                    l1, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'k.', lab    #        plt.figure(1000+ii)
+    #        plt.plot(jnk['percentile_values'], jnk['percentiles'])
+    #        plt.plot(gsbins,  bar['cumulative sum'])
+    #        plt.xlabel('values')
+    #        plt.ylabel('percentiles')el='no window')
                 else:
                     l2, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'r.', label='window')
                 # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
@@ -548,9 +554,16 @@ fig4, ax4 = plt.subplots(nrows=1, ncols=1, num='1-1')
 ax4.plot(old_dgs, new_dgs, 'k.', label='no window')
 ax4.plot(np.arange(30), np.arange(30))
 ax4.set_ylabel('DGS mean [mm]')
-fig1.tight_layout()
+fig4.tight_layout()
 
 
+fig5, ax5 = plt.subplots(nrows=1, ncols=1, num='dist')
+ax5.plot(dgsjnk['grain size bins'], dgsjnk['grain size frequencies'], 'k.', label='no window')
+ax5.plot(bar['grain size bins'], bar['grain size frequencies'], 'C0', label='no window')
+# ax5.set_ylabel('DGS mean [mm]')
+fig5.tight_layout()
+
+np.sum(bar['grain size frequencies'])
 
 saveFlag = 0
 if saveFlag == 1:

@@ -14,7 +14,7 @@ Comment headers need to be added to all these scripts.
 - run `run_dgs_static_range.py` to produce a grain size distribution for each image (specify imageset -- e.g. dense_array1)
 - run `process_dgs_output.py`
 - run `save_dz_mgs_dmgs_allsurveys.py`
-- run `survey_data_correlation_analysis.py`
+- run `survey_data_correlation_analysis.py` (for each longshore transect of dense_array2)
 - run `correlations.py`
 
 #### 1.2 Validation
