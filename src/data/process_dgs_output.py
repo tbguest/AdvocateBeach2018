@@ -158,6 +158,8 @@ def main():
     # homechar = "C:\\"
     homechar = os.path.expanduser("~") # linux
 
+    drivechar = '/media/tristan2/Advocate2018_backup2'
+
     # grid_specs = ["longshore1"]
     # grid_spec = "longshore1"
     grid_specs = ['cross_shore', 'longshore1', 'longshore2', 'dense_array1', 'dense_array2']
@@ -170,7 +172,8 @@ def main():
 
             # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys", tide, grid_spec)
 
-            gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed_x10", tide, grid_spec)
+            # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", "grainsize", "beach_surveys_reprocessed_x05", tide, grid_spec)
+            gsizedir = os.path.join(drivechar, "data", "processed", "grainsize", "beach_surveys_reprocessed_x05", tide, grid_spec)
 
             # if the survey doesn't exist for this day...
             if not os.path.exists(gsizedir):
@@ -182,8 +185,11 @@ def main():
             # outdir_json = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
             #                   "grainsize", "beach_surveys", tide, grid_spec + ".json")
 
-            outdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                              "grainsize", "beach_surveys_reprocessed_x10", tide)
+            # outdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+            #                   "grainsize", "beach_surveys_reprocessed_x05", tide)
+
+            outdir = os.path.join(drivechar, "data", "processed", \
+                              "grainsize", "beach_surveys_reprocessed_x05", tide)
 
             if not os.path.exists(outdir):
                 try:

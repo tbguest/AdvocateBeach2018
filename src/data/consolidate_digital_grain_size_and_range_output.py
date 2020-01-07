@@ -68,17 +68,17 @@ drivechar = os.path.join('/media','tristan2','Advocate2018_backup2')
 # skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
 # skip_last_chunk = 0
 
-# # tide 19
-# tide = '19'
-# skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
-# skip_last_chunk = 0
+# tide 19
+tide = '19'
+skip_first_chunk = 1 # my attempt to reconcile GPS positions with apparent range data positions
+skip_last_chunk = 0
 
 # tide 21 ?
 
-# tide 27
-tide = '27'
-skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
-skip_last_chunk = 1
+# # tide 27
+# tide = '27'
+# skip_first_chunk = 0 # my attempt to reconcile GPS positions with apparent range data positions
+# skip_last_chunk = 1
 
 pinums = ['71', '72', '73', '74']
 
@@ -118,7 +118,7 @@ for pinum in pinums:
     # gsizedir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
     #             "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level_reprocessed")
     gsizedir = os.path.join(drivechar, "data", "interim", \
-                "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level_reprocessed_x15")
+                "grainsize", "pi_array", "tide" + tide, 'pi' + pinum, "smooth_bed_level_reprocessed_x10")
     mean_gs = []
     std_gs = []
     timg = []
@@ -185,10 +185,10 @@ for jj in range(0 + skip_first_chunk, nchunks - skip_last_chunk):
     # savedir_rng = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data', \
     #                        'processed', 'range_data', 'tide' + tide)
     savedir_gs = os.path.join(drivechar, 'data', \
-                           'processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed_x15')
+                           'processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed_x10')
 
     savedir_rng = os.path.join(drivechar, 'data', \
-                           'processed', 'range_data', 'tide' + tide, 'reprocessed_x15')
+                           'processed', 'range_data', 'tide' + tide, 'reprocessed_x10')
 
     if not os.path.exists(savedir_gs):
         try:

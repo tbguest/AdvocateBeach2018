@@ -65,7 +65,8 @@ def crop_image(img, wid, height, wid0, height0):
 
 homechar = os.path.expanduser("~") # linux
 
-imset = 'longshore1' #'cross_shore' # longshore; longshore1; longshore2, dense_array1; dense_array2
+# imset = 'longshore1' #'cross_shore' # longshore; longshore1; longshore2, dense_array1; dense_array2
+imset = 'dense_array2'
 
 # tide number - 1 being first of experiment (Sunday AM UTC)
 # note 13 should really by tide B, but I'm sticking with my misinformed field convention
@@ -110,7 +111,8 @@ tide0 = ["AM", "AM", "AM", "AM", "AM", "PM", "AM", "PM", "AM", "PM", "AM", "PM",
 # date_str0 = ['22_10_2018']
 # tide0 = ['AM']
 
-for kk in range(4,5):#range(len(tide0)):
+for kk in range(5,8):#range(len(tide0)):
+# for kk in range(len(tide0)):
 
     # convert to tide number
     date_str = date_str0[kk]

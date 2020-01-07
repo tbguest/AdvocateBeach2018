@@ -422,11 +422,7 @@ for n in range(0, 2):
 
             if os.path.exists(os.path.join(pointcountdir,  date_str0[ii] + tide0[ii] + '_' + depths[Igarbo] + '.npy')):
                 if n is 0:
-                    l1, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'k.', lab    #        plt.figure(1000+ii)
-    #        plt.plot(jnk['percentile_values'], jnk['percentiles'])
-    #        plt.plot(gsbins,  bar['cumulative sum'])
-    #        plt.xlabel('values')
-    #        plt.ylabel('percentiles')el='no window')
+                    l1, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'k.', label='no window')
                 else:
                     l2, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'r.', label='window')
                 # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')

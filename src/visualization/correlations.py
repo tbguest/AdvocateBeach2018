@@ -54,12 +54,16 @@ def save_figures(dn, fn, fig):
 
 
 homechar = os.path.expanduser("~") # linux
+drivechar = '/media/tristan2/Advocate2018_backup2'
+
 
 # dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
 #                  "processed","survey_data", "dz_dmgs_correlations")
 
-dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
-                 "processed","survey_data", "reprocessed_x10", "dz_dmgs_correlations")
+# dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
+#                  "processed","survey_data", "reprocessed_x05", "dz_dmgs_correlations")
+dn = os.path.join(drivechar, "data", \
+                 "processed","survey_data", "reprocessed_x05", "dz_dmgs_correlations")
 
 r = []
 p = []
@@ -184,6 +188,6 @@ saveFlag = 0
 # export figs
 if saveFlag == 1:
     # savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD')
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed')
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x05')
 
     save_figures(savedn, 'dz_dmgs_correlations_vs_y', fig)
