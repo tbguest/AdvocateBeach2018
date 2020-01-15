@@ -162,24 +162,29 @@ def lin_fit_slope(z_line):
 
 
 # def main():
-saveFlag = 1
+saveFlag = 0
 saveCorr = 0
 
 # for portability
 # homechar = "C:\\"
 homechar = os.path.expanduser("~") # linux
+drivechar = '/media/tristan2/Advocate2018_backup2'
+
 
 figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
 'reports','figures')
 
-grid_spec = "cross_shore"
+# grid_spec = "cross_shore"
 # grid_spec = "longshore2"
-# grid_spec = "longshore1"
+grid_spec = "longshore1"
 
 hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+# hwl = [-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+
 
 if grid_spec == 'cross_shore':
-    start_tide = 13
+    # start_tide = 13
+    start_tide = 14
 elif grid_spec == 'longshore1':
     start_tide = 15
     hwl = hwl[2:]
@@ -257,8 +262,10 @@ for ii in tide_range:
     # gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
     #                       "grainsize", "beach_surveys", tide, grid_spec + ".json")
 
-    gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                          "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
+    # gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+    #                       "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
+    gsizefn = os.path.join(drivechar, "data", "processed", \
+                          "grainsize", "beach_surveys_reprocessed_x08", tide, grid_spec + ".json")
 
     gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                           "GPS", "by_tide", tide, grid_spec + ".json")

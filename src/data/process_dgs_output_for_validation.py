@@ -28,7 +28,7 @@ homechar = os.path.expanduser("~") # linux
 
 # validation_dns = ["OutdoorValidation_xmin05", "OutdoorValidation_xpos05"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_xpos05"]
-validation_dns = ["OutdoorValidation_x1", "OutdoorValidation_x15"]
+validation_dns = ["OutdoorValidation_x08", "OutdoorValidation_x09"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_x0_maxscale5"]
 
 
@@ -45,6 +45,8 @@ fig2, ax2 = plt.subplots(nrows=2, ncols=2, num="compare mean with pt count")
 fig3, ax3 = plt.subplots(nrows=2, ncols=2, num="compare sieve with pt count")
 fig11, ax11 = plt.subplots(nrows=2, ncols=2, num="compare sort arith, geom, etc")
 
+rmse_mgs_sieve_dgs = []
+rmse_mgs_count_dgs = []
 
 
 old_dgs = []
@@ -84,7 +86,8 @@ for n in range(0, 2):
             depths.append(row[3])
             iters.append(row[4])
 
-    rms_mgs_vec = []
+    rms_mgs_vec_dgs_sieve = []
+    rms_mgs_vec_dgs_count = []
     rms_std_vec = []
 
 
@@ -246,8 +249,12 @@ for n in range(0, 2):
 
             cumsum_img = np.cumsum(dgsjnk['grain size frequencies'])
 
-            rms_mgs_vec.append(mgs_a_sieve - dgsjnk['mean grain size'])
+            rms_mgs_vec_dgs_sieve.append(mgs_a_sieve - mgs_a)
+            if os.path.exists(os.path.join(pointcountdir,  date_str0[ii] + tide0[ii] + '_' + depths[Igarbo] + '.npy')):
+                rms_mgs_vec_dgs_count.append(mgs_a_ptc - mgs_a)
             rms_std_vec.append(sort_a_sieve - dgsjnk['grain size sorting'])
+
+
 
 
             # ### FIGURES
@@ -533,11 +540,12 @@ for n in range(0, 2):
     #    pos2 = ax2.imshow(gsize['sorting'], cmap='inferno')
     #    fig.colorbar(pos2, ax=ax2)
 
-    rmse_mgs = np.sqrt(np.nanmean(np.array(rms_mgs_vec)**2))
+    rmse_mgs_sieve_dgs.append(np.sqrt(np.nanmean(np.array(rms_mgs_vec_dgs_sieve)**2)))
+    rmse_mgs_count_dgs.append(np.sqrt(np.nanmean(np.array(rms_mgs_vec_dgs_count)**2)))
     rmse_sort = np.sqrt(np.nanmean(np.array(rms_std_vec)**2))
 
 # ax1[0].legend(['no windowing', 'windowing'], loc="upper left")
-ax1[0,0].legend([l1, l2],['x=0.5; lab validation', 'x=0.5; outdoor validation'], loc="upper left")
+ax1[0,0].legend([l1, l2],['x=1.0', 'x=1.5'], loc="upper left")
 
 # ax1.plot(xtr, color='r', label='HHZ 1')
 # ax1.legend(loc="upper right")

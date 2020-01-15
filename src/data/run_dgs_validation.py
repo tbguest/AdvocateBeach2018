@@ -25,7 +25,7 @@ for nn in range(len(tide0)):
     allfiles = sorted(glob.glob(os.path.join(imgdir,'*cropped.jpg')))
 
     outdir = os.path.join(homechar, 'Projects', 'AdvocateBeach2018', 'data',\
-            'processed','grainsize','validation', 'OutdoorValidation_x15_maxscale12', date_str0[nn] + tide0[nn])
+            'processed','grainsize','validation', 'OutdoorValidation_x09', date_str0[nn] + tide0[nn])
 
     if not os.path.exists(outdir):
         try:
@@ -40,13 +40,14 @@ for nn in range(len(tide0)):
 
         # change camera height on the 18th (tide 9)
         # resolution = 0.13
-        resolution = 0.10
+        # resolution = 0.10
+        resolution = 0.12
         density = 10 # process every 10 lines
         dofilter = 1 # filter the imagei
         notes = 8 # notes per octave
-        maxscale = 12 #Max scale as inverse fraction of data length
+        maxscale = 8 #Max scale as inverse fraction of data length
         verbose = 0 # print stuff to screen
-        x = 1.5
+        x = 0.9
         dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
 
         np.save(outdir + file[len(imgdir):-4] + '.npy', dgs_stats)

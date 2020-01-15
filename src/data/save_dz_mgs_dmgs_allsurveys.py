@@ -51,7 +51,7 @@ def save_figures(dn, fn, fig):
 
 
 
-saveFlag = 0
+saveFlag = 1
 
 # for portability
 # homechar = "C:\\"
@@ -60,12 +60,15 @@ drivechar = '/media/tristan2/Advocate2018_backup2'
 
 # dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed')
 # dn_out = os.path.join(homechar,'Projects','AdvocateBeach2018','data', 'processed', 'survey_data', 'reprocessed_x10')
-dn_out = os.path.join(drivechar,'data', 'processed', 'survey_data', 'reprocessed_x05')
+dn_out = os.path.join(drivechar,'data', 'processed', 'survey_data', 'reprocessed_x08')
 
 # cross-shore HWL coord and tide index
 hwl0 = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
 # hwl0 = [-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27,-27]
 Ihwl = [14, 15, 16, 17, 18,19, 20, 21, 22, 23, 24, 25, 26, 27]
+
+np.mean(hwl0)
+np.std(hwl0)
 
 # grid_specs = ["cross_shore"]#["longshore1", "longshore2"]#, "dense_array2"]
 # grid_specs = ["cross_shore","longshore1", "dense_array2"]
@@ -130,7 +133,7 @@ for grid_spec in grid_specs:
         #                       "grainsize", "beach_surveys_reprocessed_x10", tide, grid_spec + ".json")
 
         gsizefn = os.path.join(drivechar, "data", "processed", \
-                              "grainsize", "beach_surveys_reprocessed_x05", tide, grid_spec + ".json")
+                              "grainsize", "beach_surveys_reprocessed_x08", tide, grid_spec + ".json")
 
         gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                               "GPS", "by_tide", tide, grid_spec + ".json")
