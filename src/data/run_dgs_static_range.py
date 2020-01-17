@@ -21,11 +21,13 @@ drivechar = "/mnt/g"
 # imset = "dense_array2"
 
 imsets = ["cross_shore","longshore2", "longshore1", "dense_array2"]
+# imsets = ["dense_array2"]
 
 for imset in imsets:
 
-    tides = range(28)
-    # tides = [14]
+    # tides = range(28)
+    # tides = range(14,18)
+    tides = range(18,28)
 
     for n in tides:
 
@@ -45,7 +47,7 @@ for imset in imsets:
         #         'processed','grainsize','beach_surveys',tidenum,imset)
 
         outdir = os.path.join(drivechar,'data',\
-                'processed','grainsize','beach_surveys_reprocessed_x10',tidenum,imset)
+                'processed','grainsize','beach_surveys_reprocessed_x08',tidenum,imset)
 
         if not os.path.exists(outdir):
             try:
@@ -68,7 +70,7 @@ for imset in imsets:
             notes = 8 # notes per octave
             maxscale = 8 #Max scale as inverse fraction of data length
             verbose = 0 # print stuff to screen
-            x = 1.0
+            x = 0.8
             dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
 
             np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)

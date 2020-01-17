@@ -100,7 +100,7 @@ for pinum in pinums:
     # outdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim',\
     #                         'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level')
     outdir = os.path.join(drivechar,'data','interim',\
-                            'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level_reprocessed_x10')
+                            'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level_reprocessed_x08')
 
     if not os.path.exists(outdir):
         try:
@@ -129,7 +129,7 @@ for pinum in pinums:
         notes = 8 # notes per octave
         maxscale = 8 #Max scale as inverse fraction of data length
         verbose = 0 # print stuff to screen
-        x = 1.0
+        x = 0.8
         dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
 
         outpyfile = file[len(imdir):-4] + '.csv'
