@@ -106,7 +106,8 @@ for grid_spec in grid_specs:
     if grid_spec == 'cross_shore':
         start_tide = 13
     elif grid_spec == 'longshore1':
-        start_tide = 15
+        # start_tide = 15
+        start_tide = 13
     else:
         start_tide = 14
 

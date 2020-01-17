@@ -5,6 +5,8 @@ import json
 
 from src.visualization.plot_beach_profile_data import save_figures
 
+%matplotlib qt5
+
 # change default font size
 plt.rcParams.update({'font.size': 12})
 
@@ -177,7 +179,7 @@ fig2.tight_layout()
 R_mean = np.nanmean(miche)
 
 
-saveFlag = 1
+saveFlag = 0
 
 # EXPORT PLOTS
 if saveFlag == 1:

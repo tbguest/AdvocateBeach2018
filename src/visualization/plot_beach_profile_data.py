@@ -175,22 +175,33 @@ figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
 'reports','figures')
 
 # grid_spec = "cross_shore"
-# grid_spec = "longshore2"
-grid_spec = "longshore1"
+grid_spec = "longshore2"
+# grid_spec = "longshore1"
 
 hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
 # hwl = [-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
 
 
 if grid_spec == 'cross_shore':
-    # start_tide = 13
-    start_tide = 14
+    start_tide = 13
+    # start_tide = 14
+    # hwl = hwl[1:]
 elif grid_spec == 'longshore1':
     start_tide = 15
     hwl = hwl[2:]
 else:
     start_tide = 14
     hwl = hwl[1:]
+
+# if grid_spec == 'cross_shore':
+#     start_tide = 13
+#     # start_tide = 14
+#     # hwl = hwl[1:]
+# elif grid_spec == 'longshore1':
+#     start_tide = 13
+# else:
+#     start_tide = 14
+#     hwl = hwl[1:]
 
 tide_range = range(start_tide, 28)
 tide_axis = np.arange(start_tide+1,28) # for plotting later
@@ -582,8 +593,8 @@ if grid_spec == "cross_shore":
     ax010.plot([xl[0],xl[1]], [-13,-13], 'k-.',  linewidth=1)
     ax010.plot([xl[0],xl[1]], [-5,-5], 'k--', linewidth=1)
     ax010.invert_yaxis()
-    ax010.set_xlabel('mean MGS [mm]')
-    ax010.set_ylabel('cross-shore coordinate [m]')
+    ax010.set_xlabel('MGS [mm]')
+    ax010.set_ylabel('cross-shore coordinate, $y$ [m]')
     fig010.tight_layout()
     ax010.set_xlim(xl)
 
@@ -596,6 +607,7 @@ if grid_spec == "cross_shore":
     Zp = smoothed_dz
 
     jjj = matplotlib.colors.Normalize(vmin=-np.abs(np.max(smoothed_dz)), vmax=np.abs(np.max(smoothed_dz)))
+    # jjj = matplotlib.colors.Normalize(vmin=-1, vmax=1)
     vvv = jjj(smoothed_dz)
     cmap1=cm.bwr
     clrs1 = cmap1(vvv)
@@ -624,7 +636,8 @@ if grid_spec == "cross_shore":
     # surf2 = ax.plot_wireframe(X, Y, Z, cmap=cm.coolwarm,  linewidth=0.5, antialiased=False)
     acx1.invert_xaxis()
     acx1.view_init(elev=38., azim=50)
-    acx1.set_xlabel('tide')
+    # acx1.view_init(elev=38., azim=55)
+    acx1.set_xlabel('low tide')
     acx1.set_ylabel('y [m]')
     acx1.set_zlabel('z [m]')
 
@@ -632,9 +645,10 @@ if grid_spec == "cross_shore":
     surf = acx2.plot_surface(X, Y, Z, facecolors=clrs2, linewidth=0, antialiased=False)
     acx2.invert_xaxis()
     acx2.view_init(elev=38., azim=50)
-    acx2.scatter(tide_axis, hwl,  z_hwl, marker='^', color='k', depthshade=False)
+    # acx2.view_init(elev=38., azim=55)
+    acx2.scatter(tide_axis, hwl,  z_hwl, marker='^',color='k', depthshade=False)
     # fig.colorbar(surf, shrink=0.5, aspect=10)
-    acx2.set_xlabel('tide')
+    acx2.set_xlabel('low tide')
     acx2.set_ylabel('y [m]')
     acx2.set_zlabel('z [m]')
 
@@ -646,7 +660,7 @@ if grid_spec == "cross_shore":
     cax = plt.axes([0.85, 0.595, 0.02, 0.25])
     clbjnk = plt.colorbar(cax=cax)
     # pl.savefig("colorbar.pdf")
-    clbjnk.ax.set_title('dz [m]', fontsize=10)
+    clbjnk.ax.set_title('$\Delta$z [m]', fontsize=10)
 
     a = smoothed_M0
     # plt.figure(figsize=(5, 5))

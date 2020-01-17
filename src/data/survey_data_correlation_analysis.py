@@ -178,9 +178,9 @@ drivechar = '/media/tristan2/Advocate2018_backup2'
 dn_in = os.path.join(drivechar,'data', 'processed', 'survey_data', 'reprocessed_x08')
 
 # grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-grid_specs = ["longshore2","longshore1"]
+# grid_specs = ["longshore2","longshore1"]
 # grid_specs = ["longshore2"]#,"longshore2"]
-# grid_specs = ["dense_array2"]
+grid_specs = ["longshore1"]
 
 # 0 through  5
 dense_array_row = 5
@@ -232,6 +232,7 @@ for grid_spec in grid_specs:
         start_tide = 14
     elif grid_spec == 'longshore1':
         start_tide = 16
+        # start_tide = 14
     elif grid_spec == 'dense_array2':
         # start_tide = 19
         start_tide = 15

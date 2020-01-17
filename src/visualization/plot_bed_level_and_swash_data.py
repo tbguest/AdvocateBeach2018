@@ -133,7 +133,7 @@ chunk = '2'
 
 
 # for saving plots
-saveFlag = 1
+saveFlag = 0
 
 post = 1.7 # survey post height
 
