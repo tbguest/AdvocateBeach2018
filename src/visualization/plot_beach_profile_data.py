@@ -22,7 +22,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.colors as mcolors
 import matplotlib.colors
 
-# %matplotlib qt5
+%matplotlib qt5
 
 plt.close('all')
 
@@ -162,12 +162,14 @@ def lin_fit_slope(z_line):
 
 
 # def main():
-saveFlag = 1
+saveFlag = 0
 saveCorr = 0
 
 # for portability
 # homechar = "C:\\"
 homechar = os.path.expanduser("~") # linux
+drivechar = '/media/tristan2/Advocate2018_backup2'
+
 
 figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
 'reports','figures')
@@ -177,15 +179,29 @@ grid_spec = "cross_shore"
 # grid_spec = "longshore1"
 
 hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+# hwl = [-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
+
 
 if grid_spec == 'cross_shore':
     start_tide = 13
+    # start_tide = 14
+    # hwl = hwl[1:]
 elif grid_spec == 'longshore1':
     start_tide = 15
     hwl = hwl[2:]
 else:
     start_tide = 14
     hwl = hwl[1:]
+
+# if grid_spec == 'cross_shore':
+#     start_tide = 13
+#     # start_tide = 14
+#     # hwl = hwl[1:]
+# elif grid_spec == 'longshore1':
+#     start_tide = 13
+# else:
+#     start_tide = 14
+#     hwl = hwl[1:]
 
 tide_range = range(start_tide, 28)
 tide_axis = np.arange(start_tide+1,28) # for plotting later
@@ -257,8 +273,10 @@ for ii in tide_range:
     # gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
     #                       "grainsize", "beach_surveys", tide, grid_spec + ".json")
 
-    gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
-                          "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
+    # gsizefn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "processed", \
+    #                       "grainsize", "beach_surveys_reprocessed", tide, grid_spec + ".json")
+    gsizefn = os.path.join(drivechar, "data", "processed", \
+                          "grainsize", "beach_surveys_reprocessed_x08", tide, grid_spec + ".json")
 
     gpsfn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", "interim", \
                           "GPS", "by_tide", tide, grid_spec + ".json")
@@ -575,8 +593,8 @@ if grid_spec == "cross_shore":
     ax010.plot([xl[0],xl[1]], [-13,-13], 'k-.',  linewidth=1)
     ax010.plot([xl[0],xl[1]], [-5,-5], 'k--', linewidth=1)
     ax010.invert_yaxis()
-    ax010.set_xlabel('mean MGS [mm]')
-    ax010.set_ylabel('cross-shore coordinate [m]')
+    ax010.set_xlabel(r'$\overline{\mathrm{MGS}}$ [mm]')
+    ax010.set_ylabel('cross-shore coordinate, $y$ [m]')
     fig010.tight_layout()
     ax010.set_xlim(xl)
 
@@ -589,6 +607,7 @@ if grid_spec == "cross_shore":
     Zp = smoothed_dz
 
     jjj = matplotlib.colors.Normalize(vmin=-np.abs(np.max(smoothed_dz)), vmax=np.abs(np.max(smoothed_dz)))
+    # jjj = matplotlib.colors.Normalize(vmin=-1, vmax=1)
     vvv = jjj(smoothed_dz)
     cmap1=cm.bwr
     clrs1 = cmap1(vvv)
@@ -617,7 +636,8 @@ if grid_spec == "cross_shore":
     # surf2 = ax.plot_wireframe(X, Y, Z, cmap=cm.coolwarm,  linewidth=0.5, antialiased=False)
     acx1.invert_xaxis()
     acx1.view_init(elev=38., azim=50)
-    acx1.set_xlabel('tide')
+    # acx1.view_init(elev=38., azim=55)
+    acx1.set_xlabel('low tide')
     acx1.set_ylabel('y [m]')
     acx1.set_zlabel('z [m]')
 
@@ -625,9 +645,10 @@ if grid_spec == "cross_shore":
     surf = acx2.plot_surface(X, Y, Z, facecolors=clrs2, linewidth=0, antialiased=False)
     acx2.invert_xaxis()
     acx2.view_init(elev=38., azim=50)
-    acx2.scatter(tide_axis, hwl,  z_hwl, marker='^', color='k', depthshade=False)
+    # acx2.view_init(elev=38., azim=55)
+    acx2.scatter(tide_axis, hwl,  z_hwl, marker='^',color='k', depthshade=False)
     # fig.colorbar(surf, shrink=0.5, aspect=10)
-    acx2.set_xlabel('tide')
+    acx2.set_xlabel('low tide')
     acx2.set_ylabel('y [m]')
     acx2.set_zlabel('z [m]')
 
@@ -639,7 +660,7 @@ if grid_spec == "cross_shore":
     cax = plt.axes([0.85, 0.595, 0.02, 0.25])
     clbjnk = plt.colorbar(cax=cax)
     # pl.savefig("colorbar.pdf")
-    clbjnk.ax.set_title('dz [m]', fontsize=10)
+    clbjnk.ax.set_title('$\Delta$z [m]', fontsize=10)
 
     a = smoothed_M0
     # plt.figure(figsize=(5, 5))
@@ -894,13 +915,15 @@ fig11, ax11 = plt.subplots(2,1,figsize=(5,3), sharex=True,num='Hs and grainsize 
 ax11[0].plot(tide_axis, Hs[1:], 'k.')
 ax11[0].set_ylabel('$H_s$ [m]')
 ax11[0].tick_params(direction='in',top=1,right=1)
+ax11[0].text(15.6, 0.8, 'a')
 ax11[1].plot(tide_axis, np.nanmean(mgs_line,axis=0), 'k.')
 ax11[1].plot([tide_axis, tide_axis], [np.nanmean(mgs_line,axis=0) - np.nanstd(mgs_line,axis=0), np.nanmean(mgs_line,axis=0) + np.nanstd(mgs_line,axis=0)], 'k-')
 # ax11[1].errorbar(tide_axis, np.nanmean(mgs_line,axis=0),
 #             xerr=0,
 #             yerr=np.nanmean(sort_line,axis=0))
-ax11[1].set_ylabel('$M_0$ [mm]')
+ax11[1].set_ylabel(r'$\overline{\mathrm{MGS}}$ [mm]')
 ax11[1].set_xlabel('tide')
+ax11[1].text(15.6, 32, 'b')
 ax11[1].tick_params(direction='in',top=1,right=1)
 fig11.tight_layout()
 
@@ -931,7 +954,7 @@ ax987[1].set_xlabel('tide')
 if saveFlag == 1:
 
     # savedn = os.path.join(figsdn,'beach_profile',grid_spec)
-    savedn = os.path.join(figsdn,'beach_profile','reprocessed',grid_spec)
+    savedn = os.path.join(figsdn,'beach_profile','reprocessed_x08',grid_spec)
 
     save_figures(savedn, 'surfaceplots_dz_grainsize', fig)
 
@@ -950,7 +973,7 @@ if saveFlag == 1:
     # save_figures(savedn, 'iribarren_corr_coeff', fig8)
     save_figures(savedn, 'pearson_correlation_coefficients', fig9)
     # save_figures(savedn, 'profile_change', fig10)
-    # save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
+    save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
 
 
 # if __name__ == '__main__':

@@ -25,11 +25,9 @@ drivechar = "/mnt/g"
 imsets = ["cross_shore","longshore1"]
 
 for imset in imsets:
-
-    # tides = range(28)
-    # tides = range(14,18)
-    # tides = range(18,28)
-    tides = range(13,14)
+# imset = "cross_shore"
+    tides = range(28)
+    # tides = [14]
 
     for n in tides:
 

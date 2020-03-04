@@ -23,12 +23,12 @@ import matplotlib.colors as mcolors
 import matplotlib.colors
 import glob
 
-# %matplotlib qt5
+%matplotlib qt5
 
 plt.close('all')
 
 # change default font size
-plt.rcParams.update({'font.size': 12})
+plt.rcParams.update({'font.size': 10})
 
 
 def save_figures(dn, fn, fig):
@@ -63,7 +63,7 @@ drivechar = '/media/tristan2/Advocate2018_backup2'
 # dn = os.path.join(homechar, "Projects", "AdvocateBeach2018", "data", \
 #                  "processed","survey_data", "reprocessed_x05", "dz_dmgs_correlations")
 dn = os.path.join(drivechar, "data", \
-                 "processed","survey_data", "reprocessed_x05", "dz_dmgs_correlations")
+                 "processed","survey_data", "reprocessed_x08", "dz_dmgs_correlations")
 
 r = []
 p = []
@@ -144,17 +144,23 @@ for file in glob.glob(os.path.join(dn, "*.npy")):
 
 
 
-fig, ax = plt.subplots(1,1,figsize=(3,4), num='corrs')
+# fig, ax = plt.subplots(1,1,figsize=(2.5,3), num='corrs')
+fig, ax = plt.subplots(1,1,figsize=(3,4.5), num='corrs')
 ax.plot(r, y, 'k.')
 ax.plot([lo, hi], [y, y], 'k-')
 ax.plot(r_1, y_1, 'C1.')
 ax.plot([lo_1, hi_1], [y_1, y_1], 'C1-')
 ax.plot(r_2, y_2, 'C0.')
 ax.plot([lo_2, hi_2], [y_2, y_2], 'C0-')
+ax.text(0.43, -17, 'c')
 yl = ax.get_ylim()
 xl = ax.get_xlim()
 ax.plot([0,0], yl, 'k--')
-ax.plot(xl, [-14.14, -14.14], 'k-', linewidth=0.5)
+# ax.plot(xl, [-14.14, -14.14], 'k-', linewidth=0.5)
+ax.plot(xl, [-16.714285714285715, -16.714285714285715], 'k-', linewidth=0.75)
+ax.axhspan(-16.714285714285715+2.938137685886162 ,yl[0], alpha=0.4, color='grey')
+ax.axhspan(-9, yl[0], alpha=0.2, color='grey')
+
 # ax.axhspan(-9, yl[0], alpha=0.25, color='grey')
 ax.invert_yaxis()
 ax.set_xlabel('r')
@@ -188,6 +194,6 @@ saveFlag = 0
 # export figs
 if saveFlag == 1:
     # savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD')
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x05')
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x08')
 
-    save_figures(savedn, 'dz_dmgs_correlations_vs_y', fig)
+    save_figures(savedn, 'dz_dmgs_correlations_vs_y_vertical', fig)

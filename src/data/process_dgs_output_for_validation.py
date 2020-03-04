@@ -16,6 +16,28 @@ import csv
 import math
 
 
+def save_figures(dn, fn, fig):
+    ''' Saves png and pdf of figure.
+
+    INPUTS
+    dn: save directory. will be created if doesn't exist
+    fn: file name WITHOUT extension
+    fig: figure handle
+    '''
+
+    if not os.path.exists(dn):
+        try:
+            os.makedirs(dn)
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+    fig.savefig(os.path.join(dn, fn + '.png'), dpi=1000, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.pdf'), dpi=None, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.eps'), dpi=None, transparent=True)
+    fig.savefig(os.path.join(dn, fn + '.jpg'), dpi=1000, transparent=True)
+
+
 # for portability
 # homechar = "C:\\"
 homechar = os.path.expanduser("~") # linux
@@ -28,8 +50,12 @@ homechar = os.path.expanduser("~") # linux
 
 # validation_dns = ["OutdoorValidation_xmin05", "OutdoorValidation_xpos05"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_xpos05"]
-validation_dns = ["OutdoorValidation_x1", "OutdoorValidation_x15"]
+# validation_dns = ["OutdoorValidation_x08", "OutdoorValidation_x09"]
 # validation_dns = ["OutdoorValidation_x0", "OutdoorValidation_x0_maxscale5"]
+
+# validation_dns = ["OutdoorValidation_x05", "OutdoorValidation_x08", "OutdoorValidation_x15"]
+
+validation_dns = ["OutdoorValidation_maxscale48_x05", "OutdoorValidation_maxscale48_x08", "OutdoorValidation_maxscale48_x15"]
 
 
 # sample date and location
@@ -39,25 +65,33 @@ tide0 = ["_bay1", "_bay2", "_bay3", "_horn1", "_horn2", "_horn3", \
          "_bay1", "_bay2", "_horn1", "_horn2"]
 
 ### INITIALIZE FIGURES
+# # mean and standard dev of gsdist compared
+# fig1, ax1 = plt.subplots(nrows=2, ncols=2, num="compare mean and stdev")
+# fig2, ax2 = plt.subplots(nrows=2, ncols=2, num="compare mean with pt count")
+# fig3, ax3 = plt.subplots(nrows=2, ncols=2, num="compare sieve with pt count")
+# fig11, ax11 = plt.subplots(nrows=2, ncols=2, num="compare sort arith, geom, etc")
+
 # mean and standard dev of gsdist compared
-fig1, ax1 = plt.subplots(nrows=2, ncols=2, num="compare mean and stdev")
-fig2, ax2 = plt.subplots(nrows=2, ncols=2, num="compare mean with pt count")
+fig1, ax1 = plt.subplots(nrows=1, ncols=2, figsize=(6, 3), num="compare mean and stdev - sieve")
+fig2, ax2 = plt.subplots(nrows=1, ncols=2, figsize=(6, 3), num="compare mean and stdev - pt count")
 fig3, ax3 = plt.subplots(nrows=2, ncols=2, num="compare sieve with pt count")
 fig11, ax11 = plt.subplots(nrows=2, ncols=2, num="compare sort arith, geom, etc")
 
+rmse_mgs_sieve_dgs = []
+rmse_mgs_count_dgs = []
 
 
 old_dgs = []
 new_dgs = []
 
-for n in range(0, 2):
+for n in range(0, 3):
 
     validation_dn = validation_dns[n]
 
     # load in lookup tables
     # for lab validation
 
-    if n is 3:
+    if n is 4:
         lookupdir = os.path.join(homechar, "Projects", "AdvocateBeach2018", "references", \
                               "img2sample_lookup_table.csv")
     else:
@@ -84,7 +118,8 @@ for n in range(0, 2):
             depths.append(row[3])
             iters.append(row[4])
 
-    rms_mgs_vec = []
+    rms_mgs_vec_dgs_sieve = []
+    rms_mgs_vec_dgs_count = []
     rms_std_vec = []
 
 
@@ -246,8 +281,12 @@ for n in range(0, 2):
 
             cumsum_img = np.cumsum(dgsjnk['grain size frequencies'])
 
-            rms_mgs_vec.append(mgs_a_sieve - dgsjnk['mean grain size'])
+            rms_mgs_vec_dgs_sieve.append(mgs_a_sieve - mgs_a)
+            if os.path.exists(os.path.join(pointcountdir,  date_str0[ii] + tide0[ii] + '_' + depths[Igarbo] + '.npy')):
+                rms_mgs_vec_dgs_count.append(mgs_a_ptc - mgs_a)
             rms_std_vec.append(sort_a_sieve - dgsjnk['grain size sorting'])
+
+
 
 
             # ### FIGURES
@@ -255,46 +294,58 @@ for n in range(0, 2):
             # # mean and standard dev of gsdist compared
             # fig1, ax1 = plt.subplots(nrows=2, ncols=1, num="compare mean and stdev")
             if n is 0:
-                l1, = ax1[0,0].plot(mgs_a_sieve, mgs_a, 'k.', label='no window')
+                l0, = ax1[0].plot(mgs_a_sieve, mgs_a, 'C0.', markersize=5, alpha=0.5, label='l0')
+            elif n is 1:
+                l1, = ax1[0].plot(mgs_a_sieve, mgs_a, 'k.', markersize=8, label='no window')
             else:
-                l2, = ax1[0,0].plot(mgs_a_sieve, mgs_a, 'r.', label='window')
+                l2, = ax1[0].plot(mgs_a_sieve, mgs_a, 'C1.', markersize=5, alpha=0.5, label='window')
             # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
     #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
             # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
-            ax1[0,0].plot(np.arange(30), np.arange(30))
-            ax1[0,0].set_ylabel('DGS arith. MGS [mm]')
-            ax1[0,0].set_xlabel('sieve arith. MGS [mm]')
+            ax1[0].plot(np.linspace(0,30,num=100), np.linspace(0,33,num=100),'k--', linewidth=0.5)
+            ax1[0].set_ylabel('DGS MGS [mm]')
+            ax1[0].set_xlabel('sieve MGS [mm]')
+            ax1[0].set_xlim([0, 30])
+            ax1[0].set_ylim([0, 33])
+            ax1[0].autoscale(enable=True, axis='x', tight=True)
+            ax1[0].autoscale(enable=True, axis='y', tight=True)
             if n is 0:
-                ax1[0,1].plot(sort_a_sieve, sort_a, 'k.')
+                ax1[1].plot(sort_a_sieve, sort_a, 'C0.', markersize=5, alpha=0.5)
+            elif n is 1:
+                ax1[1].plot(sort_a_sieve, sort_a, 'k.', markersize=8)
                 # ax1[1,0].plot(mgs_g_sieve, mgs_g, 'k.')
             else:
-                ax1[0,1].plot(sort_a_sieve, sort_a, 'r.')
+                ax1[1].plot(sort_a_sieve, sort_a, 'C1.', markersize=5, alpha=0.5)
                 # ax1[1,0].plot(mgs_g_sieve, mgs_g, 'r.')
-            ax1[0,1].plot(np.arange(20), np.arange(20))
-            ax1[0,1].set_xlabel('sieve arith. sorting [mm]')
-            ax1[0,1].set_ylabel('DGS arith. sorting [mm]')
+            ax1[1].plot(np.linspace(0,15,num=100), np.linspace(0,25,num=100),'k--', linewidth=0.5)
+            ax1[1].set_xlabel('sieve sorting [mm]')
+            ax1[1].set_ylabel('DGS sorting [mm]')
+            ax1[1].set_xlim([0, 15])
+            ax1[1].set_ylim([0, 25])
+            ax1[1].autoscale(enable=True, axis='x', tight=True)
+            ax1[1].autoscale(enable=True, axis='y', tight=True)
 
-            if n is 0:
-                ax1[1,0].plot(mgs_g_sieve, mgs_g, 'k.')
-                # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
-            else:
-                ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
-                ax1[1,0].plot(mgs_g_sieve, mgs_g, 'r.')
-                # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
-            ax1[1,0].plot(np.arange(20), np.arange(20))
-            ax1[1,0].set_xlabel('sieve geom. MGS [mm]')
-            ax1[1,0].set_ylabel('DGS geom. MGS [mm]')
-
-            if n is 0:
-                ax1[1,1].plot(sort_g_sieve, sort_g, 'k.', markersize=12)
-                # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
-            else:
-                ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
-                ax1[1,1].plot(sort_g_sieve, sort_g, 'r.')
-                # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
-            ax1[1,1].plot(np.arange(20), np.arange(20))
-            ax1[1,1].set_xlabel('sieve geom. sorting [mm]')
-            ax1[1,1].set_ylabel('DGS geom. sorting [mm]')
+            # if n is 0:
+            #     ax1[1,0].plot(mgs_g_sieve, mgs_g, 'k.')
+            #     # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
+            # else:
+            #     ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
+            #     ax1[1,0].plot(mgs_g_sieve, mgs_g, 'r.')
+            #     # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
+            # ax1[1,0].plot(np.arange(20), np.arange(20))
+            # ax1[1,0].set_xlabel('sieve geom. MGS [mm]')
+            # ax1[1,0].set_ylabel('DGS geom. MGS [mm]')
+            #
+            # if n is 0:
+            #     ax1[1,1].plot(sort_g_sieve, sort_g, 'k.', markersize=12)
+            #     # ax1[1].plot(sort_a_sieve, sort_g, 'k.')
+            # else:
+            #     ## ax1[1].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'r.')
+            #     ax1[1,1].plot(sort_g_sieve, sort_g, 'r.')
+            #     # ax1[1].plot(sort_a_sieve, sort_g, 'r.')
+            # ax1[1,1].plot(np.arange(20), np.arange(20))
+            # ax1[1,1].set_xlabel('sieve geom. sorting [mm]')
+            # ax1[1,1].set_ylabel('DGS geom. sorting [mm]')
 
             # ax1[1].title('sorting. RMSE = ' + str(rmse_sort))
             fig1.tight_layout()
@@ -315,9 +366,9 @@ for n in range(0, 2):
             # # mean and standard dev of gsdist compared
             # fig1, ax1 = plt.subplots(nrows=2, ncols=1, num="compare mean and stdev")
             if n is 0:
-                l1, = ax11[0,0].plot(sort_a_sieve, sort_a, 'k.', label='no window')
+                l11, = ax11[0,0].plot(sort_a_sieve, sort_a, 'k.', label='no window')
             else:
-                l2, = ax11[0,0].plot(sort_a_sieve, sort_a, 'r.', label='window')
+                l12, = ax11[0,0].plot(sort_a_sieve, sort_a, 'r.', label='window')
             # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
     #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
             # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
@@ -378,53 +429,65 @@ for n in range(0, 2):
 
             if os.path.exists(os.path.join(pointcountdir,  date_str0[ii] + tide0[ii] + '_' + depths[Igarbo] + '.npy')):
                 if n is 0:
-                    l1, = ax2[0,0].plot(mgs_a_ptc, mgs_a, 'k.', label='no window')
+                    l00, = ax2[0].plot(mgs_a_ptc, mgs_a, 'C0.', markersize=5, alpha=0.5, label='l0')
+                elif n is 1:
+                    l01, = ax2[0].plot(mgs_a_ptc, mgs_a, 'k.', markersize=8, label='no window')
                 else:
-                    l2, = ax2[0,0].plot(mgs_a_ptc, mgs_a, 'r.', label='window')
+                    l02, = ax2[0].plot(mgs_a_ptc, mgs_a, 'C1.', markersize=5, alpha=0.5, label='window')
                 # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
         #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
                 # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
-                ax2[0,0].plot(np.arange(30), np.arange(30))
-                ax2[0,0].set_ylabel('DGS arith. mgs [mm]')
-                ax2[0,0].set_xlabel('pt count arith. mgs [mm]')
+                ax2[0].plot(np.linspace(0,30,num=100), np.linspace(0,33,num=100), 'k--', linewidth=0.5)
+                ax2[0].set_ylabel('DGS MGS [mm]')
+                ax2[0].set_xlabel('point count MGS [mm]')
+                ax2[0].set_xlim([0, 30])
+                ax2[0].set_ylim([0, 33])
+                ax2[0].autoscale(enable=True, axis='x', tight=True)
+                ax2[0].autoscale(enable=True, axis='y', tight=True)
                 if n is 0:
+                    ax2[1].plot(sort_a_ptc, sort_a, 'C0.', alpha=0.5, markersize=5)
+                elif n is 1:
                     # ax1[1,0].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'k.')
-                    ax2[0,1].plot(sort_a_ptc, sort_a, 'k.')
+                    ax2[1].plot(sort_a_ptc, sort_a, 'k.', markersize=8)
                 else:
                     # ax1[1,0].plot(sort_a_sieve, np.mean(dgsjnk['grain size sorting']), 'r.')
-                    ax2[0,1].plot(sort_a_ptc, sort_a, 'r.')
-                ax2[0,1].plot(np.arange(20), np.arange(20))
-                ax2[0,1].set_xlabel('pt count arith. sort [mm]')
-                ax2[0,1].set_ylabel('DGS arith. sort [mm]')
+                    ax2[1].plot(sort_a_ptc, sort_a, 'C1.', alpha=0.5, markersize=5)
+                ax2[1].plot(np.linspace(0,13,num=100), np.linspace(0,25,num=100), 'k--', linewidth=0.5)
+                ax2[1].set_xlabel('point count sorting [mm]')
+                ax2[1].set_ylabel('DGS sorting [mm]')
+                ax2[1].set_xlim([0, 13])
+                ax2[1].set_ylim([0, 25])
+                ax2[1].autoscale(enable=True, axis='x', tight=True)
+                ax2[1].autoscale(enable=True, axis='y', tight=True)
 
-                if n is 0:
-                    l1, = ax2[1,0].plot(mgs_g_ptc, mgs_g, 'k.', label='no window')
-                else:
-                    l2, = ax2[1,0].plot(mgs_g_ptc, mgs_g, 'r.', label='window')
-                # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
-        #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
-                # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
-                ax2[1,0].plot(np.arange(30), np.arange(30))
-                ax2[1,0].set_ylabel('DGS geom. mgs [mm]')
-                ax2[1,0].set_xlabel('pt count geom. mgs [mm]')
-                if n is 0:
-                    # ax1[1,0].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'k.')
-                    ax2[1,1].plot(sort_g_ptc, sort_g, 'k.')
-                else:
-                    # ax1[1,0].plot(sort_a_sieve, np.mean(dgsjnk['grain size sorting']), 'r.')
-                    ax2[1,1].plot(sort_g_ptc, sort_g, 'r.')
-                ax2[1,1].plot(np.arange(20), np.arange(20))
-                ax2[1,1].set_xlabel('pt count geom. sort [mm]')
-                ax2[1,1].set_ylabel('DGS geom. sort [mm]')
+        #         if n is 0:
+        #             l1, = ax2[1,0].plot(mgs_g_ptc, mgs_g, 'k.', label='no window')
+        #         else:
+        #             l2, = ax2[1,0].plot(mgs_g_ptc, mgs_g, 'r.', label='window')
+        #         # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
+        # #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
+        #         # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
+        #         ax2[1,0].plot(np.arange(30), np.arange(30))
+        #         ax2[1,0].set_ylabel('DGS geom. mgs [mm]')
+        #         ax2[1,0].set_xlabel('pt count geom. mgs [mm]')
+        #         if n is 0:
+        #             # ax1[1,0].plot(sort_a_sieve, dgsjnk['grain size sorting'], 'k.')
+        #             ax2[1,1].plot(sort_g_ptc, sort_g, 'k.')
+        #         else:
+        #             # ax1[1,0].plot(sort_a_sieve, np.mean(dgsjnk['grain size sorting']), 'r.')
+        #             ax2[1,1].plot(sort_g_ptc, sort_g, 'r.')
+        #         ax2[1,1].plot(np.arange(20), np.arange(20))
+        #         ax2[1,1].set_xlabel('pt count geom. sort [mm]')
+        #         ax2[1,1].set_ylabel('DGS geom. sort [mm]')
 
                 fig2.tight_layout()
 
 
             if os.path.exists(os.path.join(pointcountdir,  date_str0[ii] + tide0[ii] + '_' + depths[Igarbo] + '.npy')):
                 if n is 0:
-                    l1, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'k.', label='no window')
+                    l31, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'k.', label='no window')
                 else:
-                    l2, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'r.', label='window')
+                    l32, = ax3[0,0].plot(mgs_a_ptc, mgs_a_sieve, 'r.', label='window')
                 # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
         #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
                 # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
@@ -442,9 +505,9 @@ for n in range(0, 2):
                 ax3[0,1].set_ylabel('sieve arith. sort [mm]')
 
                 if n is 0:
-                    l1, = ax3[1,0].plot(mgs_g_ptc, mgs_g_sieve, 'k.', label='no window')
+                    l31, = ax3[1,0].plot(mgs_g_ptc, mgs_g_sieve, 'k.', label='no window')
                 else:
-                    l2, = ax3[1,0].plot(mgs_g_ptc, mgs_g_sieve, 'r.', label='window')
+                    l32, = ax3[1,0].plot(mgs_g_ptc, mgs_g_sieve, 'r.', label='window')
                 # plt.plot(mgs_a_sieve, dgsjnk['mean grain size'], 'k.')
         #            plt.plot(mgs_a_sieve, perc_freqs, 'c.')
                 # ax1[0].title('mean. RMSE = ' + str(rmse_mgs))
@@ -533,11 +596,15 @@ for n in range(0, 2):
     #    pos2 = ax2.imshow(gsize['sorting'], cmap='inferno')
     #    fig.colorbar(pos2, ax=ax2)
 
-    rmse_mgs = np.sqrt(np.nanmean(np.array(rms_mgs_vec)**2))
+    rmse_mgs_sieve_dgs.append(np.sqrt(np.nanmean(np.array(rms_mgs_vec_dgs_sieve)**2)))
+    rmse_mgs_count_dgs.append(np.sqrt(np.nanmean(np.array(rms_mgs_vec_dgs_count)**2)))
     rmse_sort = np.sqrt(np.nanmean(np.array(rms_std_vec)**2))
 
 # ax1[0].legend(['no windowing', 'windowing'], loc="upper left")
-ax1[0,0].legend([l1, l2],['x=0.5; lab validation', 'x=0.5; outdoor validation'], loc="upper left")
+# ax1[0,0].legend([l1, l2],['x=1.0', 'x=1.5'], loc="upper left")
+ax1[0].legend([l0, l1, l2],['x=0.5', 'x=0.8', 'x=1.5'], loc="upper left")
+ax2[0].legend([l00, l01, l02],['x=0.5', 'x=0.8', 'x=1.5'], loc="upper left")
+
 
 # ax1.plot(xtr, color='r', label='HHZ 1')
 # ax1.legend(loc="upper right")
@@ -561,15 +628,15 @@ fig5.tight_layout()
 
 np.sum(bar['grain size frequencies'])
 
-saveFlag = 0
-if saveFlag == 1:
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','dgs_validation')
-    if not os.path.exists(savedn):
-        try:
-            os.makedirs(savedn)
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
 
-    fig1.savefig(os.path.join(savedn, 'dgs_vs_sieve_xpos05_in-out.png'), dpi=1000, transparent=True)
-    fig1.savefig(os.path.join(savedn, 'dgs_vs_sieve_xpos05_in-out.pdf'), dpi=None, transparent=True)
+# EXPORT PLOTS
+saveFlag = 0
+
+if saveFlag == 1:
+
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','dgs_validation')
+
+    save_figures(savedn, 'DGS_sieve_validation', fig1)
+    save_figures(savedn, 'DGS_ptcount_validation', fig2)
+
+    # 2453*0.12/56

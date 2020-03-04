@@ -15,6 +15,7 @@ array({'19_10_2018_A': 11, '27_10_2018_B': 27, '23_10_2018_B': 19, '22_10_2018_B
 
 
 import numpy as np
+import numpy
 import os
 from glob import glob
 import matplotlib.pyplot as plt
@@ -28,14 +29,66 @@ import time
 import matplotlib.dates as md
 import matplotlib.mlab as mlab
 from scipy.stats import norm
+import scipy.stats as stats
+import json
+import seaborn as sb
+import pandas as pd
+from matplotlib import dates
+import scipy as sp
 
 # %matplotlib inline
-# %matplotlib qt5
+%matplotlib qt5
 
 # change default font size
 plt.rcParams.update({'font.size': 12})
 
 plt.close("all")
+
+
+def smooth(x,window_len=11,window='hanning'):
+    """smooth the data using a window with requested size.
+
+    This method is based on the convolution of a scaled window with the signal.
+    The signal is prepared by introducing reflected copies of the signal
+    (with the window size) in both ends so that transient parts are minimized
+    in the begining and end part of the output signal.
+
+    input:
+        x: the input signal
+        window_len: the dimension of the smoothing window; should be an odd integer
+        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+            flat window will produce a moving average smoothing.
+
+    output:
+        the smoothed signal
+
+    example:
+
+    t=linspace(-2,2,0.1)
+    x=sin(t)+randn(len(t))*0.1
+    y=smooth(x)
+
+    see also:
+
+    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
+    scipy.signal.lfilter
+
+    TODO: the window parameter could be the window itself if an array instead of a string
+    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
+    """
+    if window_len<3:
+        return x
+
+
+    s=numpy.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
+    #print(len(s))
+    if window == 'flat': #moving average
+        w=numpy.ones(window_len,'d')
+    else:
+        w=eval('numpy.'+window+'(window_len)')
+
+    y=numpy.convolve(w/w.sum(),s,mode='valid')
+    return y
 
 
 
@@ -117,8 +170,9 @@ def loess_fit(time_data, grain_size_data):
     return smoothed_data
 
 # tide = '15'
-# tide = '19'
-tide = '27'
+tide = '19'
+# tide = '27'
+
 
 chunk = '2'
 
@@ -133,12 +187,12 @@ chunk = '2'
 
 
 # for saving plots
-saveFlag = 1
+saveFlag = 0
 
 post = 1.7 # survey post height
 
 # homechar = "C:\\"
-# homechar = os.path.expanduser('~')
+homechar2 = os.path.expanduser('~')
 # homechar = "F:\\NovBackup"
 homechar = os.path.join('/media','tristan2','Advocate2018_backup2')
 
@@ -158,7 +212,7 @@ homechar = os.path.join('/media','tristan2','Advocate2018_backup2')
 #                            'array_position' + chunk + '.npy')
 
 # gsdir = os.path.join(homechar, 'processed', 'grainsize', 'pi_array', 'tide' + tide)
-gsdir = os.path.join(homechar, 'data','processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed_x10')
+gsdir = os.path.join(homechar, 'data','processed', 'grainsize', 'pi_array', 'tide' + tide, 'reprocessed_x08_dynamicmaxscale')
 
 beddir = os.path.join(homechar, 'data', 'processed', 'range_data', 'bed_level', 'tide' + tide)
 
@@ -168,7 +222,15 @@ swshdir = os.path.join(homechar, 'data', 'processed', 'range_data', 'swash', 'ti
 pifile = os.path.join(homechar, 'data', 'processed', 'GPS', 'array', 'tide' + tide, \
                            'array_position' + chunk + '.npy')
 
+wavefn = os.path.join(homechar2, "Projects", "AdvocateBeach2018", "data", "processed", \
+              "pressure", "wavestats", "tide" + str(tide) + ".json")
 
+# for plotting tide curve
+with open(wavefn, 'r') as fpp:
+    waves = json.load(fpp)
+dt = datetime(2018, 1, 1)
+yd2utime_tide = np.array(waves['yearday'])*24*60*60 - 3*60*60 + time.mktime(dt.timetuple())
+date_tide = [datetime.fromtimestamp(x) for x in yd2utime_tide]
 
 gs_struct = np.load(os.path.join(gsdir, 'chunk' + chunk + '.npy'), allow_pickle=True).item()
 bedlevel_struct = np.load(os.path.join(beddir, 'chunk' + chunk + '.npy'), allow_pickle=True).item()
@@ -188,6 +250,7 @@ piloc_counter = -1
 legend_xcoords = []
 
 delta_bed_histogram = []
+swash_depth_histogram = []
 handles01 = []
 
 # plot params
@@ -279,6 +342,10 @@ for pinum in pinums:
     swash_depth = swash_struct['data']['swash_depth'][pinum]
     delta_bed = swash_struct['data']['delta_bed'][pinum]*1000
     delta_bed_histogram.extend(delta_bed) # for plotting histogram that includes all sensors
+    swash_depth_histogram.extend(swash_depth) # for plotting histogram that includes all sensors
+
+    if len(delta_bed) is not len(swash_depth):
+        break
 
 
     # find peaks within retrospective vicinity of bed level change:
@@ -383,11 +450,12 @@ for pinum in pinums:
 
     # plot MSD time series
     ax01[0].plot(date_swash, swash, '-', color=clr, Linewidth=0.25, zorder=zorder)
-    # ax01[0].plot(date_swash, swash, '-', color=clr, Linewidth=0.25)
+        # ax01[0].plot(date_swash, swash, '-', color=clr, Linewidth=0.25)
 
     ax01[1].plot(date_z_bed, z_bed, '.', color=clr, Markersize=3)
 
     ax01[2].plot(date_gs, mgs, '.', color=clr, Markersize=3)
+
     tmp_hndl = ax01[2].plot(date_gs, mgs_fit, '-', color=clr, Linewidth=2)
     handles01.extend(tmp_hndl)
 
@@ -403,6 +471,9 @@ for pinum in pinums:
 
     # scatter plot
     ax02[0].plot(swash_depth*1000, delta_bed,'k.')
+
+    # fig05 = plt.figure(num='joint pdf', figsize=(7, 6))
+    # sb.jointplot(swash_depth*1000, delta_bed, kind='scatter')
 
 
 
@@ -501,6 +572,7 @@ for pinum in pinums:
     ax1011.plot(date_swash, swash_plus_bed, 'k', Linewidth=0.5)
     ax1011.plot(date_z_bed, z_bed, 'C1.', Markersize=5)
     ax1011.plot(date_swash_peaks, swash_peaks_plus_bed,'C0.', Markersize=5)
+    ax1011.text(date_swash[300], 5.16, 'a')
     # ax101.set_xlabel('time [UTC]')
     ax1011.set_ylabel('z [m]')
     ax1011.autoscale(enable=True, axis='x', tight=True)
@@ -531,6 +603,7 @@ for pinum in pinums:
     # ax103.plot(date_dz_bed, delta_bed/1000, 'C0.')
     # ax1013.plot(date_z_bed[1:], np.diff(z_bed), 'k.', Markersize=5)
     ax1013.plot(date_dbedlevel2, dbedlevel2, 'k.', Markersize=5)
+    ax1013.text(date_swash[300], 0.017, 'b')
     ax1013.set_xlabel('time, tide ' + tide + ' [UTC]')
     ax1013.set_ylabel('dz [m]')
     ax1013.set_xlim(ax101_xlims)
@@ -556,6 +629,16 @@ for pinum in pinums:
     plt.hist(delta_bed*1000, bins=20)
     plt.xlabel('bed level change [mm]')
     plt.ylabel('frequency')
+
+    stats.kurtosis(delta_bed*1000, axis=0, fisher=False)
+
+
+    fig104 = plt.figure(num=pinum + 'swash height histogram')
+    plt.hist(swash_depth*1000, bins=20)
+    plt.xlabel('swash height [mm]')
+    plt.ylabel('frequency')
+
+    stats.kurtosis(delta_bed*1000, axis=0, fisher=False)
 
 
     fig301 = plt.figure(num=pinum + '; swash; swash peaks')
@@ -592,7 +675,7 @@ for pinum in pinums:
 
     # export figs
     if saveFlag == 1:
-        loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x15','tide'+tide, 'chunk'+chunk)
+        loopdn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x08_dynamicmaxscale','tide'+tide, 'chunk'+chunk)
 
         save_figures(loopdn, pinum + '_swash_peaks_bed_level_with_dz', fig1011)
         # save_figures(loopdn, pinum + '_swash_peaks_no_bed_level', fig301)
@@ -633,6 +716,29 @@ ax01[2].set_ylabel('MGS [mm]')
 # ax01[3].tick_params(direction='in')
 # ax01[3].set_ylabel('$M_1$ [mm]')
 ax01[2].set_xlabel('time, tide ' + tide + '  [UTC]')
+if tide is '27':
+    ax01[0].text(date_swash[300], 0.17, 'a')
+    ax01[1].text(date_swash[300], 5.10, 'b')
+    ax01[2].text(date_swash[300], 44, 'c')
+else:
+    ax01[0].text(date_swash[300], 0.27, 'a')
+    ax01[1].text(date_swash[300], 4.76, 'b')
+    ax01[2].text(date_swash[300], 49, 'c')
+
+# smooth tide signal and add to plot
+Xnew = dates.date2num(date_tide)
+x_vec = np.linspace(Xnew[0], Xnew[-1], num=10000, endpoint=True)
+f2 = sp.interpolate.interp1d(Xnew, waves['depth'], kind='cubic')
+ax010 = ax01[0].twinx()
+# ax010.plot(date_tide, waves['depth'], 'k--', Linewidth=1.5)
+ax010.plot(x_vec, f2(x_vec), 'k--', Linewidth=1.5)
+if tide is '27':
+    ax010.set_ylim([6.5, 6.8])
+else:
+    ax010.set_ylim([6., 6.25])
+ax010.set_ylabel('sea elev. [m]')
+ax010.xaxis.set_major_formatter(plt.NullFormatter())
+
 fig01.tight_layout()
 
 
@@ -678,7 +784,12 @@ ax02[0].set_ylabel('absolute bed level change [mm]')
 # FIGURE 03
 
 delta_bed_histogram = np.squeeze(delta_bed_histogram)
-delta_bed_histogram = delta_bed_histogram[np.abs(delta_bed_histogram) < 30]
+I_omit = np.abs(delta_bed_histogram) < 30
+delta_bed_histogram = delta_bed_histogram[I_omit]
+
+swash_depth_histogram = np.squeeze(swash_depth_histogram)
+swash_depth_histogram = swash_depth_histogram[I_omit]
+
 
 # best fit of data
 (mu, sigma) = norm.fit(delta_bed_histogram)
@@ -688,7 +799,6 @@ fig03 = plt.figure(num='$\Delta z$ histogram', figsize=(5, 4))
 n, bins, patches = plt.hist(delta_bed_histogram, 30, density=1, alpha=0.75)
 y = mlab.normpdf(bins, mu, sigma)
 l = plt.plot(bins, y, 'k--', linewidth=2)
-
 # fig03 = plt.figure(num='$\Delta z$ histogram')
 # plt.hist(delta_bed_histogram*1000, bins=30)
 plt.xlabel('bed level change [mm]')
@@ -696,6 +806,34 @@ plt.ylabel('frequency [Hz]')
 plt.ylim([0, 0.095])
 fig03.tight_layout()
 
+# the histogram of the data
+fig04 = plt.figure(num='swash height histogram', figsize=(5, 4))
+n, bins, patches = plt.hist(swash_depth_histogram, 30, density=1, alpha=0.75)
+y = mlab.normpdf(bins, mu, sigma)
+l = plt.plot(bins, y, 'k--', linewidth=2)
+# fig03 = plt.figure(num='$\Delta z$ histogram')
+# plt.hist(delta_bed_histogram*1000, bins=30)
+plt.xlabel('swash height [mm]')
+plt.ylabel('frequency [Hz]')
+# plt.ylim([0, 0.095])
+fig04.tight_layout()
+
+stats.kurtosis(delta_bed_histogram, axis=0, fisher=False)
+stats.kurtosis(swash_depth_histogram, axis=0, fisher=False)
+
+
+# fig05, ax05 = plt.subplots(1, 1, sharey=True, figsize=(6, 6))
+# joint_dataframe = pd.dataframe()
+jdf = pd.DataFrame({'bed level change [mm]':delta_bed_histogram, 'swash height [mm]':swash_depth_histogram*1000})
+# fig05 = plt.figure(num='joint pdf')
+# sb.jointplot(swash_depth_histogram*1000, delta_bed_histogram, height=6, marginal_kws=dict(bins=20), kind="reg")
+fig05 = sb.jointplot(y=jdf['bed level change [mm]'], x=jdf['swash height [mm]'], data=jdf, height=6, marginal_kws=dict(bins=30), kind="scatter", color="k", ratio=3)#, edgecolor="w")
+# plt.ylabel('bed level change [mm]')
+# plt.xlabel('swash height [mm]')
+# fig05.tight_layout()
+
+len(swash_depth_histogram)
+len(delta_bed_histogram)
 
 # the histogram of the data
 # fig03 = plt.figure(num='$\Delta z$ histogram', figsize=(5, 4))
@@ -713,10 +851,11 @@ fig02.tight_layout()
 
 # export figs
 if saveFlag == 1:
-    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x10','tide'+tide, 'chunk'+chunk)
+    savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD','reprocessed_x08_dynamicmaxscale','tide'+tide, 'chunk'+chunk)
 
     save_figures(savedn, 'MSD_timeseries', fig01)
     save_figures(savedn, 'MSD_timeseries_pi4', fig001)
     # # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
     save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
     save_figures(savedn, 'delta_bed_level_histogram', fig03)
+    save_figures(savedn, 'joint_pdf', fig05)
