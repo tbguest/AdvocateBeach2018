@@ -249,7 +249,7 @@ for grid_spec in grid_specs:
                 'maxdepth': maxdepth, 'hwl': hwl, 'x':x[:len(dz_tides[ii])], 'y':y[:len(dz_tides[ii])]}
 
 
-    saveFlag = 1
+    saveFlag = 0
     if saveFlag == 1:
 
         fn_out = os.path.join(dn_out, grid_spec + '.npy')

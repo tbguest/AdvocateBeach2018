@@ -23,7 +23,7 @@ import matplotlib.colors as mcolors
 import matplotlib.colors
 import matplotlib.mlab as mlab
 
-# %matplotlib qt5
+%matplotlib qt5
 
 plt.close('all')
 
@@ -178,9 +178,9 @@ drivechar = '/media/tristan2/Advocate2018_backup2'
 dn_in = os.path.join(drivechar,'data', 'processed', 'survey_data', 'reprocessed_x08')
 
 # grid_specs = ["cross_shore","longshore1", "longshore2", "dense_array2"]
-# grid_specs = ["longshore2","longshore1"]
+grid_specs = ["longshore2","longshore1"]
 # grid_specs = ["longshore2"]#,"longshore2"]
-grid_specs = ["longshore1"]
+# grid_specs = ["longshore1"]
 
 # 0 through  5
 dense_array_row = 5
@@ -189,7 +189,8 @@ dense_array_row = 5
 
 fig1, ax1 = plt.subplots(1,2,figsize=(6,3), num='tide only correlations')
 fig01, ax01 = plt.subplots(1,1,figsize=(3,2.5), num='tide only correlations - for RCEM')
-fig2, ax2 = plt.subplots(1,2,figsize=(6,3), num='scatter')
+# fig2, ax2 = plt.subplots(1,2,figsize=(6,3), num='scatter')
+fig2, ax2 = plt.subplots(2,1,figsize=(3,4.5), num='scatter')
 fig22, ax22 = plt.subplots(1,2,figsize=(6,3), num='scatter normalized')
 
 foobar = []
@@ -382,7 +383,7 @@ for grid_spec in grid_specs:
         # tide-only correlations
         # r1, p1, lo1, hi1 = pearsonr_ci(dz_tide, mgs_tide, alpha=0.05)
         # r2, p2, lo2, hi2 = pearsonr_ci(dz_tide, dmgs_tide, alpha=0.05)
-        # r3, p3, lo3, hi3 = pearsonr_ci(dz_tide[1:], mgs_tide[:-1], alpha=0.05)
+        # r3, p3, lo3, hi3 = pearsonr_ci(dz_tide[1:], mgs_tide[:-1], alpha=0.05)fi100
         # r4, p4, lo4, hi4 = pearsonr_ci(dz_tide[1:], dz_tide[:-1], alpha=0.05)
         # r5, p5, lo5, hi5 = pearsonr_ci(mgs_tide[1:], mgs_tide[:-1], alpha=0.05)
         # r6, p6, lo6, hi6 = pearsonr_ci(dmgs_tide[1:], dmgs_tide[:-1], alpha=0.05)
@@ -504,6 +505,34 @@ for grid_spec in grid_specs:
     ax0[2,1].plot(mean_mgs_tide, steepness_array, 'k.')
     fig0.tight_layout()
 
+    # find mgs values > 15
+    Imgs = np.where(np.array(mean_mgs_tide) > 15.)
+    Hsig_fit = np.polyfit(np.array(mean_mgs_tide)[Imgs], np.array(Hs_array)[Imgs], 1)
+    steepness_fit = np.polyfit(np.array(mean_mgs_tide)[Imgs], np.array(steepness_array)[Imgs], 1)
+    # for plotting:
+    newMGS = np.linspace(18, 27, 100)
+    Hs_line = np.polyval(Hsig_fit, newMGS)
+    steepness_line = np.polyval(steepness_fit, newMGS)
+
+    1/Hsig_fit[0]
+    1/steepness_fit[0]
+
+    fig00, ax00 = plt.subplots(1,2,figsize=(5,2.5), num='Hsig and steepness vs MGS')
+    ax00[0].plot(Hs_array, mean_mgs_tide, 'k.')
+    ax00[0].plot(Hs_line, newMGS, 'k--')
+    ax00[1].plot(steepness_array, mean_mgs_tide, 'k.')
+    ax00[1].plot(steepness_line, newMGS, 'k--')
+    ax00[0].set_xlabel('$H_s$ [m]')
+    ax00[0].set_ylabel('$\overline{\mathrm{MGS}}$ [mm]')
+    ax00[1].set_xlabel('$H_0/L_0$')
+    ax00[0].text(0.8,26,'a')
+    ax00[1].text(0.0225,26,'b')
+    ax00[0].tick_params(axis="y",direction="in")
+    ax00[0].tick_params(axis="x",direction="in")
+    ax00[1].tick_params(axis="y",direction="in")
+    ax00[1].tick_params(axis="x",direction="in")
+    fig00.tight_layout()
+
 
 
     if grid_spec == 'longshore2':
@@ -512,6 +541,7 @@ for grid_spec in grid_specs:
         ax1[0].plot(r2_tides, 1*np.ones(len(r2_tides)), 'kx')
         ax1[0].plot(r3_tides, 2*np.ones(len(r3_tides)), 'kx')
         ax1[0].plot(r4_tides, 3*np.ones(len(r4_tides)), 'kx')
+        ax1[0].text(-0.65, -0.1, 'a')
         # ax1[0].plot(r4b_tides, 3*np.ones(len(r4b_tides)), 'rx')
         # ax1.plot(r5_tides, 4*np.ones(len(r5_tides)), 'kx')
         # ax1.plot(r6_tides, 5*np.ones(len(r6_tides)), 'kx')
@@ -532,6 +562,7 @@ for grid_spec in grid_specs:
         ax1[1].plot(r2_tides, 1*np.ones(len(r2_tides)), 'kx')
         ax1[1].plot(r3_tides, 2*np.ones(len(r3_tides)), 'kx')
         ax1[1].plot(r4_tides, 3*np.ones(len(r4_tides)), 'kx')
+        ax1[1].text(-0.65, -0.1, 'b')
         # ax1[1].plot(r4b_tides, 3*np.ones(len(r4b_tides)), 'rx')
         # ax1.plot(r5_tides, 4*np.ones(len(r5_tides)), 'kx')
         # ax1.plot(r6_tides, 5*np.ones(len(r6_tides)), 'kx')
@@ -577,14 +608,16 @@ for grid_spec in grid_specs:
         ax2[0].plot(dz_mean_removed, dmgs_mean_removed, 'C0.')
         ax2[0].grid()
         ax2[0].set_ylabel(r'$\Delta$MGS [mm]')
-        ax2[0].set_xlabel(r'$\Delta z$ [m]')
+        ax2[0].text(-0.15, 23, 'a')
+        # ax2[0].set_xlabel(r'$\Delta z$ [m]')
         # yl = ax2[0].get_ylim()
         xl1 = ax2[0].get_xlim()
     elif grid_spec == 'longshore1':
         ax2[1].plot(dz_mean_removed, dmgs_mean_removed, 'C1.')
         ax2[1].grid()
-        # ax2[1].set_ylabel(r'$\Delta$MGS [mm]')
+        ax2[1].set_ylabel(r'$\Delta$MGS [mm]')
         ax2[1].set_xlabel(r'$\Delta z$ [m]')
+        ax2[1].text(-0.15, 23, 'b')
         yl1 = ax2[1].get_ylim()
         ax2[0].set_ylim(yl1)
         # xl = ax2[0].get_xlim()
@@ -693,14 +726,15 @@ ax31[1].plot(xrng, mlab.normpdf(xrng, 0, 1))
 np.sum(np.abs(dz_mean_removed))
 np.sum(np.abs(dz_mean_removed_norm))
 
-saveFlag = 1
+saveFlag = 0
 # export figs
 if saveFlag == 1:
     savedn = os.path.join(homechar,'Projects','AdvocateBeach2018','reports','figures','MSD', 'reprocessed_x08')
 
     save_figures(savedn, 'correlation_spatialonly', fig1)
     save_figures(savedn, 'correlation_spatialonly_RCEM', fig01)
-    save_figures(savedn, 'dz_dmgs_scatter', fig2)
+    save_figures(savedn, 'dz_dmgs_scatter_vertical', fig2)
+    save_figures(savedn, 'Hsig_and_steepness_vs_MGS_scatter', fig00)
     # # # save_figures(savedn, 'delta_bed_level_swash_depth_scatter', fig02)
     # save_figures(savedn, 'bed_level_swash_depth_scatter_and_histogram_'+'tide'+tide+'_chunk'+chunk, fig02)
     # save_figures(savedn, 'delta_bed_level_histogram', fig03)

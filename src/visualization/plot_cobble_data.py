@@ -13,7 +13,7 @@ from datetime import datetime
 import matplotlib.dates as md
 
 
-# %matplotlib qt5
+%matplotlib qt5
 
 # change default font size
 plt.rcParams.update({'font.size': 12})
@@ -170,8 +170,8 @@ def coarsefine_binning(stones):
 
 # VARIABLE DEFINITIONS
 
-homechar = "C:\\"
-# homechar = os.path.expanduser('~')
+# homechar = "C:\\"
+homechar = os.path.expanduser('~')
 
 stone_class = 'yellows'
 # for tide 19, position 1: scaling = 421.0550841144531 pix/m
@@ -434,19 +434,21 @@ for position in positions:
 
     # plot binned data
     fi100, axs100 = plt.subplots(nrows=1, ncols=3, num='station ' + position[-1] + ': binned transport stats combi', \
-                gridspec_kw = {'width_ratios':[4, 3, 1]}, figsize=(10.5,4))
+                gridspec_kw = {'width_ratios':[4, 2.5, 1]}, figsize=(9.5,4))
     axs100[1].plot(binmean, imgbins, 'ko')
     axs100[1].plot([binmean-binstd, binmean+binstd], [imgbins, imgbins], 'k-')
     axs100[1].plot(np.zeros(50), np.linspace(-0.25, nbins-1 + 0.25, 50), 'k--')
-    axs100[1].set_xlabel('cross-shore transport distance [m]')
+    axs100[1].set_xlabel('cross-shore transport dist. [m]')
     axs100[1].set_ylabel('cross-shore bin')
     axs100[1].set_ylim(-0.25, nbins-1 + 0.25)
+    axs100[1].text(0.38, 6.8, 'b')
     # axs[0].invert_yaxis()
 
     axs100[2].plot(bincount, imgbins,'ko')
     axs100[2].set_xlabel('events')
     axs100[2].set_xlim(-1, np.max(bincount)+0.1*(np.max(bincount)))
     axs100[2].set_ylim(-0.25, nbins-1 + 0.25)
+    axs100[2].text(37, 6.8, 'c')
     axs100[2].yaxis.set_major_formatter(plt.NullFormatter())
     # axs[1].invert_yaxis()
     # fi100.tight_layout()
@@ -459,6 +461,7 @@ for position in positions:
     else:
         swashd = swash_date
         axs100[0].plot(swashd, -swash_ts['0600'] - offset2, c='grey', Linewidth=0.5, alpha=1)
+        axs100[0].text(swashd[-100], -5.13, 'a')
     axs100[0].xaxis.set_major_formatter(xfmt)
     # # for setting ax lims:
     # mint = 1000
@@ -570,6 +573,7 @@ ax21.invert_yaxis()
 ax21.set_ylim(4.2, 0.8)
 ax21.set_ylabel('station')
 ax21.set_xlabel('net transport/cobble [m]')
+ax21.text(-1, 1.1, 'a')
 ax21.yaxis.set_major_locator(plt.MultipleLocator(1))
 
 ax22.plot(abs_xtransport, np.linspace(1,4,4), 'ko')
@@ -580,6 +584,7 @@ ax22.plot([abs_ytransport+std_abs_ytransport, abs_ytransport-std_abs_ytransport]
             [np.linspace(1,4,4) + yoffset, np.linspace(1,4,4) + yoffset], 'r')
 ax22.invert_yaxis()
 ax22.set_ylim(4.2, 0.8)
+ax22.text(-0.8, 1.1, 'b')
 ax22.set_xlabel('cumulative transport/cobble [m]')
 ax22.legend(['cross-shore', 'longshore'])
 # ax22.yaxis.set_major_locator(plt.NullLocator())

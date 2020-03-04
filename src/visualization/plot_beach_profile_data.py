@@ -22,7 +22,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.colors as mcolors
 import matplotlib.colors
 
-# %matplotlib qt5
+%matplotlib qt5
 
 plt.close('all')
 
@@ -174,8 +174,8 @@ drivechar = '/media/tristan2/Advocate2018_backup2'
 figsdn = os.path.join(homechar,'Projects','AdvocateBeach2018',\
 'reports','figures')
 
-# grid_spec = "cross_shore"
-grid_spec = "longshore2"
+grid_spec = "cross_shore"
+# grid_spec = "longshore2"
 # grid_spec = "longshore1"
 
 hwl = [-21,-9,-15,-15,-18,-15,-15,-15,-18,-21,-18,-18,-18,-18]
@@ -593,7 +593,7 @@ if grid_spec == "cross_shore":
     ax010.plot([xl[0],xl[1]], [-13,-13], 'k-.',  linewidth=1)
     ax010.plot([xl[0],xl[1]], [-5,-5], 'k--', linewidth=1)
     ax010.invert_yaxis()
-    ax010.set_xlabel('MGS [mm]')
+    ax010.set_xlabel(r'$\overline{\mathrm{MGS}}$ [mm]')
     ax010.set_ylabel('cross-shore coordinate, $y$ [m]')
     fig010.tight_layout()
     ax010.set_xlim(xl)
@@ -915,13 +915,15 @@ fig11, ax11 = plt.subplots(2,1,figsize=(5,3), sharex=True,num='Hs and grainsize 
 ax11[0].plot(tide_axis, Hs[1:], 'k.')
 ax11[0].set_ylabel('$H_s$ [m]')
 ax11[0].tick_params(direction='in',top=1,right=1)
+ax11[0].text(15.6, 0.8, 'a')
 ax11[1].plot(tide_axis, np.nanmean(mgs_line,axis=0), 'k.')
 ax11[1].plot([tide_axis, tide_axis], [np.nanmean(mgs_line,axis=0) - np.nanstd(mgs_line,axis=0), np.nanmean(mgs_line,axis=0) + np.nanstd(mgs_line,axis=0)], 'k-')
 # ax11[1].errorbar(tide_axis, np.nanmean(mgs_line,axis=0),
 #             xerr=0,
 #             yerr=np.nanmean(sort_line,axis=0))
-ax11[1].set_ylabel('$M_0$ [mm]')
+ax11[1].set_ylabel(r'$\overline{\mathrm{MGS}}$ [mm]')
 ax11[1].set_xlabel('tide')
+ax11[1].text(15.6, 32, 'b')
 ax11[1].tick_params(direction='in',top=1,right=1)
 fig11.tight_layout()
 
@@ -952,7 +954,7 @@ ax987[1].set_xlabel('tide')
 if saveFlag == 1:
 
     # savedn = os.path.join(figsdn,'beach_profile',grid_spec)
-    savedn = os.path.join(figsdn,'beach_profile','reprocessed',grid_spec)
+    savedn = os.path.join(figsdn,'beach_profile','reprocessed_x08',grid_spec)
 
     save_figures(savedn, 'surfaceplots_dz_grainsize', fig)
 
@@ -971,7 +973,7 @@ if saveFlag == 1:
     # save_figures(savedn, 'iribarren_corr_coeff', fig8)
     save_figures(savedn, 'pearson_correlation_coefficients', fig9)
     # save_figures(savedn, 'profile_change', fig10)
-    # save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
+    save_figures(savedn, 'grain_size_and_waveheight_timeseries', fig11)
 
 
 # if __name__ == '__main__':
