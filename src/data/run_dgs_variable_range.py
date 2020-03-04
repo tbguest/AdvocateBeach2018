@@ -77,91 +77,99 @@ def imname2scalefactor(image_file, tide, pinum):
 homechar = os.path.expanduser('~')
 
 # date_str0 = "21_10_2018"
-# tide = "19"
-tide = "27"
+tides = ["19", "27"]
+# tide = "27"
 
-pinums = ['71', '73', '74']
-# pinums = ['71', '72','73', '74']
+for tide in tides:
 
-for pinum in pinums:
-    # pinum = "74"
+    if tide is "19":
+        pinums = ['71', '72','73', '74']
 
-    #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/" + date_str0 + "/horn_growth/selected/cropped"
-    #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/tide" + tide + "/pi" + pinum + "/cropped"
-    #C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide19\pi71\cropped
+    elif tide is "27":
+        pinums = ['71', '73', '74']
 
-    # imdir = "/mnt/c/Projects/AdvocateBeach2018/data/processed/images/cropped/pi_cameras/tide" + tide + "/pi" + pinum
-    # outdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/grainsize_dists/pi_array/tide" + tide + "/pi" + pinum + "/smooth_bed_level/"
+# pinums = ['71', '73', '74']
 
-    # imdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','processed',\
-    #                         'images','cropped','pi_cameras','tide'+tide,'pi'+pinum)
-    imdir = os.path.join(drivechar,'data','processed',\
-                            'images','cropped','pi_cameras','tide'+tide,'pi'+pinum)
-    # outdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim',\
-    #                         'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level')
-    outdir = os.path.join(drivechar,'data','interim',\
-                            'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level_reprocessed_x08')
+    for pinum in pinums:
+        # pinum = "74"
 
-    if not os.path.exists(outdir):
-        try:
-            os.makedirs(outdir)
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
+        #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/" + date_str0 + "/horn_growth/selected/cropped"
+        #imdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/images/PiCameras/tide" + tide + "/pi" + pinum + "/cropped"
+        #C:\Projects\AdvocateBeach2018\data\interim\images\PiCameras\tide19\pi71\cropped
 
-    #for file in glob.glob(imdir + '*.jpg'):
-    for file in glob.glob(os.path.join(imdir, '*-cropped.jpg')):
+        # imdir = "/mnt/c/Projects/AdvocateBeach2018/data/processed/images/cropped/pi_cameras/tide" + tide + "/pi" + pinum
+        # outdir = "/mnt/c/Projects/AdvocateBeach2018/data/interim/grainsize_dists/pi_array/tide" + tide + "/pi" + pinum + "/smooth_bed_level/"
 
-        image_file = file
+        # imdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','processed',\
+        #                         'images','cropped','pi_cameras','tide'+tide,'pi'+pinum)
+        imdir = os.path.join(drivechar,'data','processed',\
+                                'images','cropped','pi_cameras','tide'+tide,'pi'+pinum)
+        # outdir = os.path.join(homechar,'Projects','AdvocateBeach2018','data','interim',\
+        #                         'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level')
+        outdir = os.path.join(drivechar,'data','interim',\
+                                'grainsize','pi_array','tide'+tide,'pi'+pinum,'smooth_bed_level_reprocessed_x08_dynamicmaxscale')
 
-    	  #'/home/tristan/Documents/Projects/DigitalGrainSizing/20180809_071614.jpg'
+        if not os.path.exists(outdir):
+            try:
+                os.makedirs(outdir)
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
 
-        mm_per_pix = imname2scalefactor(image_file, tide, pinum)
+        #for file in glob.glob(imdir + '*.jpg'):
+        for file in glob.glob(os.path.join(imdir, '*-cropped.jpg')):
 
-        if mm_per_pix is 0:
-            continue
+            image_file = file
 
-        density = 10 # process every 10 lines
-    	  #resolution = 0.162 # mm/pixel [camera height 1]
-    #        resolution = 0.123 # mm/pixel [camera height 2]
-        resolution = mm_per_pix # mm/pixel [camera height 2]
-        dofilter = 1 # filter the imagei
-        notes = 8 # notes per octave
-        maxscale = 8 #Max scale as inverse fraction of data length
-        verbose = 0 # print stuff to screen
-        x = 0.8
-        dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
+        	  #'/home/tristan/Documents/Projects/DigitalGrainSizing/20180809_071614.jpg'
 
-        outpyfile = file[len(imdir):-4] + '.csv'
-    		  # f = open(outpydir+outpyfile,"w")
-    		  # pickle.dump(dgs_stats,f)
-    		  # f.close()
+            mm_per_pix = imname2scalefactor(image_file, tide, pinum)
 
-    #        with open(outpydir+outpyfile, 'wb') as f:  # Just use 'w' mode in 3.x
-    #            w = csv.DictWriter(f, dgs_stats.keys())
-    #            w.writeheader()
-    #            w.writerow(dgs_stats)
+            if mm_per_pix is 0:
+                continue
+
+            density = 10 # process every 10 lines
+        	  #resolution = 0.162 # mm/pixel [camera height 1]
+        #        resolution = 0.123 # mm/pixel [camera height 2]
+            resolution = mm_per_pix # mm/pixel [camera height 2]
+            dofilter = 1 # filter the imagei
+            notes = 8 # notes per octave
+            # maxscale = 8 #Max scale as inverse fraction of data length
+            maxscale = 1641*resolution/56  # cropped img width * res / max scale mm
+            verbose = 0 # print stuff to screen
+            x = 0.8
+            dgs_stats = DGS.dgs(image_file, density, resolution, dofilter, maxscale, notes, verbose, x)
+
+            outpyfile = file[len(imdir):-4] + '.csv'
+        		  # f = open(outpydir+outpyfile,"w")
+        		  # pickle.dump(dgs_stats,f)
+        		  # f.close()
+
+        #        with open(outpydir+outpyfile, 'wb') as f:  # Just use 'w' mode in 3.x
+        #            w = csv.DictWriter(f, dgs_stats.keys())
+        #            w.writeheader()
+        #            w.writerow(dgs_stats)
 
 
-    #        with open(outpydir + file[len(imdir):-4] + '.json', 'w') as f:
-    #            json.dump(dgs_stats, f)
+        #        with open(outpydir + file[len(imdir):-4] + '.json', 'w') as f:
+        #            json.dump(dgs_stats, f)
 
-        np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)
+            np.save(outdir + file[len(imdir):-4] + '.npy', dgs_stats)
 
-    		# #remove spaces from var names for matlab compatability
-    		# dgs_stats['grain_size_bins'] = dgs_stats['grain size bins']
-    		# dgs_stats['grain_size_frequencies'] = dgs_stats['grain size frequencies']
-    		# dgs_stats['grain_size_skewness'] = dgs_stats['grain size skewness']
-    		# dgs_stats['grain_size_kurtosis'] = dgs_stats['grain size kurtosis']
-    		# dgs_stats['grain_size_sorting'] = dgs_stats['grain size sorting']
-    		# dgs_stats['mean_grain_size'] = dgs_stats['mean grain size']
-    		# del dgs_stats['grain size bins']
-    		# del dgs_stats['grain size frequencies']
-    		# del dgs_stats['grain size skewness']
-    		# del dgs_stats['grain size kurtosis']
-    		# del dgs_stats['grain size sorting']
-    		# del dgs_stats['mean grain size']
-    		#
-    		# # print data to .mat file
-    		# outfile = file[len(imdir):-4] + '.mat'
-    		# savemat(outdir+outfile, dgs_stats, oned_as='row')
+        		# #remove spaces from var names for matlab compatability
+        		# dgs_stats['grain_size_bins'] = dgs_stats['grain size bins']
+        		# dgs_stats['grain_size_frequencies'] = dgs_stats['grain size frequencies']
+        		# dgs_stats['grain_size_skewness'] = dgs_stats['grain size skewness']
+        		# dgs_stats['grain_size_kurtosis'] = dgs_stats['grain size kurtosis']
+        		# dgs_stats['grain_size_sorting'] = dgs_stats['grain size sorting']
+        		# dgs_stats['mean_grain_size'] = dgs_stats['mean grain size']
+        		# del dgs_stats['grain size bins']
+        		# del dgs_stats['grain size frequencies']
+        		# del dgs_stats['grain size skewness']
+        		# del dgs_stats['grain size kurtosis']
+        		# del dgs_stats['grain size sorting']
+        		# del dgs_stats['mean grain size']
+        		#
+        		# # print data to .mat file
+        		# outfile = file[len(imdir):-4] + '.mat'
+        		# savemat(outdir+outfile, dgs_stats, oned_as='row')

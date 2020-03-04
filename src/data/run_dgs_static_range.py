@@ -20,14 +20,16 @@ drivechar = "/mnt/g"
 # imset = "longshore1"
 # imset = "dense_array2"
 
-imsets = ["cross_shore","longshore2", "longshore1", "dense_array2"]
+# imsets = ["cross_shore","longshore2", "longshore1", "dense_array2"]
 # imsets = ["dense_array2"]
+imsets = ["cross_shore","longshore1"]
 
 for imset in imsets:
 
     # tides = range(28)
     # tides = range(14,18)
-    tides = range(18,28)
+    # tides = range(18,28)
+    tides = range(13,14)
 
     for n in tides:
 
