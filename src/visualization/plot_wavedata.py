@@ -23,12 +23,11 @@ figsdn = os.path.join(
     homechar,
     "Documents",
     "manuscripts",
-    "msd-swash",
-    "jmse-manuscript-2021",
+    "guest-hay-jmse-2022",
+    "src",
     "figures",
-    "review",
+    "revised",
 )
-
 
 start_tide = 1
 tide_range = range(start_tide, 28)
@@ -138,7 +137,7 @@ for tide in tide_range:
 
 fig1, ax1 = plt.subplots(nrows=4, ncols=1, figsize=(8, 6), num="wavedata")
 ax1[0].plot(yearday, depth, ".")
-ax1[0].plot(yearday0, depth0, "r.")
+# ax1[0].plot(yearday0, depth0, "r.")
 for n in range(len(tide_count)):
     ax1[0].text(yearday0[n], 7.5, str(tide_count[n]))
 ax1[0].text(295, 9.5, "tide")
@@ -148,21 +147,21 @@ ax1[0].set_xticklabels([])
 ax1[0].set_xlim(np.min(yearday), np.max(yearday))
 ax1[0].tick_params(direction="in", top=1, right=1)
 ax1[1].plot(yearday, Hs, ".")
-ax1[1].plot(yearday0, Hs0, "r.")
+# ax1[1].plot(yearday0, Hs0, "r.")
 ax1[1].set_ylabel("$H_s$ [m]")
 ax1[1].set_xticklabels([])
 ax1[1].set_xlim(np.min(yearday), np.max(yearday))
 ax1[1].tick_params(direction="in", top=1, right=1)
 ax1[1].text(291, 1.5, "b")
 ax1[2].plot(yearday, Tp, ".")
-ax1[2].plot(yearday0, Tp0, "r.")
+# ax1[2].plot(yearday0, Tp0, "r.")
 ax1[2].set_ylabel("$T_p$ [s]")
 ax1[2].set_xticklabels([])
 ax1[2].set_xlim(np.min(yearday), np.max(yearday))
 ax1[2].tick_params(direction="in", top=1, right=1)
 ax1[2].text(291, 10.5, "c")
 ax1[3].plot(yearday, steepness, ".")
-ax1[3].plot(yearday0, steepness0, "r.")
+# ax1[3].plot(yearday0, steepness0, "r.")
 ax1[3].set_ylabel("$H_0/L_0$")
 ax1[3].plot(yearday, 0.01 * np.ones(len(yearday)), "k--")
 # ax1[3].set_xticklabels([])
@@ -250,7 +249,7 @@ fig3.tight_layout()
 
 R_mean = np.nanmean(miche)
 
-plt.show()
+# plt.show()
 
 saveFlag = 1
 
@@ -260,5 +259,5 @@ if saveFlag == 1:
     # savedn = os.path.join(figsdn, "wave_stats")
     savedn = os.path.join(figsdn, "wave_stats_basic")
 
-    save_figures(savedn, "wave_stats", fig3)
+    save_figures(savedn, "wave_stats", fig1)
 

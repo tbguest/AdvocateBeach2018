@@ -18,6 +18,8 @@ plt.rcParams.update({"font.size": 14})
 
 # matplotlib.rc("font", **font)
 
+force_y_offset = 0
+
 
 saveFlag = True
 
@@ -154,7 +156,7 @@ for t in tides:
     zall.extend(foo1["z"])
 
     # fig, ax = plt.subplots(1, 1)
-    ax.plot(yround + 18, foo1["z"], "C0-", linewidth=0.75)
+    ax.plot(yround + force_y_offset, foo1["z"], "C0-", linewidth=0.75)
 
 
 yvec0 = np.arange(np.min(yall), np.max(yall), 3)
@@ -162,10 +164,9 @@ zmean = np.zeros((1, len(yvec0)))[0]
 yall = np.array(yall)
 zall = np.array(zall)
 
-yvec = yvec0 + 18
-yall = yall + 18
-yround = yround + 18
-
+yvec = yvec0 + force_y_offset
+yall = yall + force_y_offset
+yround = yround + force_y_offset
 
 for i in range(len(yvec)):
     zmean[i] = np.mean(zall[yall == int(yvec[i])])
@@ -174,25 +175,27 @@ i_zhwl = np.argmin(np.abs(yvec0 - np.mean(hwl)))
 zhwl = zmean[i_zhwl]
 
 # force profile artificially further seaward
-yvec = np.append(yvec, np.array([75, 78, 81, 84]))
-zmean = np.append(zmean, np.array([-4.42, -4.75, -5.08, -5.41]))
+# yvec = np.append(yvec, np.array([75, 78, 81, 84]))
+zmean = np.append(zmean, np.array([-4.42, -4.75, -5.08, -5.41]) - 0.12 * 18)
+yvec = np.append(yvec, np.array([75, 78, 81, 84])) - force_y_offset
+
 
 yHW = np.arange(0, 100, 1)
 yLW = np.arange(78.9, 100, 1)
 ax.plot(yvec, zmean, "k-", linewidth=2)
 # ax.plot(yvec, zhwl * np.ones(len(yvec)), "k--")
 # ax.plot(yvec, zhwl * np.ones(len(yvec)) - meanTideRange, "k--")  # 78.9
-ax.plot(yHW, zhwl * np.ones(len(yHW)), "k--")
-ax.plot(yLW, zhwl * np.ones(len(yLW)) - meanTideRange, "k--")  # 78.9
-ax.text(87, zhwl + 0.2, "MHW")
-ax.text(87, zhwl - meanTideRange + 0.2, "MLW")
-ax.plot(58, -2, "C2.", markersize=12)
-ax.text(59, -1.75, "PT")
+ax.plot(yHW - 18, zhwl * np.ones(len(yHW)), "k--")
+ax.plot(yLW - 18, zhwl * np.ones(len(yLW)) - meanTideRange, "k--")  # 78.9
+ax.text(87 - 18, zhwl + 0.2, "MHW")
+ax.text(87 - 18, zhwl - meanTideRange + 0.2, "MLW")
+ax.plot(58 - 18, -2, "C2.", markersize=12)
+ax.text(59 - 18, -1.75, "PT")
 
 ax.tick_params(axis="y", direction="in")
 ax.tick_params(axis="x", direction="in")
 # ax.set_xlim([np.min(yvec), np.max(yvec)])
-ax.set_xlim([-12, 96])
+ax.set_xlim([-12 - 18, 96 - 18])
 ax.set_ylim([-5.4, 7])
 ax.tick_params(axis="both", direction="in", top=True, right=True)
 
@@ -239,7 +242,8 @@ ax2.set_xlim([np.min(yvec), np.max(yvec)])
 ax2.tick_params(axis="both", direction="in", top=True, right=True)
 
 # for inset
-ax2.set_xlim([-27.5 + 18, -5 + 18])
+# ax2.set_xlim([-27.5 + force_y_offset, -5 + force_y_offset])
+ax2.set_xlim([-27.5 + force_y_offset, -5])
 ax2.set_ylim([-0.25, 0.25])
 
 plt.xticks(fontsize=14)
@@ -251,7 +255,7 @@ fig2.tight_layout()
 
 plt.show()
 
-savedn = "/home/tristan/Documents/manuscripts/msd-swash/review/jmse-manuscript-2021/figures/revised"
+savedn = "/home/tristan/Documents/manuscripts/guest-hay-jmse-2022/src/figures/revised"
 if saveFlag:
     save_figures(savedn, "mean_profile", fig)
     save_figures(savedn, "mean_profile_inset", fig2)
@@ -461,20 +465,23 @@ for t in tides:
     # ax.plot(y[:, -1], z[:, -1])
     # ax.plot(yz, zz)
     if counter == 0:
-        ax.plot(composite_y + 18, composite_z, "C0", linewidth=1.5)
+        ax.plot(composite_y + force_y_offset, composite_z, "C0", linewidth=1.5)
     else:
-        ax.plot(composite_y + 18, composite_z, "k", linewidth=2)
+        ax.plot(composite_y + force_y_offset, composite_z, "k", linewidth=2)
     if tide == "tide18" or tide == "tide19":
         (h_array,) = ax.plot(
-            loc19.item()["y"] + 18, loc19.item()["z"] + 1.2, "b.", markersize=12
+            loc19.item()["y"] + force_y_offset,
+            loc19.item()["z"] + 1.2,
+            "b.",
+            markersize=12,
         )
-        (h_station,) = ax.plot(y1 + 18, z1, "r.", markersize=12)
-        ax.plot(y2 + 18, z2, "r.", markersize=12)
-        ax.plot(y3 + 18, z3, "r.", markersize=12)
-        ax.plot(y4 + 18, z4, "r.", markersize=12)
+        (h_station,) = ax.plot(y1 + force_y_offset, z1, "r.", markersize=12)
+        ax.plot(y2 + force_y_offset, z2, "r.", markersize=12)
+        ax.plot(y3 + force_y_offset, z3, "r.", markersize=12)
+        ax.plot(y4 + force_y_offset, z4, "r.", markersize=12)
     elif tide == "tide26" or tide == "tide27":
         h_array = ax.plot(
-            loc27.item()["y"] + 18,
+            loc27.item()["y"] + force_y_offset,
             loc27.item()["z"] + [0.4, 0.4, 0, 0] + 1.2,
             "b.",
             markersize=12,
@@ -487,24 +494,24 @@ for t in tides:
 if tide == "tide18" or tide == "tide19":
     i_zhwl = np.argmin(np.abs(composite_y - -15))
 elif tide == "tide26" or tide == "tide27":
-    i_zhwl = np.argmin(np.abs(composite_y - -18))
+    i_zhwl = np.argmin(np.abs(composite_y - -force_y_offset))
 zhwl = zmean[i_zhwl]
 
 # ax.grid()
 if tide == "tide18" or tide == "tide19":
-    jnky = np.arange(6.8, composite_y[-1] + 18, 0.1)
-    # ax.plot(composite_y + 18, zhwl * np.ones(len(composite_y)), "k--")
+    jnky = np.arange(6.8, composite_y[-1] + force_y_offset, 0.1)
+    # ax.plot(composite_y + force_y_offset, zhwl * np.ones(len(composite_y)), "k--")
     ax.plot(jnky, zhwl * np.ones(len(jnky)), "k--")
     ax.text(16, zhwl + 0.2, "HW")
 elif tide == "tide26" or tide == "tide27":
-    jnky = np.arange(3.6, composite_y[-1] + 18, 0.1)
-    # ax.plot(composite_y + 18, zhwl * np.ones(len(composite_y)) - 0.3, "k--")
+    jnky = np.arange(3.6, composite_y[-1] + force_y_offset, 0.1)
+    # ax.plot(composite_y + force_y_offset, zhwl * np.ones(len(composite_y)) - 0.3, "k--")
     ax.plot(jnky, zhwl * np.ones(len(jnky)) - 0.3, "k--")
     ax.text(16, zhwl + 0.2 - 0.3, "HW")
-# ax.text(0 + 18, zhwl + 0.05, "HW")
+# ax.text(0 + force_y_offset, zhwl + 0.05, "HW")
 ax.set_ylabel("elevation [m]")
 # ax.set_xlabel("cross-shore coordinate [m]")
-# ax.set_xlim([np.min(composite_y) + 5 + 18, 3 + 18])
+# ax.set_xlim([np.min(composite_y) + 5 + force_y_offset, 3 + force_y_offset])
 # ax.set_xlim([-6, 16])
 ax.set_xlim([-1.5, 17.5])
 ax.set_ylim([1.95, 6.75])
@@ -524,7 +531,6 @@ elif tide == "tide26" or tide == "tide27":
 fig.tight_layout()
 plt.show()
 
-savedn = "/home/tristan/Documents/manuscripts/msd-swash/review/jmse-manuscript-2021/figures/revised"
+savedn = "/home/tristan/Documents/manuscripts/guest-hay-jmse-2022/src/figures/revised"
 if saveFlag:
     save_figures(savedn, f"{tide}_profile_nolegend", fig)
-

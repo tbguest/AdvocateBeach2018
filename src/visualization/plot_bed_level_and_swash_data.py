@@ -149,10 +149,10 @@ def save_figures(dn, fn, fig):
     # if not os.path.exists(dn3):
     #     os.makedirs(dn3)
 
-    fig.savefig(os.path.join(dn, fn + ".png"), dpi=1000, transparent=True)
-    fig.savefig(os.path.join(dn, fn + ".pdf"), dpi=None, transparent=True)
-    fig.savefig(os.path.join(dn, fn + ".eps"), dpi=None, transparent=True)
-    fig.savefig(os.path.join(dn, fn + ".jpg"), dpi=1000, transparent=True)
+    fig.savefig(os.path.join(dn, fn + ".png"), dpi=1000, transparent=False)
+    fig.savefig(os.path.join(dn, fn + ".pdf"), dpi=None, transparent=False)
+    fig.savefig(os.path.join(dn, fn + ".eps"), dpi=None, transparent=False)
+    fig.savefig(os.path.join(dn, fn + ".jpg"), dpi=1000, transparent=False)
 
 
 def utime2yearday(unixtime):

@@ -77,10 +77,10 @@ def save_figures(dn, fn, fig):
             if exc.errno != errno.EEXIST:
                 raise
 
-    fig.savefig(os.path.join(dn, fn + ".png"), dpi=1000, transparent=True)
-    fig.savefig(os.path.join(dn, fn + ".pdf"), dpi=None, transparent=True)
-    fig.savefig(os.path.join(dn, fn + ".eps"), dpi=None, transparent=True)
-    fig.savefig(os.path.join(dn, fn + ".jpg"), dpi=1000, transparent=True)
+    fig.savefig(os.path.join(dn, fn + ".png"), dpi=1000, transparent=False)
+    fig.savefig(os.path.join(dn, fn + ".pdf"), dpi=None, transparent=False)
+    fig.savefig(os.path.join(dn, fn + ".eps"), dpi=None, transparent=False)
+    fig.savefig(os.path.join(dn, fn + ".jpg"), dpi=1000, transparent=False)
 
 
 def find_fit_values(ys_orig, xs_orig, ys_line, xs_line):
@@ -173,7 +173,7 @@ def lin_fit_slope(z_line):
 
 
 def main():
-    saveFlag = 0
+    saveFlag = 1
     saveCorr = 0
 
     # for portability
@@ -181,9 +181,10 @@ def main():
     homechar = os.path.expanduser("~")  # linux
     drivechar = "/media/tristan2/Advocate2018_backup2"
 
-    figsdn = os.path.join(
-        homechar, "Projects", "AdvocateBeach2018", "reports", "figures"
-    )
+    # figsdn = os.path.join(
+    #     homechar, "Projects", "AdvocateBeach2018", "reports", "figures"
+    # )
+    figsdn = "/home/tristan/Documents/manuscripts/guest-hay-jmse-2022/src/figures/revised/profiledata"
 
     grid_spec = "cross_shore"
     # grid_spec = "longshore2"
@@ -1178,7 +1179,8 @@ def main():
     if saveFlag == 1:
 
         # savedn = os.path.join(figsdn,'beach_profile',grid_spec)
-        savedn = os.path.join(figsdn, "beach_profile", "reprocessed_x08", grid_spec)
+        # savedn = os.path.join(figsdn, "beach_profile", "reprocessed_x08", grid_spec)
+        savedn = os.path.join(figsdn, "beach_profile", grid_spec)
 
         save_figures(savedn, "surfaceplots_dz_grainsize", fig)
 
